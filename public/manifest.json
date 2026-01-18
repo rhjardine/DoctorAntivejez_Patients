@@ -1,0 +1,23 @@
+
+{
+  "short_name": "Rejuvenate",
+  "name": "Rejuvenate - Medicina Antivejez",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3063/3063822.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3063/3063822.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#F0F4F8",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#23BCEF",
+  "description": "Aplicación integral de medicina antienvejecimiento y longevidad."
+}
