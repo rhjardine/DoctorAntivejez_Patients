@@ -16,6 +16,10 @@ const LoginPage: React.FC = () => {
 
         setError(null);
 
+        // Clear any old session data before attempting new login
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('rejuvenate_session_v1');
+
         try {
             await login(documentId, password);
             navigate('/');

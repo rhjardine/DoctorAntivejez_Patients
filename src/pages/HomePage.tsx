@@ -31,10 +31,12 @@ const HomePage: React.FC = () => {
     const [completedCount, setCompletedCount] = useState(0);
     const [totalCount, setTotalCount] = useState(0);
     const [adherence, setAdherence] = useState(0);
+    const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
 
     useEffect(() => {
         const loadMetrics = async () => {
-            if (session) {
+            if (session && !isLoadingMetrics) {
+                setIsLoadingMetrics(true);
                 try {
                     const profile = await ProtocolService.getMyProfile();
                     if (profile) {
@@ -51,11 +53,13 @@ const HomePage: React.FC = () => {
                     setAdherence(total > 0 ? Math.round((completed / total) * 100) : 0);
                 } catch (e) {
                     console.error(e);
+                } finally {
+                    setIsLoadingMetrics(false);
                 }
             }
         };
         loadMetrics();
-    }, [session]);
+    }, [session?.token]);
 
     const getIcon = (category: keyof typeof userPreferences.icons) => {
         const iconId = userPreferences.icons[category];
