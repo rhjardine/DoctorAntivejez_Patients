@@ -16,9 +16,8 @@ const LoginPage: React.FC = () => {
 
         setError(null);
 
-        // Clear any old session data before attempting new login
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('rejuvenate_session_v1');
+        // Full localStorage clear to avoid any session conflicts
+        localStorage.clear();
 
         try {
             await login(documentId, password);

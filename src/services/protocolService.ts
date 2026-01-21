@@ -37,13 +37,6 @@ export const ProtocolService = {
         });
         return items;
       }
-
-      // Fallback to legacy endpoint if no profile guide found
-      const response = await apiClient.get(`/patients/${patientId}/guide`);
-      const data: PatientGuideResponse = response.data;
-      if (data?.items) {
-        return data.items;
-      }
       return [];
     } catch (error) {
       console.error("Error fetching protocol:", error);

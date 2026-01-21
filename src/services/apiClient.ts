@@ -20,8 +20,11 @@ apiClient.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             localStorage.removeItem('auth_token');
-            // Redirección limpia - Usando window.location para forzar recarga y limpieza de estado
-            window.location.href = '/login';
+            localStorage.removeItem('rejuvenate_session_v1');
+            // Solo redirigir si no estamos ya en login para evitar loops
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }
