@@ -1,23 +1,24 @@
-
 {
-  "short_name": "Rejuvenate",
-  "name": "Rejuvenate - Medicina Antivejez",
+  "short_name": "Dr. Antivejez",
+  "name": "Doctor Antivejez - Medicina Personalizada",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3063/3063822.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3063/3063822.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "/",
-  "background_color": "#F0F4F8",
+  "background_color": "#F8FAFC",
   "display": "standalone",
   "scope": "/",
-  "theme_color": "#23BCEF",
-  "description": "Aplicación integral de medicina antienvejecimiento y longevidad."
+  "theme_color": "#293b64",
+  "description": "Plataforma médica personalizada de medicina antienvejecimiento y longevidad."
 }

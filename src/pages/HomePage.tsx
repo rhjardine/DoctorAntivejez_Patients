@@ -7,6 +7,7 @@ import {
 import { COLORS, MainTab } from '../types';
 import { useUIStore } from '../store/useUIStore';
 import { useAuthStore } from '../store/useAuthStore';
+import { useProfileStore } from '../store/useProfileStore';
 import { ProtocolService } from '../services/protocolService';
 import CircularProgress from '../components/CircularProgress';
 import BiologicalAgeGauge from '../components/BiologicalAgeGauge';
@@ -25,6 +26,7 @@ const HomePage: React.FC = () => {
     const navigate = useNavigate();
     const { currentMainTab, userPreferences, toggleClinicalInfo } = useUIStore();
     const { session } = useAuthStore();
+    const { profileData, setProfileData, isCacheValid } = useProfileStore();
 
     const [biophysicalAge, setBiophysicalAge] = useState<number>(65);
     const [chronologicalAge, setChronologicalAge] = useState<number>(58);
@@ -35,29 +37,54 @@ const HomePage: React.FC = () => {
 
     useEffect(() => {
         const loadMetrics = async () => {
-            if (session && !isLoadingMetrics) {
-                setIsLoadingMetrics(true);
-                try {
-                    const profile = await ProtocolService.getMyProfile();
-                    if (profile) {
-                        // Ensure we have valid numbers, fallback to defaults if null
-                        setBiophysicalAge(profile.biologicalAge ?? 65);
-                        setChronologicalAge(profile.chronologicalAge ?? 58);
-                    }
+            if (!session) return;
 
-                    const items = await ProtocolService.fetchActiveProtocol(session.id);
-                    const completed = items.filter(i => i.status === 'completed').length;
-                    const total = items.length;
-                    setCompletedCount(completed);
-                    setTotalCount(total);
-                    setAdherence(total > 0 ? Math.round((completed / total) * 100) : 0);
-                } catch (e) {
-                    console.error(e);
-                } finally {
-                    setIsLoadingMetrics(false);
+            // Check if we have valid cached data
+            if (profileData && isCacheValid()) {
+                console.log('✅ Using cached profile data (< 5 min old)');
+                setBiophysicalAge(profileData.biologicalAge ?? 65);
+                setChronologicalAge(profileData.chronologicalAge ?? 58);
+
+                // Still need to fetch protocol items for adherence
+                const items = await ProtocolService.fetchActiveProtocol(session.id);
+                const completed = items.filter(i => i.status === 'completed').length;
+                const total = items.length;
+                setCompletedCount(completed);
+                setTotalCount(total);
+                setAdherence(total > 0 ? Math.round((completed / total) * 100) : 0);
+                return;
+            }
+
+            // Cache is invalid or missing - fetch fresh data
+            if (isLoadingMetrics) return;
+
+            setIsLoadingMetrics(true);
+            console.log('🌐 Fetching fresh profile data from API');
+
+            try {
+                const profile = await ProtocolService.getMyProfile();
+                if (profile) {
+                    // Cache the profile data
+                    setProfileData(profile);
+
+                    // Update UI
+                    setBiophysicalAge(profile.biologicalAge ?? 65);
+                    setChronologicalAge(profile.chronologicalAge ?? 58);
                 }
+
+                const items = await ProtocolService.fetchActiveProtocol(session.id);
+                const completed = items.filter(i => i.status === 'completed').length;
+                const total = items.length;
+                setCompletedCount(completed);
+                setTotalCount(total);
+                setAdherence(total > 0 ? Math.round((completed / total) * 100) : 0);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setIsLoadingMetrics(false);
             }
         };
+
         loadMetrics();
     }, [session?.token]);
 
