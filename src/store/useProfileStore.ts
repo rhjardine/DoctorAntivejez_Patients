@@ -15,6 +15,7 @@ interface ProfileState {
     setProfileData: (data: ProfileData) => void;
     clearProfileData: () => void;
     isCacheValid: () => boolean;
+    forceRefresh: () => void;
 }
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -36,5 +37,9 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         if (!profileData) return false;
         const age = Date.now() - profileData.fetchedAt;
         return age < CACHE_DURATION;
+    },
+
+    forceRefresh: () => {
+        set({ profileData: null }); // Clear cache to force new fetch
     },
 }));

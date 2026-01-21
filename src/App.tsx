@@ -2,11 +2,12 @@ import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   Shield, Trophy, RefreshCw, Menu, ChevronLeft, LayoutDashboard,
-  Store, LogOut, Dna
+  Store, LogOut, Dna, WifiOff
 } from 'lucide-react';
 import { MainTab } from './types';
 import { useAuthStore } from './store/useAuthStore';
 import { useUIStore } from './store/useUIStore';
+import { useProfileStore } from './store/useProfileStore';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -53,10 +54,27 @@ const App: React.FC = () => {
     isPrivacyConsentOpen, togglePrivacyConsent,
     currentMainTab, setMainTab
   } = useUIStore();
+  const { forceRefresh, profileData } = useProfileStore();
+  const [isOnline, setIsOnline] = React.useState(navigator.onLine);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
 
   // Initialize session check
   useEffect(() => {
     checkSession();
+  }, []);
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   // Mock reminders hook usage - ideally this should be in a context or global listener
@@ -72,6 +90,13 @@ const App: React.FC = () => {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    forceRefresh(); // Clear cache
+    setTimeout(() => setIsRefreshing(false), 1000); // Visual feedback
+    window.location.reload(); // Force full refresh
   };
 
   return (
@@ -101,7 +126,17 @@ const App: React.FC = () => {
                 <h1 className="text-sm font-black text-primary tracking-tighter uppercase leading-none">Antivejez</h1>
               </div>
             </div>
-            <button onClick={handleLogout} className="p-1 text-white/20 hover:text-white transition-colors"><LogOut size={20} /></button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleRefresh}
+                className={`p-1 text-white/70 hover:text-white transition-all ${isRefreshing ? 'animate-spin' : ''
+                  }`}
+                disabled={isRefreshing}
+              >
+                <RefreshCw size={18} />
+              </button>
+              <button onClick={handleLogout} className="p-1 text-white/20 hover:text-white transition-colors"><LogOut size={20} /></button>
+            </div>
           </div>
 
           {isHome && (
@@ -147,6 +182,17 @@ const App: React.FC = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+
+      {showHeaderFooter && !isOnline && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
+          <div className="bg-amber-500/90 backdrop-blur-sm text-white px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg border border-amber-400/50 animate-in fade-in slide-in-from-bottom-4">
+            <WifiOff size={14} />
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              Modo Offline - Datos de {profileData?.fetchedAt ? new Date(profileData.fetchedAt).toLocaleDateString() : 'hoy'}
+            </span>
+          </div>
+        </div>
+      )}
 
       {showHeaderFooter && (
         <footer className="fixed bottom-0 left-0 right-0 z-40 bg-darkBlue border-t border-white/5 pb-safe-bottom shrink-0">

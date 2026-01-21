@@ -2,9 +2,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { COLORS, ChatMessage } from '../types';
 import { Send, Bot, User, Sparkles } from 'lucide-react';
-import { sendMessageToVCoach } from '../services/geminiService';
+import { sendMessageToVCoach, startChatSession } from '../services/geminiService';
+import { useAuthStore } from '../store/useAuthStore';
+import { useProfileStore } from '../store/useProfileStore';
 
 const VCoachChat: React.FC = () => {
+  const { session } = useAuthStore();
+  const { profileData } = useProfileStore();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -40,18 +44,28 @@ const VCoachChat: React.FC = () => {
     setIsLoading(true);
 
     try {
+      if (messages.length === 1) { // First message or session start
+        const context = {
+          name: session?.name,
+          chronologicalAge: profileData?.chronologicalAge || 0,
+          biologicalAge: profileData?.biologicalAge || 0,
+          bloodType: profileData?.bloodType || ''
+        };
+        await startChatSession(context);
+      }
+
       const responseText = await sendMessageToVCoach(userMessage.text);
-      
+
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'model',
         text: responseText,
         timestamp: new Date().toISOString()
       };
-      
+
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
-       console.error("Chat error", error);
+      console.error("Chat error", error);
     } finally {
       setIsLoading(false);
     }
@@ -74,40 +88,39 @@ const VCoachChat: React.FC = () => {
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
           >
             <div
-              className={`max-w-[85%] p-4 rounded-3xl shadow-sm flex gap-3 ${
-                msg.role === 'user'
+              className={`max-w-[85%] p-4 rounded-3xl shadow-sm flex gap-3 ${msg.role === 'user'
                   ? 'bg-primary text-white rounded-tr-none'
                   : 'bg-white text-textDark rounded-tl-none border border-gray-100'
-              }`}
+                }`}
             >
-               {msg.role === 'model' && (
-                   <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100">
-                       <Bot size={18} className="text-primary" />
-                   </div>
-               )}
-               <div className="flex flex-col">
-                   <p className="text-sm font-medium leading-relaxed">{msg.text}</p>
-                   <span className={`text-[9px] mt-1 font-bold uppercase tracking-widest ${msg.role === 'user' ? 'text-white/60' : 'text-gray-400'}`}>
-                       {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                   </span>
-               </div>
-               {msg.role === 'user' && (
-                   <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-                       <User size={18} color="white" />
-                   </div>
-               )}
+              {msg.role === 'model' && (
+                <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100">
+                  <Bot size={18} className="text-primary" />
+                </div>
+              )}
+              <div className="flex flex-col">
+                <p className="text-sm font-medium leading-relaxed">{msg.text}</p>
+                <span className={`text-[9px] mt-1 font-bold uppercase tracking-widest ${msg.role === 'user' ? 'text-white/60' : 'text-gray-400'}`}>
+                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+              {msg.role === 'user' && (
+                <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                  <User size={18} color="white" />
+                </div>
+              )}
             </div>
           </div>
         ))}
         {isLoading && (
           <div className="flex justify-start animate-pulse">
-             <div className="bg-white p-4 rounded-3xl rounded-tl-none shadow-sm border border-gray-100">
-                <div className="flex space-x-2">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-75"></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-150"></div>
-                </div>
-             </div>
+            <div className="bg-white p-4 rounded-3xl rounded-tl-none shadow-sm border border-gray-100">
+              <div className="flex space-x-2">
+                <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-75"></div>
+                <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-150"></div>
+              </div>
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -131,9 +144,8 @@ const VCoachChat: React.FC = () => {
           <button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className={`p-3 rounded-full transition-all ${
-              input.trim() ? 'bg-primary text-white shadow-lg scale-105' : 'bg-gray-200 text-gray-400'
-            }`}
+            className={`p-3 rounded-full transition-all ${input.trim() ? 'bg-primary text-white shadow-lg scale-105' : 'bg-gray-200 text-gray-400'
+              }`}
           >
             <Send size={18} strokeWidth={2.5} />
           </button>

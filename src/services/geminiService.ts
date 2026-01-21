@@ -1,20 +1,47 @@
 
 import { GoogleGenAI, Chat } from "@google/genai";
 
-const SYSTEM_INSTRUCTION = `
-Eres VCoach, asistente médico de Rejuvenate. 
+interface PatientContext {
+  name?: string;
+  chronologicalAge?: number;
+  biologicalAge?: number;
+  bloodType?: string;
+}
+
+const buildSystemInstruction = (context?: PatientContext): string => {
+  if (!context) {
+    return `Eres VCoach, asistente médico de Rejuvenate. 
 Ayudas a pacientes a reducir su edad biológica mediante las 5A Claves y Terapias 4R.
-Responde de forma concisa y profesional en español.
-`;
+Responde de forma concisa y profesional en español.`;
+  }
+
+  const { name, chronologicalAge, biologicalAge, bloodType } = context;
+  const ageDiff = chronologicalAge && biologicalAge ? chronologicalAge - biologicalAge : null;
+  const vitalityMessage = ageDiff && ageDiff > 0
+    ? `(+${ageDiff} años de vitalidad)`
+    : ageDiff && ageDiff < 0
+      ? `(necesita ${Math.abs(ageDiff)} años de rejuvenecimiento)`
+      : '';
+
+  return `Eres VCoach, asistente médico personalizado de ${name || 'este paciente'}.
+${name} tiene ${chronologicalAge || '?'} años cronológicos y una edad biológica de ${biologicalAge || '?'} ${vitalityMessage}.
+${bloodType ? `Su grupo sanguíneo es ${bloodType}.` : ''}
+
+Tu misión es guiar a ${name || 'tu paciente'} hacia la reducción de su edad biológica mediante:
+- Las 5A Claves: Alimentación, Actividad, Actitud, Ambiente, Anti-envejecimiento
+- Las Terapias 4R: Remoción, Restauración, Regeneración, Revitalización
+
+Responde de forma concisa, profesional y personalizada en español.`;
+};
 
 let chatSession: Chat | null = null;
 
-export const startChatSession = async (): Promise<Chat> => {
+export const startChatSession = async (patientContext?: PatientContext): Promise<Chat> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   chatSession = ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {
-      systemInstruction: SYSTEM_INSTRUCTION,
+      systemInstruction: buildSystemInstruction(patientContext),
       temperature: 0.7,
     },
   });
