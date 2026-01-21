@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* Identidad Corporativa Doctor Antivejez */
+        --primary-cyan: #23bcef;
+        --dark-navy: #293b64;
+        --background: #F8FAFC;
+
+        /* Soporte para Mobile PWA Safe Areas */
+        --sat: env(safe-area-inset-top);
+        --sar: env(safe-area-inset-right);
+        --sab: env(safe-area-inset-bottom);
+        --sal: env(safe-area-inset-left);
+    }
+
+    html {
+        -webkit-tap-highlight-color: transparent;
+        scroll-behavior: smooth;
+        /* Evita el rebote elástico molesto en iOS */
+        overflow: hidden;
+        height: 100%;
+    }
+
+    body {
+        @apply bg-[#F8FAFC] text-slate-900 antialiased;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        /* Previene scroll no deseado en el body */
+    }
+
+    #root {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+@layer components {
+
+    /* Clases de utilidad para el App.tsx */
+    .pt-safe-top {
+        padding-top: max(1rem, var(--sat));
+    }
+
+    .pb-safe-bottom {
+        padding-bottom: max(1rem, var(--sab));
+    }
+
+    .bg-darkBlue {
+        background-color: var(--dark-navy);
+    }
+
+    .bg-primary {
+        background-color: var(--primary-cyan);
+    }
+
+    .text-primary {
+        color: var(--primary-cyan);
+    }
+
+    /* Ocultar scrollbars sin perder funcionalidad */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+
+/* Animaciones de transición de página médicas */
+.page-transition {
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

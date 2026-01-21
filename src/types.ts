@@ -28,23 +28,23 @@ export enum MainTab {
   CHALLENGE = 'Reto Antivejez'
 }
 
-export type DetailView = 
-  | 'NUTRITION' 
-  | 'ATTITUDE' 
-  | 'ACTIVITY' 
-  | 'ENVIRONMENT' 
-  | 'REST' 
-  | 'ABOUT' 
+export type DetailView =
+  | 'NUTRITION'
+  | 'ATTITUDE'
+  | 'ACTIVITY'
+  | 'ENVIRONMENT'
+  | 'REST'
+  | 'ABOUT'
   | 'TEAM'
   | 'USAGE_GUIDE'
-  | 'PATIENT_GUIDE' 
-  | 'BIOMETRICS' 
+  | 'PATIENT_GUIDE'
+  | 'BIOMETRICS'
   | 'CONSULTATION_HISTORY'
   | 'BIO_PASE'
   | 'SETTINGS'
   | null;
 
-export type ProtocolCategory = 
+export type ProtocolCategory =
   | 'REMOVAL_PHASE'
   | 'REVITALIZATION_PHASE'
   | 'PRIMARY_NUTRACEUTICALS'
@@ -55,7 +55,8 @@ export type ProtocolCategory =
   | 'NATURAL_FORMULAS'
   | 'ANTI_AGING_SERUMS'
   | 'ANTI_AGING_THERAPIES'
-  | 'THERAPY_CONTROL';
+  | 'THERAPY_CONTROL'
+  | string;
 
 export type TimeSlot = 'MORNING' | 'AFTERNOON' | 'EVENING' | 'ANYTIME';
 
@@ -91,13 +92,13 @@ export interface NutrigenomicFood {
   name: string;
   category: string;
   mealTypes: MealType[];
-  isClinicalPriority?: boolean; 
+  isClinicalPriority?: boolean;
   notes?: string;
 }
 
 export interface NutrigenomicPlan {
   bloodType: BloodType;
-  dietTypes: DietType[]; 
+  dietTypes: DietType[];
   forbidden: string[];
   foods: NutrigenomicFood[];
   updatedAt: string;
@@ -154,7 +155,7 @@ export interface ConsultationRecord {
   date: string;
   doctorName: string;
   doctorNotes: string;
-  adherenceRate: number; 
+  adherenceRate: number;
   biologicalAgeAtTime: number;
   chronologicalAgeAtTime: number;
   treatmentSnapshot: PatientProtocol[];

@@ -12,12 +12,12 @@ const ClinicalInfoModal: React.FC<ClinicalInfoModalProps> = ({ isOpen, onClose }
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
-      <div 
-        className="absolute inset-0 bg-darkBlue/60 backdrop-blur-sm" 
+      <div
+        className="absolute inset-0 bg-darkBlue/60 backdrop-blur-sm"
         onClick={onClose}
       />
       <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl relative animate-in zoom-in-95 duration-300 border border-white/20">
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-6 right-6 p-2 bg-gray-100 dark:bg-slate-700 rounded-full text-gray-400 hover:text-darkBlue transition-colors"
         >
@@ -28,14 +28,14 @@ const ClinicalInfoModal: React.FC<ClinicalInfoModalProps> = ({ isOpen, onClose }
           <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6">
             <ShieldCheck size={32} strokeWidth={2.5} />
           </div>
-          
+
           <h3 className="text-xl font-black text-darkBlue dark:text-white uppercase tracking-tighter mb-4">
             Rigor Clínico
           </h3>
-          
+
           <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border border-gray-100 dark:border-slate-700">
             <p className="text-sm font-bold text-textMedium dark:text-slate-300 leading-relaxed italic">
-              "Basado en algoritmos de biomarcadores validados y protocolos de medicina antienvejecimiento."
+              "Tu Edad Biológica es calculada en base a biomarcadores de Biofísica y Bioquímica validados por Doctor Antivejez."
             </p>
           </div>
 
