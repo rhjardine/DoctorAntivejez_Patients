@@ -47,7 +47,7 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/doctor-antivejez-web\.onrender\.com\/api\//,
+              urlPattern: /^https:\/\/doctor-antivejez-web\.onrender\.com\/(mobile-auth-v1|mobile-profile-v1)/,
               handler: 'NetworkFirst',
               options: {
                 cacheName: 'api-cache',

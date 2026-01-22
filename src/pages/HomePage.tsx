@@ -37,7 +37,7 @@ const HomePage: React.FC = () => {
 
     useEffect(() => {
         const loadMetrics = async () => {
-            if (!session) return;
+            if (!session || isLoadingMetrics) return;
 
             // Check if we have valid cached data
             if (profileData && isCacheValid()) {
@@ -54,9 +54,6 @@ const HomePage: React.FC = () => {
                 setAdherence(total > 0 ? Math.round((completed / total) * 100) : 0);
                 return;
             }
-
-            // Cache is invalid or missing - fetch fresh data
-            if (isLoadingMetrics) return;
 
             setIsLoadingMetrics(true);
             console.log('🌐 Fetching fresh profile data from API');

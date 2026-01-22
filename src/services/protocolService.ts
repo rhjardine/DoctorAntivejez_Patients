@@ -102,7 +102,7 @@ export const ProtocolService = {
   },
   getMyProfile: async (): Promise<any> => {
     try {
-      const response = await apiClient.get('/mobile-profile');
+      const response = await apiClient.get('/mobile-profile-v1');
       return response.data;
     } catch (error) {
       console.error("Error fetching profile:", error);
