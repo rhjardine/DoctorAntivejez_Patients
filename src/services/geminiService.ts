@@ -1,5 +1,7 @@
 
 import { GoogleGenAI, Chat } from "@google/genai";
+import { useProfileStore } from "../store/useProfileStore";
+import { authService } from "./authService";
 
 interface PatientContext {
   name?: string;
@@ -8,30 +10,17 @@ interface PatientContext {
   bloodType?: string;
 }
 
-const buildSystemInstruction = (context?: PatientContext): string => {
-  if (!context) {
-    return `Eres VCoach, asistente médico de Rejuvenate. 
-Ayudas a pacientes a reducir su edad biológica mediante las 5A Claves y Terapias 4R.
-Responde de forma concisa y profesional en español.`;
-  }
+// Get data from store if not provided in context
+const profile = useProfileStore.getState().profileData;
 
-  const { name, chronologicalAge, biologicalAge, bloodType } = context;
-  const ageDiff = chronologicalAge && biologicalAge ? chronologicalAge - biologicalAge : null;
-  const vitalityMessage = ageDiff && ageDiff > 0
-    ? `(+${ageDiff} años de vitalidad)`
-    : ageDiff && ageDiff < 0
-      ? `(necesita ${Math.abs(ageDiff)} años de rejuvenecimiento)`
-      : '';
+const name = context?.name || (authService.getCurrentUser()?.email?.split('@')[0] || 'Paciente');
+const chromeAge = context?.chronologicalAge || profile?.chronologicalAge || 58;
+const bioAge = context?.biologicalAge || profile?.biologicalAge || 65;
+const bType = context?.bloodType || profile?.bloodType || 'O';
 
-  return `Eres VCoach, asistente médico personalizado de ${name || 'este paciente'}.
-${name} tiene ${chronologicalAge || '?'} años cronológicos y una edad biológica de ${biologicalAge || '?'} ${vitalityMessage}.
-${bloodType ? `Su grupo sanguíneo es ${bloodType}.` : ''}
+const gap = chromeAge - bioAge;
 
-Tu misión es guiar a ${name || 'tu paciente'} hacia la reducción de su edad biológica mediante:
-- Las 5A Claves: Alimentación, Actividad, Actitud, Ambiente, Anti-envejecimiento
-- Las Terapias 4R: Remoción, Restauración, Regeneración, Revitalización
-
-Responde de forma concisa, profesional y personalizada en español.`;
+return `Eres el VCoach de Doctor Antivejez. Estás hablando con ${name}. Su edad cronológica es ${chromeAge}, su edad biológica es ${bioAge}, lo que le da un bono de vitalidad de ${gap} años. Su grupo sanguíneo es ${bType}. Usa esta información para dar consejos nutricionales y de actividad física ultra-personalizados.`;
 };
 
 let chatSession: Chat | null = null;
