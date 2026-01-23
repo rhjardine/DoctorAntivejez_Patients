@@ -47,6 +47,10 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
           runtimeCaching: [
             {
+              urlPattern: ({ url }) => url.pathname.includes('mobile-profile-v1'),
+              handler: 'NetworkOnly', // NO usar cache para el perfil clínico por ahora
+            },
+            {
               urlPattern: /^https:\/\/doctor-antivejez-web\.onrender\.com\/(mobile-auth-v1|mobile-profile-v1)/,
               handler: 'NetworkFirst',
               options: {

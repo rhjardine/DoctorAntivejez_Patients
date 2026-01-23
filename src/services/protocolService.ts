@@ -104,7 +104,7 @@ export const ProtocolService = {
     try {
       // Usamos la URL completa para evitar que apiClient agregue /api al path
       // Esto es necesario porque la ruta está en la raíz (flat route)
-      const response = await apiClient.get('https://doctor-antivejez-web.onrender.com/api/mobile-profile-v1');
+      const response = await apiClient.get('https://doctor-antivejez-web.onrender.com/mobile-profile-v1');
       return response.data;
     } catch (error) {
       console.error("Error fetching profile:", error);

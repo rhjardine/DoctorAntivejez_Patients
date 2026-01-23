@@ -36,8 +36,9 @@ const HomePage: React.FC = () => {
     const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
 
     useEffect(() => {
+        if (isLoadingMetrics || profileData) return;
         const loadMetrics = async () => {
-            if (!session || isLoadingMetrics) return;
+            if (!session || isLoadingMetrics || profileData) return;
 
             // Check if we have valid cached data
             if (profileData && isCacheValid()) {
