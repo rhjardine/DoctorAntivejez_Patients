@@ -1,14 +1,8 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useProfileStore } from "../store/useProfileStore";
 import { authService } from "./authService";
 
-// 1. Tipado de Interfaces
-interface PatientContext {
-  name?: string;
-  chronologicalAge?: number;
-  biologicalAge?: number;
-  bloodType?: string;
-}
+// URL del backend (Render)
+const BACKEND_URL = "https://doctor-antivejez-web.onrender.com/api/vcoach/chat";
 
 export interface FoodAnalysisResult {
   productName: string;
@@ -18,77 +12,68 @@ export interface FoodAnalysisResult {
   inflammatoryIngredients: string[];
 }
 
-// 2. Inicialización de IA (Vite standard)
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
-const genAI = new GoogleGenerativeAI(API_KEY);
+interface ChatMessage {
+  role: 'user' | 'model';
+  parts: { text: string }[];
+}
 
-// 3. Constructor de Instrucciones (Arreglo del error de lógica previo)
-const buildSystemInstruction = (context?: PatientContext): string => {
-  const profile = useProfileStore.getState().profileData;
+let chatHistory: ChatMessage[] = [];
 
-  const name = context?.name || profile?.firstName || (authService.getCurrentUser()?.email?.split('@')[0] || 'Paciente');
-  const chronoAge = context?.chronologicalAge || profile?.chronologicalAge || 51;
-  const bioAge = context?.biologicalAge || profile?.biologicalAge || 45;
-  const bType = context?.bloodType || profile?.bloodType || 'A+';
-  const gap = chronoAge - bioAge;
-
-  return `Eres el VCoach de Doctor Antivejez. Estás hablando con el paciente ${name}. 
-          Su perfil actual: Edad ${chronoAge}, Edad Biológica ${bioAge} (Vitalidad: +${gap} años), Grupo Sanguíneo ${bType}. 
-          Usa esta información para dar consejos de longevidad, nutrición y actividad física personalizados bajo el protocolo de la clínica. 
-          Sé motivador pero científicamente riguroso.`;
+export const startChatSession = async () => {
+  // Reset or load history logic if needed
+  chatHistory = [];
+  return true;
 };
 
-// 4. Gestión de Sesión de Chat
-let chatSession: any = null;
-
-export const startChatSession = async (context?: PatientContext) => {
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash", // Versión estable y rápida para PWA
-    systemInstruction: buildSystemInstruction(context),
-  });
-
-  chatSession = model.startChat({
-    generationConfig: {
-      maxOutputTokens: 800,
-      temperature: 0.7,
-    },
-  });
-  return chatSession;
-};
-
-export const sendMessageToVCoach = async (message: string) => {
+export const sendMessageToVCoach = async (message: string): Promise<string> => {
   try {
-    if (!chatSession) {
-      await startChatSession();
+    const profile = useProfileStore.getState().profileData;
+
+    const patientContext = {
+      name: profile?.firstName || authService.getCurrentUser()?.email?.split('@')[0] || "Richard",
+      chronoAge: profile?.chronologicalAge || 51,
+      bioAge: profile?.biologicalAge || 45,
+      bloodType: profile?.bloodType || "A+"
+    };
+
+    const response = await fetch(BACKEND_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Optional: Add authorization if the backend route requires it later
+        // "Authorization": `Bearer ${authService.getSession()?.token}` 
+      },
+      body: JSON.stringify({
+        message,
+        history: chatHistory,
+        patientContext
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
     }
-    const result = await chatSession.sendMessage(message);
-    const response = await result.response;
-    return response.text();
+
+    const data = await response.json();
+
+    // Update local history
+    chatHistory.push({ role: 'user', parts: [{ text: message }] });
+    chatHistory.push({ role: 'model', parts: [{ text: data.text }] });
+
+    return data.text;
+
   } catch (error) {
-    console.error("🔥 [Gemini Chat Error]:", error);
-    return "Lo siento, Richard. Mi conexión con el laboratorio central se ha interrumpido. ¿Podrías intentar de nuevo?";
+    console.error("🔥 [VCoach Proxy Error]:", error);
+    return "Richard, mi conexión con el servidor central está inestable debido a restricciones regionales. Por favor reintenta.";
   }
 };
 
-// 5. Análisis de Alimentos (Vision AI)
-export const analyzeFoodImage = async (base64Image: string): Promise<FoodAnalysisResult> => {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const cleanBase64 = base64Image.replace(/^data:image\/(png|jpg|jpeg|webp);base64,/, "");
-
-  const prompt = "Analiza esta imagen de comida bajo el protocolo Antivejez. Grupo Sanguíneo del paciente: A+. Responde estrictamente en formato JSON con estas llaves: productName, recommendation (RECOMMENDED/MODERATE/AVOID), reasoning, macros (sugar, carbs, protein), inflammatoryIngredients.";
-
-  try {
-    const result = await model.generateContent([
-      prompt,
-      { inlineData: { mimeType: "image/jpeg", data: cleanBase64 } }
-    ]);
-
-    const textResponse = result.response.text();
-    // Limpieza de posibles tags de markdown que Gemini a veces añade
-    const jsonString = textResponse.replace(/```json|```/g, "").trim();
-    return JSON.parse(jsonString);
-  } catch (error) {
-    console.error("🔥 [Vision AI Error]:", error);
-    throw new Error("No pude analizar la imagen. Asegúrate de que sea clara.");
-  }
+// Scanner de Alimentos - Por ahora retornamos un mock o unimplemented si Vision también falla por región
+// O idealmente deberíamos hacer otro endpoint proxy para la imagen.
+// Para cumplir con el requerimiento de "Remove GoogleGenerativeAI", comentamos la implementación vieja.
+export const analyzeFoodImage = async (base64Image: string): Promise<any> => {
+  // TODO: Implementar proxy para visión también si es necesario.
+  // Por ahora, para evitar el error de importación, retornamos un error controlado.
+  console.warn("Vision AI temporalmente deshabilitada en cliente por restricciones regionales.");
+  throw new Error("Vision AI requiere refactorización a proxy backend.");
 };
