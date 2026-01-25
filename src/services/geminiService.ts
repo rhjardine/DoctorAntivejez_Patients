@@ -1,7 +1,7 @@
 import { useProfileStore } from "../store/useProfileStore";
 import { authService } from "./authService";
 
-// URL del backend (Render)
+// URL del Backend Proxy
 const BACKEND_URL = "https://doctor-antivejez-web.onrender.com/api/vcoach/chat";
 
 export interface FoodAnalysisResult {
@@ -20,10 +20,23 @@ interface ChatMessage {
 let chatHistory: ChatMessage[] = [];
 
 export const startChatSession = async () => {
-  // Reset or load history logic if needed
+  // Se reinicia el historial local al iniciar sesión
   chatHistory = [];
   return true;
 };
+
+// Helper fetch con retry logic
+async function fetchWithRetry(url: string, options: RequestInit, retries = 2, delay = 1000): Promise<Response> {
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response;
+  } catch (error) {
+    if (retries <= 0) throw error;
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return fetchWithRetry(url, options, retries - 1, delay);
+  }
+}
 
 export const sendMessageToVCoach = async (message: string): Promise<string> => {
   try {
@@ -36,12 +49,11 @@ export const sendMessageToVCoach = async (message: string): Promise<string> => {
       bloodType: profile?.bloodType || "A+"
     };
 
-    const response = await fetch(BACKEND_URL, {
+    // Usamos fetch con retry (max 2)
+    const response = await fetchWithRetry(BACKEND_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        // Optional: Add authorization if the backend route requires it later
-        // "Authorization": `Bearer ${authService.getSession()?.token}` 
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         message,
@@ -50,11 +62,11 @@ export const sendMessageToVCoach = async (message: string): Promise<string> => {
       })
     });
 
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.status}`);
-    }
-
     const data = await response.json();
+
+    if (data.error) {
+      throw new Error(data.error);
+    }
 
     // Update local history
     chatHistory.push({ role: 'user', parts: [{ text: message }] });
@@ -63,17 +75,14 @@ export const sendMessageToVCoach = async (message: string): Promise<string> => {
     return data.text;
 
   } catch (error) {
-    console.error("🔥 [VCoach Proxy Error]:", error);
-    return "Richard, mi conexión con el servidor central está inestable debido a restricciones regionales. Por favor reintenta.";
+    console.error("🔥 [VCoach Service Error]:", error);
+    return "Lo siento Richard, la conexión es inestable en este momento. Intenta de nuevo en unos segundos.";
   }
 };
 
-// Scanner de Alimentos - Por ahora retornamos un mock o unimplemented si Vision también falla por región
-// O idealmente deberíamos hacer otro endpoint proxy para la imagen.
-// Para cumplir con el requerimiento de "Remove GoogleGenerativeAI", comentamos la implementación vieja.
+// Vision AI: Placeholder o Proxy futuro
 export const analyzeFoodImage = async (base64Image: string): Promise<any> => {
-  // TODO: Implementar proxy para visión también si es necesario.
-  // Por ahora, para evitar el error de importación, retornamos un error controlado.
-  console.warn("Vision AI temporalmente deshabilitada en cliente por restricciones regionales.");
-  throw new Error("Vision AI requiere refactorización a proxy backend.");
+  // Por ahora deshabilitado para evitar crash por falta de SDK
+  console.warn("Vision AI requiere endpoint en backend.");
+  throw new Error("Función de análisis de imagen en mantenimiento.");
 };
