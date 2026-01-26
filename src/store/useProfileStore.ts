@@ -6,6 +6,7 @@ interface ProfileData {
     guides: any[];
     foodPlans: any[];
     bloodType: string | null;
+    latestNlr: any | null;
     fetchedAt: number;
 }
 

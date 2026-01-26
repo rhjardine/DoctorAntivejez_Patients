@@ -109,11 +109,16 @@ const HomePage: React.FC = () => {
                     </>
                 )}
 
+                {/* VCoach Feature Parked - Hidden to prevent 500 errors */}
+                {/* 
                 <div className="col-span-2 flex justify-center -my-6 z-10">
                     <button onClick={() => navigate('/chat')} className="active:scale-90 transition-transform">
                         <CircularProgress percentage={adherence} label="Mi VCoach" icon={<MessageCircle size={30} />} color={COLORS.DarkBlue} isCenter={true} size={110} />
                     </button>
-                </div>
+                </div> 
+                */}
+
+                <div className="col-span-2 h-4"></div> {/* Spacer where VCoach was */}
 
                 {is5A ? (
                     <>

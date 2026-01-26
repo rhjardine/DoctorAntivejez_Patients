@@ -7,6 +7,7 @@ import {
   ChevronRight, Check, ClipboardList, ChevronDown, FileSearch,
   MessageSquareQuote, AlertTriangle, Clock, Info
 } from 'lucide-react';
+import { useProfileStore } from '../store/useProfileStore';
 
 interface PatientGuideViewProps {
   items: PatientProtocol[];
@@ -21,6 +22,8 @@ type ViewMode = 'PLAN' | 'TRACK';
 const CATEGORY_LABELS: Record<string, string> = {
   REMOVAL_PHASE: 'Fase de Remoción',
   REVITALIZATION_PHASE: 'Fase de Revitalización',
+  REGENERATION_PHASE: 'Fase de Regeneración',
+  RESTORATION_PHASE: 'Fase de Restauración',
   PRIMARY_NUTRACEUTICALS: 'Nutracéuticos Primarios',
   SECONDARY_NUTRACEUTICALS: 'Nutracéuticos Secundarios',
   COMPLEMENTARY_NUTRACEUTICALS: 'Nutracéuticos Complementarios',
@@ -33,30 +36,64 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onInfoPress, onToggleItem, onRefresh }) => {
+  const { profileData } = useProfileStore();
   const [viewMode, setViewMode] = useState<ViewMode>('TRACK');
   const [activeTab, setActiveTab] = useState<TimeSlot>('MORNING');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Data Binding Fix: Use items from the profile store if available, or fall back to props
+  const effectiveItems = useMemo(() => {
+    if (profileData?.guides && profileData.guides.length > 0) {
+      const guide = profileData.guides[0];
+      const selections = guide.selections; // JSON from backend
+
+      if (selections && typeof selections === 'object') {
+        const mappedItems: PatientProtocol[] = [];
+        Object.keys(selections).forEach(category => {
+          const categoryItems = (selections as any)[category];
+          if (Array.isArray(categoryItems)) {
+            categoryItems.forEach((item: any) => {
+              mappedItems.push({
+                id: item.id || Math.random().toString(36).substr(2, 9),
+                category: category as any,
+                itemName: item.name || item.itemName,
+                dose: item.dose || '',
+                schedule: item.schedule || '',
+                observations: item.observations || '',
+                status: item.status || 'pending',
+                timeSlot: item.timeSlot || 'MORNING', // Default to morning for better visibility
+                prescribedAt: guide.createdAt,
+                updatedAt: guide.updatedAt || guide.createdAt
+              });
+            });
+          }
+        });
+        if (mappedItems.length > 0) return mappedItems;
+      }
+    }
+    return items;
+  }, [profileData, items]);
+
   // Group items by category dynamically
   const activeCategories = useMemo(() => {
     const groups: Record<string, PatientProtocol[]> = {};
-    items.forEach(item => {
+    effectiveItems.forEach(item => {
       if (!groups[item.category]) {
         groups[item.category] = [];
       }
       groups[item.category].push(item);
     });
     return groups;
-  }, [items]);
+  }, [effectiveItems]);
 
   const sortedActiveCategoryTypes = useMemo(() => {
     return (Object.keys(activeCategories) as ProtocolCategory[]).sort();
   }, [activeCategories]);
 
-  const completedCount = items.filter(i => i.status === 'completed').length;
-  const totalCount = items.length;
+  const completedCount = effectiveItems.filter(i => i.status === 'completed').length;
+  const totalCount = effectiveItems.length;
   const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const handleManualRefresh = () => {
@@ -212,7 +249,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onI
   };
 
   const renderTrackMode = () => {
-    const filteredItems = items.filter(item => {
+    const filteredItems = effectiveItems.filter(item => {
       if (activeTab === 'ANYTIME') return true;
       return item.timeSlot === activeTab || item.timeSlot === 'ANYTIME';
     });
@@ -363,7 +400,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onI
       <div className="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
         {loading ? (
           renderSkeleton()
-        ) : items.length === 0 ? (
+        ) : effectiveItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-10 text-center space-y-6 animate-in fade-in duration-700">
             <div className="w-24 h-24 bg-sky-50 rounded-[2.5rem] flex items-center justify-center text-primary shadow-inner">
               <Stethoscope size={48} className="animate-pulse" />

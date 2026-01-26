@@ -120,7 +120,7 @@ export interface PatientGuideResponse {
   items: PatientProtocol[];
 }
 
-export type BiometricType = 'BLOOD_PRESSURE' | 'HEART_RATE' | 'GLUCOSE' | 'WEIGHT' | 'BIO_AGE';
+export type BiometricType = 'BLOOD_PRESSURE' | 'HEART_RATE' | 'GLUCOSE' | 'WEIGHT' | 'BIO_AGE' | 'NLR';
 
 export interface BiometricData {
   id: string;

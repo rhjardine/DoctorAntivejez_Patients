@@ -46,6 +46,21 @@ const BiometricsPage: React.FC = () => {
                     }
                 }
 
+                if (profile.latestNlr) {
+                    const nlr = profile.latestNlr;
+                    newEntries.push({
+                        id: nlr.id + '_nlr',
+                        userId: profile.id,
+                        type: 'NLR',
+                        value: nlr.nlrValue.toFixed(2),
+                        numericValue: nlr.nlrValue,
+                        unit: 'Ratio',
+                        recordedAt: nlr.testDate,
+                        timestamp: new Date(nlr.testDate),
+                        source: 'CLINICAL'
+                    });
+                }
+
                 setEntries(newEntries);
             }
         };
