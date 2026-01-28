@@ -1,13 +1,14 @@
 
 import React from 'react';
-import { 
-  Apple, Utensils, Coffee, Salad, Grape, 
+import {
+  Apple, Utensils, Coffee, Salad, Grape,
   Zap, Activity, Dumbbell, Trophy, Bike,
   Smile, Brain, Heart, Sparkles, Star,
   Sprout, Leaf, Home, CloudSun, Wind,
   Bed, Moon, Clock, Bell, Check
 } from 'lucide-react';
 import { UserPreferences, COLORS } from '../types';
+import { PrivacySettings } from './Settings/PrivacySettings';
 
 interface SettingsViewProps {
   preferences: UserPreferences;
@@ -79,11 +80,10 @@ const SettingsView: React.FC<SettingsViewProps> = ({ preferences, onUpdatePrefer
               <button
                 key={opt.id}
                 onClick={() => handleIconSelect(category, opt.id)}
-                className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center transition-all border-2 ${
-                  isSelected 
-                    ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105' 
-                    : 'bg-white border-slate-100 text-slate-300'
-                }`}
+                className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center transition-all border-2 ${isSelected
+                  ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105'
+                  : 'bg-white border-slate-100 text-slate-300'
+                  }`}
               >
                 <Icon size={24} />
               </button>
@@ -107,6 +107,10 @@ const SettingsView: React.FC<SettingsViewProps> = ({ preferences, onUpdatePrefer
         {renderCategorySelection('ATTITUDE', 'Icono de Actitud')}
         {renderCategorySelection('ENVIRONMENT', 'Icono de Entorno')}
         {renderCategorySelection('REST', 'Icono de Descanso')}
+      </div>
+
+      <div className="mt-8">
+        <PrivacySettings />
       </div>
 
       <div className="mt-8 bg-primary/5 rounded-[2rem] p-6 border border-primary/10">

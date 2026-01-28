@@ -12,6 +12,7 @@ import { ProtocolService } from '../services/protocolService';
 import CircularProgress from '../components/CircularProgress';
 import BiologicalAgeGauge from '../components/BiologicalAgeGauge';
 import BioAgeAlert from '../components/BioAgeAlert';
+import TherapiesView from '../components/TherapiesView';
 import { Apple, Utensils, Coffee, Salad, Grape, Zap, Dumbbell, Trophy, Bike, Smile, Brain, Heart, Sparkles, Star, Sprout, Leaf, Home, CloudSun, Wind, Bed, Moon, Clock, Bell, Check } from 'lucide-react';
 
 const ICON_MAP: Record<string, any> = {
@@ -94,6 +95,11 @@ const HomePage: React.FC = () => {
 
     const renderDashboardMatrix = () => {
         const is5A = currentMainTab === MainTab.KEYS_5A;
+        const is4R = currentMainTab === MainTab.THERAPIES_4R;
+
+        if (is4R) {
+            return <TherapiesView />
+        }
 
         return (
             <div className="grid grid-cols-2 gap-x-4 gap-y-0 mt-2 w-full px-4 relative pb-10">
@@ -102,35 +108,16 @@ const HomePage: React.FC = () => {
                         <div onClick={() => navigate('/nutrition')} className="cursor-pointer flex justify-center transition-transform active:scale-95"><CircularProgress percentage={75} label="Alimentación" icon={getIcon('NUTRITION')} color={COLORS.PrimaryBlue} size={90} /></div>
                         <div onClick={() => navigate('/activity')} className="cursor-pointer flex justify-center transition-transform active:scale-95"><CircularProgress percentage={40} label="Actividad" icon={getIcon('ACTIVITY')} color={COLORS.PrimaryBlue} size={90} /></div>
                     </>
-                ) : (
-                    <>
-                        <div onClick={() => navigate('/about')} className="cursor-pointer flex justify-center transition-transform active:scale-95"><CircularProgress percentage={25} label="Remoción" icon={<Trash2 size={20} />} color={COLORS.PrimaryBlue} size={90} /></div>
-                        <div onClick={() => navigate('/about')} className="cursor-pointer flex justify-center transition-transform active:scale-95"><CircularProgress percentage={35} label="Restauración" icon={<RefreshCw size={20} />} color={COLORS.PrimaryBlue} size={90} /></div>
-                    </>
-                )}
+                ) : null}
 
-                {/* VCoach Feature Parked - Hidden to prevent 500 errors */}
-                {/* 
-                <div className="col-span-2 flex justify-center -my-6 z-10">
-                    <button onClick={() => navigate('/chat')} className="active:scale-90 transition-transform">
-                        <CircularProgress percentage={adherence} label="Mi VCoach" icon={<MessageCircle size={30} />} color={COLORS.DarkBlue} isCenter={true} size={110} />
-                    </button>
-                </div> 
-                */}
-
-                <div className="col-span-2 h-4"></div> {/* Spacer where VCoach was */}
+                <div className="col-span-2 h-4"></div>
 
                 {is5A ? (
                     <>
                         <div onClick={() => navigate('/attitude')} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95"><CircularProgress percentage={60} label="Actitud" icon={getIcon('ATTITUDE')} color={COLORS.PrimaryBlue} size={85} /></div>
                         <div onClick={() => navigate('/environment')} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95"><CircularProgress percentage={30} label="Entorno" icon={getIcon('ENVIRONMENT')} color={COLORS.PrimaryBlue} size={85} /></div>
                     </>
-                ) : (
-                    <>
-                        <div onClick={() => navigate('/about')} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95"><CircularProgress percentage={40} label="Regeneración" icon={<Activity size={20} />} color={COLORS.PrimaryBlue} size={85} /></div>
-                        <div onClick={() => navigate('/about')} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95"><CircularProgress percentage={60} label="Revitalización" icon={<Flame size={20} />} color={COLORS.PrimaryBlue} size={85} /></div>
-                    </>
-                )}
+                ) : null}
             </div>
         );
     };
@@ -177,25 +164,29 @@ const HomePage: React.FC = () => {
                     <>
                         {renderDashboardMatrix()}
 
-                        <BioAgeAlert
-                            bioAge={biophysicalAge}
-                            chronoAge={chronologicalAge}
-                            onAction={() => navigate('/guide')}
-                        />
+                        {currentMainTab !== MainTab.THERAPIES_4R && (
+                            <BioAgeAlert
+                                bioAge={biophysicalAge}
+                                chronoAge={chronologicalAge}
+                                onAction={() => navigate('/guide')}
+                            />
+                        )}
 
-                        <div
-                            onClick={() => navigate('/guide')}
-                            className="mx-6 mb-6 mt-6 bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><ClipboardList size={28} /></div>
-                                <div>
-                                    <h3 className="font-black text-darkBlue text-base leading-tight">Continuar Plan</h3>
-                                    <p className="text-[10px] font-bold text-textMedium uppercase tracking-tighter">{totalCount - completedCount} tareas pendientes</p>
+                        {currentMainTab !== MainTab.THERAPIES_4R && (
+                            <div
+                                onClick={() => navigate('/guide')}
+                                className="mx-6 mb-6 mt-6 bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><ClipboardList size={28} /></div>
+                                    <div>
+                                        <h3 className="font-black text-darkBlue text-base leading-tight">Continuar Plan</h3>
+                                        <p className="text-[10px] font-bold text-textMedium uppercase tracking-tighter">{totalCount - completedCount} tareas pendientes</p>
+                                    </div>
                                 </div>
+                                <ChevronRight className="text-slate-300" size={20} />
                             </div>
-                            <ChevronRight className="text-slate-300" size={20} />
-                        </div>
+                        )}
                     </>
                 )}
             </div>
