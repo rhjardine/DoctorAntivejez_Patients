@@ -198,7 +198,11 @@ const App: React.FC = () => {
         <footer className="fixed bottom-0 left-0 right-0 z-40 bg-darkBlue border-t border-white/5 pb-safe-bottom shrink-0">
           <div className="flex justify-around items-center py-3.5 px-4">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => {
+                navigate('/');
+                setMainTab(MainTab.KEYS_5A);
+                toggleDrawer(false);
+              }}
               className={`flex flex-col items-center gap-1 transition-all ${isHome ? 'text-white scale-110' : 'text-white/40'}`}
             >
               <LayoutDashboard size={24} strokeWidth={isHome ? 2.5 : 2} />

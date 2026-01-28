@@ -41,6 +41,10 @@ const HomePage: React.FC = () => {
     const [activeDetail, setActiveDetail] = useState<string | null>(null);
 
     useEffect(() => {
+        setActiveDetail(null);
+    }, [currentMainTab]);
+
+    useEffect(() => {
         if (isLoadingMetrics || profileData) return;
         const loadMetrics = async () => {
             if (!session || isLoadingMetrics || profileData) return;
@@ -103,7 +107,7 @@ const HomePage: React.FC = () => {
         return (
             <div className="grid grid-cols-2 gap-x-4 gap-y-0 mt-2 w-full px-4 relative pb-10">
                 {/* Top Row */}
-                <div onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                <div onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')} className="cursor-pointer flex justify-center transition-transform active:scale-95 min-h-[44px] min-w-[44px]">
                     <CircularProgress
                         percentage={is5A ? 75 : 25}
                         label={is5A ? "Alimentación" : "Remoción"}
@@ -112,7 +116,7 @@ const HomePage: React.FC = () => {
                         size={90}
                     />
                 </div>
-                <div onClick={() => is5A ? navigate('/activity') : null /* Restauración */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                <div onClick={() => is5A ? navigate('/activity') : null /* Restauración */} className="cursor-pointer flex justify-center transition-transform active:scale-95 min-h-[44px] min-w-[44px]">
                     <CircularProgress
                         percentage={is5A ? 40 : 35}
                         label={is5A ? "Actividad" : "Restauración"}
@@ -124,7 +128,7 @@ const HomePage: React.FC = () => {
 
                 {/* VCoach Center Circle */}
                 <div className="col-span-2 flex justify-center -my-6 z-10">
-                    <button onClick={() => navigate('/chat')} className="active:scale-90 transition-transform">
+                    <button onClick={() => navigate('/chat')} className="active:scale-90 transition-transform min-h-[44px] min-w-[44px]">
                         <CircularProgress
                             percentage={adherence}
                             label="Mi VCoach"
@@ -137,7 +141,7 @@ const HomePage: React.FC = () => {
                 </div>
 
                 {/* Bottom Row */}
-                <div onClick={() => is5A ? navigate('/attitude') : null /* Regeneración */} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95">
+                <div onClick={() => is5A ? navigate('/attitude') : null /* Regeneración */} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95 min-h-[44px] min-w-[44px]">
                     <CircularProgress
                         percentage={is5A ? 60 : 40}
                         label={is5A ? "Actitud" : "Regeneración"}
@@ -146,7 +150,7 @@ const HomePage: React.FC = () => {
                         size={85}
                     />
                 </div>
-                <div onClick={() => is5A ? navigate('/environment') : null /* Revitalización */} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95">
+                <div onClick={() => is5A ? navigate('/environment') : null /* Revitalización */} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95 min-h-[44px] min-w-[44px]">
                     <CircularProgress
                         percentage={is5A ? 30 : 60}
                         label={is5A ? "Entorno" : "Revitalización"}
