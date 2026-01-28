@@ -209,32 +209,44 @@ const ChelationProtocolModal: React.FC<{ isOpen: boolean; onClose: () => void }>
 
 // --- Main View ---
 
-const RemovalView: React.FC = () => {
+interface RemovalViewProps {
+    onBack?: () => void;
+}
+
+const RemovalView: React.FC<RemovalViewProps> = ({ onBack }) => {
     const { session } = useAuthStore();
     const [openModal, setOpenModal] = useState<null | 'purga' | 'chelation'>(null);
 
     return (
         <div className="flex flex-col w-full pb-32">
 
-            {/* Header Card */}
-            <div className="mx-4 mt-6 bg-[#293b64] rounded-[2.5rem] p-6 shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#23bcef]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            {/* Compact Clinical Banner (Header) */}
+            <div className="mx-4 mt-6 bg-[#293b64] rounded-3xl p-4 shadow-xl relative overflow-hidden transition-all duration-300">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[#23bcef]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
                 <div className="relative z-10">
-                    <div className="flex items-center gap-2 mb-4">
-                        <div className="bg-[#23bcef] p-2 rounded-xl text-white">
-                            <Beaker size={20} fill="currentColor" fillOpacity={0.2} />
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={onBack}
+                                className="bg-white/10 p-1.5 rounded-lg text-white hover:bg-white/20 active:scale-95 transition-all outline-none"
+                            >
+                                <ChevronRight size={16} className="rotate-180" />
+                            </button>
+                            <div className="bg-[#23bcef] p-1.5 rounded-lg text-white">
+                                <Beaker size={14} fill="currentColor" fillOpacity={0.2} />
+                            </div>
+                            <span className="text-[#23bcef] font-black uppercase tracking-widest text-[9px]">Fase 1: Remoción</span>
                         </div>
-                        <span className="text-[#23bcef] font-black uppercase tracking-widest text-xs">Fase 1: Remoción</span>
                     </div>
 
-                    <h2 className="text-white text-lg font-bold italic leading-relaxed mb-6 opacity-90">
-                        "{session?.name?.split(' ')[0] || 'Paciente'}, para rejuvenecer, primero debemos remover. La acumulación de toxinas es la causa #1 de la inflamación crónica y el envejecimiento prematuro."
+                    <h2 className="text-white text-[11px] font-bold italic leading-relaxed mb-4 opacity-90 max-w-[90%]">
+                        "{session?.name?.split(' ')[0] || 'Paciente'}, para rejuvenecer, primero debemos remover. La acumulación de toxinas es la causa #1 de la inflamación crónica."
                     </h2>
 
-                    <div className="flex items-center justify-between">
-                        <div className="flex flex-col gap-1">
-                            <div className="w-48 h-1.5 bg-blue-900/50 rounded-full overflow-hidden">
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex-1">
+                            <div className="w-full h-1 bg-blue-900/50 rounded-full overflow-hidden">
                                 <motion.div
                                     className="h-full bg-[#23bcef]"
                                     initial={{ width: 0 }}
@@ -243,9 +255,7 @@ const RemovalView: React.FC = () => {
                                 />
                             </div>
                         </div>
-                        <div className="text-right">
-                            <span className="block text-white font-black text-xs uppercase tracking-widest">Nivel de Desbloqueo</span>
-                        </div>
+                        <span className="text-white font-black text-[8px] uppercase tracking-widest shrink-0">Nivel de Desbloqueo</span>
                     </div>
                 </div>
             </div>
@@ -310,8 +320,8 @@ const RemovalView: React.FC = () => {
                             <button
                                 onClick={() => therapy.modalId && setOpenModal(therapy.modalId)}
                                 className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${therapy.modalId
-                                        ? 'bg-[#293b64] text-white shadow-lg hover:bg-[#1e2b4a]'
-                                        : 'bg-slate-50 text-slate-300 cursor-default'
+                                    ? 'bg-[#293b64] text-white shadow-lg hover:bg-[#1e2b4a]'
+                                    : 'bg-slate-50 text-slate-300 cursor-default'
                                     }`}
                             >
                                 <ChevronRight size={20} />

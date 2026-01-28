@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trash2, RefreshCw, Activity, Flame, MessageCircle,
     ClipboardCheck, ChevronRight, ClipboardList
@@ -12,7 +13,7 @@ import { ProtocolService } from '../services/protocolService';
 import CircularProgress from '../components/CircularProgress';
 import BiologicalAgeGauge from '../components/BiologicalAgeGauge';
 import BioAgeAlert from '../components/BioAgeAlert';
-import TherapiesView from '../components/TherapiesView';
+import RemovalView from '../components/Therapies/RemovalView';
 import { Apple, Utensils, Coffee, Salad, Grape, Zap, Dumbbell, Trophy, Bike, Smile, Brain, Heart, Sparkles, Star, Sprout, Leaf, Home, CloudSun, Wind, Bed, Moon, Clock, Bell, Check } from 'lucide-react';
 
 const ICON_MAP: Record<string, any> = {
@@ -35,6 +36,9 @@ const HomePage: React.FC = () => {
     const [totalCount, setTotalCount] = useState(0);
     const [adherence, setAdherence] = useState(0);
     const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
+
+    // View state for detail drill-down
+    const [activeDetail, setActiveDetail] = useState<string | null>(null);
 
     useEffect(() => {
         if (isLoadingMetrics || profileData) return;
@@ -95,101 +99,158 @@ const HomePage: React.FC = () => {
 
     const renderDashboardMatrix = () => {
         const is5A = currentMainTab === MainTab.KEYS_5A;
-        const is4R = currentMainTab === MainTab.THERAPIES_4R;
-
-        if (is4R) {
-            return <TherapiesView />
-        }
 
         return (
             <div className="grid grid-cols-2 gap-x-4 gap-y-0 mt-2 w-full px-4 relative pb-10">
-                {is5A ? (
-                    <>
-                        <div onClick={() => navigate('/nutrition')} className="cursor-pointer flex justify-center transition-transform active:scale-95"><CircularProgress percentage={75} label="Alimentación" icon={getIcon('NUTRITION')} color={COLORS.PrimaryBlue} size={90} /></div>
-                        <div onClick={() => navigate('/activity')} className="cursor-pointer flex justify-center transition-transform active:scale-95"><CircularProgress percentage={40} label="Actividad" icon={getIcon('ACTIVITY')} color={COLORS.PrimaryBlue} size={90} /></div>
-                    </>
-                ) : null}
+                {/* Top Row */}
+                <div onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                    <CircularProgress
+                        percentage={is5A ? 75 : 25}
+                        label={is5A ? "Alimentación" : "Remoción"}
+                        icon={is5A ? getIcon('NUTRITION') : <Trash2 size={20} />}
+                        color={COLORS.PrimaryBlue}
+                        size={90}
+                    />
+                </div>
+                <div onClick={() => is5A ? navigate('/activity') : null /* Restauración */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                    <CircularProgress
+                        percentage={is5A ? 40 : 35}
+                        label={is5A ? "Actividad" : "Restauración"}
+                        icon={is5A ? getIcon('ACTIVITY') : <RefreshCw size={20} />}
+                        color={COLORS.PrimaryBlue}
+                        size={90}
+                    />
+                </div>
 
-                <div className="col-span-2 h-4"></div>
+                {/* VCoach Center Circle */}
+                <div className="col-span-2 flex justify-center -my-6 z-10">
+                    <button onClick={() => navigate('/chat')} className="active:scale-90 transition-transform">
+                        <CircularProgress
+                            percentage={adherence}
+                            label="Mi VCoach"
+                            icon={<MessageCircle size={30} />}
+                            color={COLORS.DarkBlue}
+                            isCenter={true}
+                            size={110}
+                        />
+                    </button>
+                </div>
 
-                {is5A ? (
-                    <>
-                        <div onClick={() => navigate('/attitude')} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95"><CircularProgress percentage={60} label="Actitud" icon={getIcon('ATTITUDE')} color={COLORS.PrimaryBlue} size={85} /></div>
-                        <div onClick={() => navigate('/environment')} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95"><CircularProgress percentage={30} label="Entorno" icon={getIcon('ENVIRONMENT')} color={COLORS.PrimaryBlue} size={85} /></div>
-                    </>
-                ) : null}
+                {/* Bottom Row */}
+                <div onClick={() => is5A ? navigate('/attitude') : null /* Regeneración */} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95">
+                    <CircularProgress
+                        percentage={is5A ? 60 : 40}
+                        label={is5A ? "Actitud" : "Regeneración"}
+                        icon={is5A ? getIcon('ATTITUDE') : <Activity size={20} />}
+                        color={COLORS.PrimaryBlue}
+                        size={85}
+                    />
+                </div>
+                <div onClick={() => is5A ? navigate('/environment') : null /* Revitalización */} className="cursor-pointer flex justify-center mt-8 transition-transform active:scale-95">
+                    <CircularProgress
+                        percentage={is5A ? 30 : 60}
+                        label={is5A ? "Entorno" : "Revitalización"}
+                        icon={is5A ? getIcon('ENVIRONMENT') : <Flame size={20} />}
+                        color={COLORS.PrimaryBlue}
+                        size={85}
+                    />
+                </div>
             </div>
         );
     };
 
     return (
-        <div className="flex flex-col w-full animate-in fade-in duration-500 overflow-y-auto no-scrollbar pb-32">
-            <BiologicalAgeGauge
-                biologicalAge={biophysicalAge}
-                chronologicalAge={chronologicalAge}
-                completedItems={completedCount}
-                totalItems={totalCount}
-                onInfoPress={() => toggleClinicalInfo(true)}
-            />
+        <div className="flex flex-col w-full h-full overflow-y-auto no-scrollbar relative bg-[#F8FAFC]">
+            <AnimatePresence mode="wait">
+                {!activeDetail ? (
+                    <motion.div
+                        key="matrix"
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.02 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="flex flex-col w-full pb-32"
+                    >
+                        <BiologicalAgeGauge
+                            biologicalAge={biophysicalAge}
+                            chronologicalAge={chronologicalAge}
+                            completedItems={completedCount}
+                            totalItems={totalCount}
+                            onInfoPress={() => toggleClinicalInfo(true)}
+                        />
 
-            <div className="w-full">
-                {currentMainTab === MainTab.CHALLENGE ? (
-                    <div className="flex flex-col items-center w-full px-6 py-4 animate-in fade-in duration-300">
-                        <div className="w-full bg-white/70 backdrop-blur-sm rounded-3xl p-4 mb-6 border border-white/50 text-center shadow-sm">
-                            <p className="text-[11px] font-bold text-darkBlue italic">"La consistencia es la clave de la regeneración celular."</p>
-                        </div>
-                        <div onClick={() => navigate('/guide')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-6 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
-                            <div className="flex items-center gap-4">
-                                <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><ClipboardCheck size={28} /></div>
-                                <div>
-                                    <h3 className="font-black text-darkBlue text-lg">Guía del Paciente</h3>
-                                    <p className="text-[10px] font-bold text-textMedium uppercase">Misión Diaria</p>
-                                </div>
-                            </div>
-                            <div className="bg-red-50 text-accentRed text-[9px] font-black px-3 py-2 rounded-xl uppercase tracking-tighter">
-                                {totalCount - completedCount} Pendientes
-                            </div>
-                        </div>
-                        <div className="w-full bg-white rounded-[2rem] p-5 shadow-sm border border-gray-50 mb-6">
-                            <div className="flex justify-between items-center mb-3">
-                                <span className="text-xs font-black text-darkBlue uppercase">Progreso Hoy</span>
-                                <span className="text-xs font-black text-primary">{adherence}%</span>
-                            </div>
-                            <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${adherence}%` }}></div>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <>
-                        {renderDashboardMatrix()}
-
-                        {currentMainTab !== MainTab.THERAPIES_4R && (
-                            <BioAgeAlert
-                                bioAge={biophysicalAge}
-                                chronoAge={chronologicalAge}
-                                onAction={() => navigate('/guide')}
-                            />
-                        )}
-
-                        {currentMainTab !== MainTab.THERAPIES_4R && (
-                            <div
-                                onClick={() => navigate('/guide')}
-                                className="mx-6 mb-6 mt-6 bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><ClipboardList size={28} /></div>
-                                    <div>
-                                        <h3 className="font-black text-darkBlue text-base leading-tight">Continuar Plan</h3>
-                                        <p className="text-[10px] font-bold text-textMedium uppercase tracking-tighter">{totalCount - completedCount} tareas pendientes</p>
+                        <div className="w-full">
+                            {currentMainTab === MainTab.CHALLENGE ? (
+                                <div className="flex flex-col items-center w-full px-6 py-4">
+                                    <div className="w-full bg-white/70 backdrop-blur-sm rounded-3xl p-4 mb-6 border border-white/50 text-center shadow-sm">
+                                        <p className="text-[11px] font-bold text-darkBlue italic">"La consistencia es la clave de la regeneración celular."</p>
+                                    </div>
+                                    <div onClick={() => navigate('/guide')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-6 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><ClipboardCheck size={28} /></div>
+                                            <div>
+                                                <h3 className="font-black text-darkBlue text-lg">Guía del Paciente</h3>
+                                                <p className="text-[10px] font-bold text-textMedium uppercase">Misión Diaria</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-red-50 text-accentRed text-[9px] font-black px-3 py-2 rounded-xl uppercase tracking-tighter">
+                                            {totalCount - completedCount} Pendientes
+                                        </div>
+                                    </div>
+                                    <div className="w-full bg-white rounded-[2rem] p-5 shadow-sm border border-gray-50 mb-6">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <span className="text-xs font-black text-darkBlue uppercase">Progreso Hoy</span>
+                                            <span className="text-xs font-black text-primary">{adherence}%</span>
+                                        </div>
+                                        <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+                                            <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${adherence}%` }}></div>
+                                        </div>
                                     </div>
                                 </div>
-                                <ChevronRight className="text-slate-300" size={20} />
-                            </div>
-                        )}
-                    </>
+                            ) : (
+                                <>
+                                    {renderDashboardMatrix()}
+
+                                    {currentMainTab !== MainTab.THERAPIES_4R && (
+                                        <BioAgeAlert
+                                            bioAge={biophysicalAge}
+                                            chronoAge={chronologicalAge}
+                                            onAction={() => navigate('/guide')}
+                                        />
+                                    )}
+
+                                    {currentMainTab !== MainTab.THERAPIES_4R && (
+                                        <div
+                                            onClick={() => navigate('/guide')}
+                                            className="mx-6 mb-6 mt-6 bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><ClipboardList size={28} /></div>
+                                                <div>
+                                                    <h3 className="font-black text-darkBlue text-base leading-tight">Continuar Plan</h3>
+                                                    <p className="text-[10px] font-bold text-textMedium uppercase tracking-tighter">{totalCount - completedCount} tareas pendientes</p>
+                                                </div>
+                                            </div>
+                                            <ChevronRight className="text-slate-300" size={20} />
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="detail"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className="flex flex-col w-full h-full"
+                    >
+                        {activeDetail === 'removal' && <RemovalView onBack={() => setActiveDetail(null)} />}
+                    </motion.div>
                 )}
-            </div>
+            </AnimatePresence>
         </div>
     );
 };
