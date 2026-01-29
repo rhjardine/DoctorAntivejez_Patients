@@ -17,6 +17,7 @@ interface ProfileState {
     clearProfileData: () => void;
     isCacheValid: () => boolean;
     forceRefresh: () => void;
+    updateAdherence: (type: string, data: any) => void;
 }
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -43,4 +44,10 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     forceRefresh: () => {
         set({ profileData: null }); // Clear cache to force new fetch
     },
+
+    updateAdherence: (type: string, data: any) => {
+        console.log(`[Store] Updating adherence for ${type}:`, data);
+        // In a real app, this might involve an API call or updating a specific adherence field
+        // For now, we'll just log it as requested for the simulation
+    }
 }));

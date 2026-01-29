@@ -5,6 +5,7 @@ import {
     ChevronRight, X, Info
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
+import { PurgeProtocolModal, ChelationProtocolModal } from './RemovalModals';
 
 // --- Types & Data ---
 
@@ -84,127 +85,7 @@ const THERAPIES: TherapyItem[] = [
 
 // --- Modals ---
 
-const PurgaProtocolModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-    return (
-        <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6"
-                >
-                    <motion.div
-                        initial={{ y: '100%' }}
-                        animate={{ y: 0 }}
-                        exit={{ y: '100%' }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
-                    >
-                        <div className="bg-[#293b64] p-6 text-white flex justify-between items-center shrink-0">
-                            <h3 className="text-xl font-black uppercase tracking-widest">Protocolo Purga</h3>
-                            <button onClick={onClose} className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors">
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <div className="p-6 overflow-y-auto">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-[#23bcef]">
-                                    <Beaker size={32} />
-                                </div>
-                                <div>
-                                    <h4 className="text-lg font-black text-[#293b64] leading-tight">Limpieza Intestinal</h4>
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Fase 1: Preparación</p>
-                                </div>
-                            </div>
-                            <p className="text-slate-600 leading-relaxed mb-6 font-medium">
-                                Este protocolo requiere preparación previa de 24 horas. Sigue las indicaciones médicas estrictamente para asegurar la efectividad de la remoción de toxinas.
-                            </p>
-
-                            <div className="space-y-3">
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex gap-3">
-                                    <span className="bg-[#23bcef] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0">1</span>
-                                    <p className="text-sm font-bold text-slate-700">Ayuno sólido a partir de las 6:00 PM del día anterior.</p>
-                                </div>
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex gap-3">
-                                    <span className="bg-[#23bcef] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0">2</span>
-                                    <p className="text-sm font-bold text-slate-700">Ingesta de solución purgante a las 3:00 AM (Ritmo Circadiano).</p>
-                                </div>
-                                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex gap-3">
-                                    <span className="bg-[#23bcef] text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0">3</span>
-                                    <p className="text-sm font-bold text-slate-700">Hidratación constante con suero oral durante el proceso.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="p-6 pt-0 mt-auto shrink-0">
-                            <button onClick={onClose} className="w-full bg-[#23bcef] text-white font-black uppercase tracking-widest py-4 rounded-2xl hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-200">
-                                Entendido
-                            </button>
-                        </div>
-                    </motion.div>
-                </motion.div>
-            )}
-        </AnimatePresence>
-    );
-};
-
-const ChelationProtocolModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-    return (
-        <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6"
-                >
-                    <motion.div
-                        initial={{ y: '100%' }}
-                        animate={{ y: 0 }}
-                        exit={{ y: '100%' }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
-                    >
-                        <div className="bg-[#293b64] p-6 text-white flex justify-between items-center shrink-0">
-                            <h3 className="text-xl font-black uppercase tracking-widest">Quelación IV</h3>
-                            <button onClick={onClose} className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors">
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <div className="p-6 overflow-y-auto">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-[#23bcef]">
-                                    <Syringe size={32} />
-                                </div>
-                                <div>
-                                    <h4 className="text-lg font-black text-[#293b64] leading-tight">Remoción de Metales</h4>
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Protocolo Clínico</p>
-                                </div>
-                            </div>
-                            <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl mb-6">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Info size={16} className="text-amber-500" />
-                                    <span className="text-xs font-black text-amber-600 uppercase tracking-widest">Requisito Previo</span>
-                                </div>
-                                <p className="text-xs text-amber-800 font-bold">
-                                    Requiere exámenes de función renal (Creatinina y Urea) recientes antes de la aplicación.
-                                </p>
-                            </div>
-                            <p className="text-slate-600 leading-relaxed mb-6 font-medium">
-                                La terapia de quelación utiliza EDTA y otros agentes para atrapar metales pesados como plomo, mercurio y cadmio, permitiendo su eliminación a través de la orina.
-                            </p>
-                        </div>
-                        <div className="p-6 pt-0 mt-auto shrink-0">
-                            <button onClick={onClose} className="w-full bg-[#23bcef] text-white font-black uppercase tracking-widest py-4 rounded-2xl hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-200">
-                                Confirmar Cita
-                            </button>
-                        </div>
-                    </motion.div>
-                </motion.div>
-            )}
-        </AnimatePresence>
-    );
-};
+// --- Main View ---
 
 
 // --- Main View ---
@@ -241,7 +122,7 @@ const RemovalView: React.FC<RemovalViewProps> = ({ onBack }) => {
                     </div>
 
                     <h2 className="text-white text-[11px] font-bold italic leading-relaxed mb-4 opacity-90 max-w-[90%]">
-                        "{session?.name?.split(' ')[0] || 'Paciente'}, para rejuvenecer, primero debemos remover. La acumulación de toxinas es la causa #1 de la inflamación crónica."
+                        "{session?.name?.split(' ')[0]?.toUpperCase() || 'PACIENTE'}, para rejuvenecer, primero debemos remover. La acumulación de toxinas es la causa #1 de la inflamación crónica."
                     </h2>
 
                     <div className="flex items-center justify-between gap-4">
@@ -332,7 +213,7 @@ const RemovalView: React.FC<RemovalViewProps> = ({ onBack }) => {
             </div>
 
             {/* Modals */}
-            <PurgaProtocolModal isOpen={openModal === 'purga'} onClose={() => setOpenModal(null)} />
+            <PurgeProtocolModal isOpen={openModal === 'purga'} onClose={() => setOpenModal(null)} />
             <ChelationProtocolModal isOpen={openModal === 'chelation'} onClose={() => setOpenModal(null)} />
 
         </div>
