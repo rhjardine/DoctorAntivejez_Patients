@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => {
             },
             {
               urlPattern: /^https:\/\/doctor-antivejez-web\.onrender\.com\/(mobile-auth-v1|mobile-profile-v1)/,
-              handler: 'NetworkFirst',
+              handler: 'StaleWhileRevalidate',
               options: {
                 cacheName: 'api-cache',
                 expiration: {
@@ -70,7 +70,6 @@ export default defineConfig(({ mode }) => {
     ],
     define: {
       'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
     },
     resolve: {
       alias: {
