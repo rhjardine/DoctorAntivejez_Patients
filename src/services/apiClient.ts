@@ -5,9 +5,13 @@ const apiClient = axios.create({
     headers: { 'Content-Type': 'application/json' }
 });
 
+import { useProfileStore } from '../store/useProfileStore';
+
+// ...
+
 // Interceptor para inyectar el Token en cada llamada médica
 apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('auth_token');
+    const token = sessionStorage.getItem('auth_token'); // Switched to sessionStorage
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -17,15 +21,42 @@ apiClient.interceptors.request.use((config) => {
 // Interceptor para manejar expulsión por token expirado
 apiClient.interceptors.response.use(
     (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('rejuvenate_session_v1');
-            // Solo redirigir si no estamos ya en login para evitar loops
-            if (window.location.pathname !== '/login') {
+    async (error) => {
+        const originalRequest = error.config;
+
+        // Si es 401 y no hemos intentado refresh
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                const refreshToken = sessionStorage.getItem('refresh_token'); // Switched to sessionStorage
+                if (!refreshToken) throw new Error('No refresh token');
+
+                // Llamar endpoint de refresh (backend debe implementarlo)
+                const { data } = await axios.post(
+                    `${originalRequest.baseURL}/auth/refresh`,
+                    { refreshToken }
+                );
+
+                // Actualizar tokens
+                sessionStorage.setItem('auth_token', data.accessToken);
+                if (data.refreshToken) {
+                    sessionStorage.setItem('refresh_token', data.refreshToken);
+                }
+
+                // Reintentar request original
+                originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+                return apiClient(originalRequest);
+
+            } catch (refreshError) {
+                // NUCLEAR RESET: Limpieza total por seguridad
+                sessionStorage.clear();
+                useProfileStore.getState().clearProfileData();
                 window.location.href = '/login';
+                return Promise.reject(refreshError);
             }
         }
+
         return Promise.reject(error);
     }
 );

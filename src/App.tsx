@@ -61,6 +61,17 @@ const App: React.FC = () => {
   // Initialize session check
   useEffect(() => {
     checkSession();
+
+    // SESSION HEARTBEAT: Clear PHI on tab close
+    const handleBeforeUnload = () => {
+      sessionStorage.clear();
+      useProfileStore.getState().clearProfileData();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, []);
 
   // Monitor online/offline status

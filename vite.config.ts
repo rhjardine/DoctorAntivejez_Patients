@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         manifest: {
-          short_name: 'Dr. Antivejez',
+          short_name: 'Antivejez',
           name: 'Doctor Antivejez - Medicina Personalizada',
           theme_color: '#293b64',
           background_color: '#F8FAFC',
@@ -69,7 +69,7 @@ export default defineConfig(({ mode }) => {
       })
     ],
     define: {
-      'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      // 'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY), // REMOVED FOR SECURITY
     },
     resolve: {
       alias: {

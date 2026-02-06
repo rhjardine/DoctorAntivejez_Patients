@@ -8,6 +8,7 @@ interface ProfileData {
     bloodType: string | null;
     latestNlr: any | null;
     fetchedAt: number;
+    firstName?: string;
 }
 
 interface ProfileState {

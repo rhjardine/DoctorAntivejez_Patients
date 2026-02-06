@@ -2,7 +2,10 @@ import axios from 'axios';
 import { useProfileStore } from '../store/useProfileStore';
 
 // URL del Backend Proxy
-const BACKEND_URL = 'https://doctor-antivejez-web.onrender.com/vcoach-chat-v1';
+// URL del Backend Proxy
+const BACKEND_URL = import.meta.env.DEV
+  ? '/api/vcoach-chat'
+  : 'https://doctor-antivejez-web.onrender.com/vcoach-chat-v1';
 
 export interface FoodAnalysisResult {
   productName: string;

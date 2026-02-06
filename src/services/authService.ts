@@ -41,8 +41,8 @@ export const authService = {
         lastLoginAt: new Date().toISOString()
       };
 
-      localStorage.setItem('auth_token', token);
-      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      sessionStorage.setItem('auth_token', token);
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
       return session;
     } catch (error: any) {
       const message = error.response?.data?.error || "Error al iniciar sesión. Verifique sus credenciales.";
@@ -55,7 +55,7 @@ export const authService = {
    * Finaliza la sesión y limpia el almacenamiento local.
    */
   logout: () => {
-    localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
     // Opcional: limpiar otros datos de caché si fuera necesario
   },
 
@@ -63,7 +63,7 @@ export const authService = {
    * Recupera la sesión actual desde el almacenamiento persistente.
    */
   getCurrentUser: (): UserSession | null => {
-    const session = localStorage.getItem(SESSION_KEY);
+    const session = sessionStorage.getItem(SESSION_KEY);
     if (!session) return null;
 
     try {
@@ -78,6 +78,6 @@ export const authService = {
    * Verifica si hay una sesión activa.
    */
   isAuthenticated: (): boolean => {
-    return localStorage.getItem(SESSION_KEY) !== null;
+    return sessionStorage.getItem(SESSION_KEY) !== null;
   }
 };
