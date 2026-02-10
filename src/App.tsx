@@ -18,6 +18,7 @@ import AchievementsPage from './pages/AchievementsPage';
 import StorePage from './pages/StorePage';
 import SettingsPage from './pages/SettingsPage';
 import BiometricsPage from './pages/BiometricsPage';
+import BiomicsPage from './pages/BiomicsPage';
 
 // Components (Views mapped to routes)
 import NutritionView from './components/NutritionView';
@@ -176,6 +177,7 @@ const App: React.FC = () => {
           <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
           <Route path="/store" element={<ProtectedRoute><StorePage /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+          <Route path="/biomics" element={<ProtectedRoute><BiomicsPage /></ProtectedRoute>} />
 
           {/* Detail Views */}
           <Route path="/nutrition" element={<ProtectedRoute><NutritionView /></ProtectedRoute>} />
@@ -226,6 +228,14 @@ const App: React.FC = () => {
             >
               <Trophy size={24} strokeWidth={location.pathname === '/achievements' ? 2.5 : 2} />
               <span className="text-[9px] font-black uppercase tracking-widest">Logros</span>
+            </button>
+
+            <button
+              onClick={() => navigate('/biomics')}
+              className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/biomics' ? 'text-white scale-110' : 'text-white/40'}`}
+            >
+              <Dna size={24} strokeWidth={location.pathname === '/biomics' ? 2.5 : 2} />
+              <span className="text-[9px] font-black uppercase tracking-widest">Biomics</span>
             </button>
 
             <button

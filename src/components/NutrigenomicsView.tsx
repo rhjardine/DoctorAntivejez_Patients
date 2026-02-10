@@ -6,7 +6,8 @@ import { useProfileStore } from '../store/useProfileStore';
 import { NutrigenomicPlan, MealType, NutrigenomicFood, BloodType, DietType } from '../types';
 import {
   ChevronLeft, Sun, Sunset, Moon, Coffee, AlertCircle, Droplet,
-  ChefHat, Leaf, Check, Heart, Info, Zap, Star, ShieldAlert
+  ChefHat, Leaf, Check, Heart, Info, Zap, Star, ShieldAlert, X,
+  Activity, Microscope
 } from 'lucide-react';
 
 interface NutrigenomicsViewProps {
@@ -24,10 +25,12 @@ const BLOOD_TYPE_RESTRICTIONS: Record<BloodType, string[]> = {
 };
 
 const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
+  const { profileData } = useProfileStore(); // FIXED: Added missing hook usage
   const [plan, setPlan] = useState<NutrigenomicPlan | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<MealType>('BREAKFAST');
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [selectedFood, setSelectedFood] = useState<NutrigenomicFood | null>(null); // Added state
   const user = authService.getCurrentUser();
 
   useEffect(() => {
@@ -126,6 +129,70 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
   return (
     <div className="flex flex-col h-full bg-[#F8FAFC] animate-in slide-in-from-right duration-500 absolute inset-0 z-40 overflow-hidden">
 
+      {/* Food Details Modal */}
+      {selectedFood && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] p-6 shadow-2xl animate-in slide-in-from-bottom-10 duration-300">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-sky-50 text-primary text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-sky-100">
+                    {selectedFood.category}
+                  </span>
+                  {selectedFood.isClinicalPriority && (
+                    <span className="bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-md shadow-primary/30">
+                      <Zap size={10} fill="currentColor" /> Prioridad
+                    </span>
+                  )}
+                </div>
+                <h2 className="text-2xl font-black text-darkBlue leading-tight">{selectedFood.name}</h2>
+              </div>
+              <button
+                onClick={() => setSelectedFood(null)}
+                className="p-2 bg-slate-50 text-slate-400 rounded-full hover:bg-slate-100 transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-8">
+              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <Activity size={16} className="text-emerald-500" />
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Impacto Metabólico Estimado</h4>
+                </div>
+                <div className="flex items-end gap-2">
+                  <span className="text-2xl font-black text-darkBlue">Alto</span>
+                  <span className="text-xs font-bold text-emerald-500 mb-1">Optimización Mitocondrial</span>
+                </div>
+              </div>
+
+              <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                  <Microscope size={64} className="text-amber-600" />
+                </div>
+                <div className="relative z-10 w-full">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold border border-amber-200">Dr</span>
+                    <h4 className="text-[10px] font-black text-amber-800/60 uppercase tracking-widest">Nota del Dr. Antivejez</h4>
+                  </div>
+                  <p className="text-sm font-medium text-amber-900 leading-relaxed italic">
+                    "{selectedFood.notes || "Este alimento ha sido seleccionado específicamente para tu genotipo debido a su capacidad para reducir la inflamación sistémica y mejorar la señalización celular."}"
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedFood(null)}
+              className="w-full bg-darkBlue text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-900/20 active:scale-[0.98] transition-all"
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header - Profile Sync UI */}
       <div className="bg-darkBlue px-4 pt-12 pb-6 shadow-xl z-20">
         <div className="flex items-center justify-between mb-4">
@@ -209,7 +276,8 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
                   return (
                     <div
                       key={food.id}
-                      className={`relative bg-white rounded-[1.75rem] p-5 shadow-sm border-2 transition-all flex items-center gap-4 ${food.isClinicalPriority ? 'border-primary/20 bg-sky-50/20' : 'border-white hover:border-slate-100'
+                      onClick={() => setSelectedFood(food)} // Added click handler
+                      className={`relative bg-white rounded-[1.75rem] p-5 shadow-sm border-2 transition-all flex items-center gap-4 cursor-pointer active:scale-[0.98] ${food.isClinicalPriority ? 'border-primary/20 bg-sky-50/20' : 'border-white hover:border-slate-100'
                         }`}
                     >
                       {food.isClinicalPriority && (
