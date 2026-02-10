@@ -65,16 +65,13 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
   };
 
-  // Rule Engine: Derive forbidden items if backend doesn't provide them all
   const derivedForbidden = useMemo(() => {
-    // Phase 5: Use Profile Store Blood Type
-    const profileStore = useProfileStore.getState();
-    const effectiveBloodType = (profileStore.profileData?.bloodType as BloodType) || plan?.bloodType || 'O';
+    const effectiveBloodType = (profileData?.bloodType as BloodType) || plan?.bloodType || 'O';
 
     const bloodRules = BLOOD_TYPE_RESTRICTIONS[effectiveBloodType] || [];
     // Merge backend forbidden with local rules, removing duplicates
     return Array.from(new Set([...bloodRules, ...(plan?.forbidden || [])]));
-  }, [plan]);
+  }, [plan, profileData]);
 
   const groupedFoods = useMemo(() => {
     if (!plan) return {};
