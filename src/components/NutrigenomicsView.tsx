@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { ProtocolService } from '../services/protocolService';
+import { nutritionService } from '../services/nutritionService';
 import { authService } from '../services/authService';
 import { useProfileStore } from '../store/useProfileStore';
 import { NutrigenomicPlan, MealType, NutrigenomicFood, BloodType, DietType } from '../types';
@@ -38,7 +38,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
       if (!user) return;
       setLoading(true);
       try {
-        const data = await ProtocolService.fetchNutrigenomicPlan(user.id);
+        const data = await nutritionService.getSmartNutritionPlan();
         setPlan(data);
       } catch (e) {
         console.error("Error loading nutrigenomics", e);
@@ -124,7 +124,17 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
     );
   }
 
-  const sortedCategories = Object.keys(groupedFoods).sort();
+  /* Custom Sorting for Categories: Beneficios > Neutros > Evitar */
+  const categoryOrder = ['Beneficios', 'Neutros', 'Evitar'];
+  const sortedCategories = Object.keys(groupedFoods).sort((a, b) => {
+    const indexA = categoryOrder.indexOf(a);
+    const indexB = categoryOrder.indexOf(b);
+    // If not in order list, push to end alphabetically
+    if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
 
   return (
     <div className="flex flex-col h-full bg-[#F8FAFC] animate-in slide-in-from-right duration-500 absolute inset-0 z-40 overflow-hidden">
