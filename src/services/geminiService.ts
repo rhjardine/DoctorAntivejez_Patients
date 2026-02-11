@@ -7,6 +7,10 @@ const BACKEND_URL = import.meta.env.DEV
   ? '/api/vcoach-chat'
   : 'https://doctor-antivejez-web.onrender.com/vcoach-chat-v1';
 
+const VISION_API_URL = import.meta.env.DEV
+  ? '/api/vision-v1'
+  : 'https://doctor-antivejez-web.onrender.com/api/vision-v1';
+
 export interface FoodAnalysisResult {
   productName: string;
   recommendation: 'RECOMMENDED' | 'MODERATE' | 'AVOID';
@@ -46,6 +50,13 @@ export const startChatSession = async (context?: any) => {
 };
 
 export const analyzeFoodImage = async (base64Image: string): Promise<FoodAnalysisResult> => {
-  console.warn("Vision AI temporalmente deshabilitada en cliente por restricciones regionales.");
-  throw new Error("Vision AI requiere refactorización a proxy backend.");
+  try {
+    const response = await axios.post(VISION_API_URL, {
+      imageBase64: base64Image
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Vision AI Error:", error);
+    throw new Error("Error al analizar la imagen. Intenta nuevamente.");
+  }
 };

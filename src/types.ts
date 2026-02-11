@@ -160,3 +160,12 @@ export interface ConsultationRecord {
   chronologicalAgeAtTime: number;
   treatmentSnapshot: PatientProtocol[];
 }
+
+export interface GeneticResult {
+  telomereLength: string;
+  biologicalAge: number;
+  chronologicalAge: number;
+  agingDelta: number;
+  rejuvenationScore: number;  // 0-100, derived from agingDelta
+  lastTestDate: string;
+}

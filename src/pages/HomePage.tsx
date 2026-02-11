@@ -117,7 +117,7 @@ const HomePage: React.FC = () => {
                             size={90}
                         />
                     </div>
-                    <div onClick={() => is5A ? navigate('/activity') : null /* Restauración */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                    <div onClick={() => is5A ? navigate('/activity') : navigate('/restoration')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
                             percentage={is5A ? 40 : 35}
                             label={is5A ? "Actividad" : "Restauración"}

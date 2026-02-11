@@ -26,6 +26,7 @@ import AttitudeView from './components/AttitudeView';
 import ActivityView from './components/ActivityView';
 import EnvironmentView from './components/EnvironmentView';
 import RestView from './components/RestView';
+import RestorationView from './components/Therapies/RestorationView';
 import AboutView from './components/AboutView';
 import MedicalTeamView from './components/MedicalTeamView';
 import UsageGuideView from './components/UsageGuideView';
@@ -185,6 +186,7 @@ const App: React.FC = () => {
           <Route path="/activity" element={<ProtectedRoute><ActivityView /></ProtectedRoute>} />
           <Route path="/environment" element={<ProtectedRoute><EnvironmentView /></ProtectedRoute>} />
           <Route path="/rest" element={<ProtectedRoute><RestView /></ProtectedRoute>} />
+          <Route path="/restoration" element={<ProtectedRoute><RestorationView onBack={() => navigate(-1)} /></ProtectedRoute>} />
           <Route path="/about" element={<ProtectedRoute><AboutView onNavigateToTeam={() => navigate('/team')} onNavigateToGuide={() => navigate('/usage-guide')} /></ProtectedRoute>} />
           <Route path="/team" element={<ProtectedRoute><MedicalTeamView /></ProtectedRoute>} />
           <Route path="/usage-guide" element={<ProtectedRoute><UsageGuideView /></ProtectedRoute>} />
