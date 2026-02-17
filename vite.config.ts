@@ -51,7 +51,7 @@ export default defineConfig(({ mode }) => {
               handler: 'NetworkOnly', // NO usar cache para el perfil clínico por ahora
             },
             {
-              urlPattern: /^https:\/\/doctor-antivejez-web\.onrender\.com\/(mobile-auth-v1|mobile-profile-v1)/,
+              urlPattern: ({ url }) => url.pathname.includes('mobile-auth-v1') || url.pathname.includes('mobile-profile-v1'),
               handler: 'StaleWhileRevalidate',
               options: {
                 cacheName: 'api-cache',
@@ -68,9 +68,6 @@ export default defineConfig(({ mode }) => {
         }
       })
     ],
-    define: {
-      // 'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY), // REMOVED FOR SECURITY
-    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

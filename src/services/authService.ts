@@ -2,7 +2,10 @@ import axios from 'axios';
 import { UserSession } from '../types';
 import apiClient from './apiClient';
 import { useProfileStore } from '../store/useProfileStore';
+import { logger } from '../utils/logger';
 
+// ✅ SECURITY: URL centralizada via variable de entorno
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 const SESSION_KEY = 'rejuvenate_session_v1';
 
@@ -13,29 +16,28 @@ const SESSION_KEY = 'rejuvenate_session_v1';
 export const authService = {
   /**
    * Intenta iniciar sesión con el ID de documento del paciente.
-   * En esta fase beta, aceptamos el ID del piloto o generamos uno genérico para pruebas.
    */
   login: async (identification: string, password?: string): Promise<UserSession> => {
     try {
-      const isDev = import.meta.env.DEV;
-      const baseUrl = isDev ? '/api-render' : 'https://doctor-antivejez-web.onrender.com';
+      const baseUrl = import.meta.env.DEV ? '/api-render' : API_URL;
       const response = await axios.post(`${baseUrl}/mobile-auth-v1`, { identification, password });
       const { token, patient } = response.data;
 
-      // Almacenamos los datos consolidados del perfil en el store global para evitar clusters de llamadas
+      // Almacenamos los datos consolidados del perfil en el store global
       useProfileStore.getState().setProfileData({
         biologicalAge: patient.biophysicsTests?.[0]?.biologicalAge || null,
         chronologicalAge: patient.chronologicalAge,
         guides: patient.guides || [],
         foodPlans: patient.foodPlans || [],
         bloodType: patient.bloodType,
+        latestNlr: null,
         fetchedAt: Date.now()
       });
 
       const session: UserSession = {
         id: patient.id,
         token: token,
-        name: patient.name, // El backend ya envía el nombre concatenado
+        name: patient.name,
         email: patient.email,
         role: 'PATIENT',
         lastLoginAt: new Date().toISOString()
@@ -43,20 +45,26 @@ export const authService = {
 
       sessionStorage.setItem('auth_token', token);
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+      // ✅ SECURITY: Log only the action, no PHI
+      logger.audit('login_success', { patientId: patient.id });
       return session;
     } catch (error: any) {
+      logger.error('Login failed', { status: error.response?.status });
       const message = error.response?.data?.error || "Error al iniciar sesión. Verifique sus credenciales.";
       throw new Error(message);
     }
   },
-
 
   /**
    * Finaliza la sesión y limpia el almacenamiento local.
    */
   logout: () => {
     sessionStorage.removeItem(SESSION_KEY);
-    // Opcional: limpiar otros datos de caché si fuera necesario
+    sessionStorage.removeItem('auth_token');
+    sessionStorage.removeItem('refresh_token');
+    useProfileStore.getState().clearProfileData();
+    logger.audit('logout');
   },
 
   /**
@@ -69,7 +77,7 @@ export const authService = {
     try {
       return JSON.parse(session);
     } catch (e) {
-      console.error("Error al parsear la sesión persistente", e);
+      logger.error('Error parsing persisted session');
       return null;
     }
   },
