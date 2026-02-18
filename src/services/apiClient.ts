@@ -1,10 +1,9 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 import { useProfileStore } from '../store/useProfileStore';
 import { logger } from '../utils/logger';
-import { cryptoService } from './cryptoService'; // ✅ SECURITY
 
 // ✅ SECURITY: URL centralizada via variable de entorno
-// Fallback hardcoded para evitar errores si la env var no está configurada en Render
+// Fallback hardcoded para garantizar funcionamiento en producción si la env var no está configurada
 const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com';
 
 const apiClient = axios.create({
@@ -12,19 +11,11 @@ const apiClient = axios.create({
     headers: { 'Content-Type': 'application/json' }
 });
 
-// Interceptor para inyectar el Token en cada llamada médica (Decrypting first)
-apiClient.interceptors.request.use(async (config) => {
-    const encryptedToken = sessionStorage.getItem('auth_token');
-    if (encryptedToken) {
-        try {
-            // ✅ SECURITY: Decrypt token before use
-            const token = await cryptoService.decrypt(encryptedToken);
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
-        } catch (e) {
-            logger.error('Failed to decrypt token in interceptor');
-        }
+// Interceptor para inyectar el Token en cada llamada médica
+apiClient.interceptors.request.use((config) => {
+    const token = sessionStorage.getItem('auth_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
     }
     // ✅ SECURITY: Never log request data (may contain PHI)
     logger.audit('api_request', { method: config.method || 'unknown', url: config.url || 'unknown' });
@@ -42,12 +33,8 @@ apiClient.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const encryptedRefreshToken = sessionStorage.getItem('refresh_token');
-                if (!encryptedRefreshToken) throw new Error('No refresh token');
-
-                // Decrypt refresh token
-                const refreshToken = await cryptoService.decrypt(encryptedRefreshToken);
-                if (!refreshToken) throw new Error('Invalid refresh token');
+                const refreshToken = sessionStorage.getItem('refresh_token');
+                if (!refreshToken) throw new Error('No refresh token');
 
                 // Llamar endpoint de refresh (backend debe implementarlo)
                 const { data } = await axios.post(
@@ -55,13 +42,10 @@ apiClient.interceptors.response.use(
                     { refreshToken }
                 );
 
-                // ✅ SECURITY: Encrypt new tokens
-                const newEncryptedToken = await cryptoService.encrypt(data.accessToken);
-                sessionStorage.setItem('auth_token', newEncryptedToken);
-
+                // Actualizar tokens
+                sessionStorage.setItem('auth_token', data.accessToken);
                 if (data.refreshToken) {
-                    const newEncryptedRefreshToken = await cryptoService.encrypt(data.refreshToken);
-                    sessionStorage.setItem('refresh_token', newEncryptedRefreshToken);
+                    sessionStorage.setItem('refresh_token', data.refreshToken);
                 }
 
                 // Reintentar request original
@@ -73,7 +57,6 @@ apiClient.interceptors.response.use(
                 // NUCLEAR RESET: Limpieza total por seguridad
                 logger.warn('Session expired, forcing logout');
                 sessionStorage.clear();
-                localStorage.clear(); // Ensure clean state
                 useProfileStore.getState().clearProfileData();
                 window.location.href = '/login';
                 return Promise.reject(refreshError);

@@ -1,19 +1,18 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 import { UserSession } from '../types';
 import apiClient from './apiClient';
 import { useProfileStore } from '../store/useProfileStore';
 import { logger } from '../utils/logger';
-import { cryptoService } from './cryptoService'; // ✅ SECURITY
 
 // ✅ SECURITY: URL centralizada via variable de entorno
-// Fallback hardcoded para evitar errores si la env var no está configurada en Render
+// Fallback hardcoded para garantizar funcionamiento en producción si la env var no está configurada
 const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com';
 
-const SESSION_KEY = 'rejuvenate_session_enc_v1'; // Renamed to indicate encryption
+const SESSION_KEY = 'rejuvenate_session_v1';
 
 /**
  * Servicio de Autenticación para la PWA Rejuvenate.
- * Maneja el inicio de sesión del paciente y la persistencia de la sesión encriptada.
+ * Maneja el inicio de sesión del paciente y la persistencia de la sesión.
  */
 export const authService = {
   /**
@@ -25,7 +24,7 @@ export const authService = {
       const response = await axios.post(`${baseUrl}/mobile-auth-v1`, { identification, password });
       const { token, patient } = response.data;
 
-      // Almacenamos los datos consolidados del perfil en el store global (Memory Only)
+      // Almacenamos los datos consolidados del perfil en el store global
       useProfileStore.getState().setProfileData({
         biologicalAge: patient.biophysicsTests?.[0]?.biologicalAge || null,
         chronologicalAge: patient.chronologicalAge,
@@ -45,12 +44,8 @@ export const authService = {
         lastLoginAt: new Date().toISOString()
       };
 
-      // ✅ SECURITY: Encrypt sensitive data before storage
-      const encryptedToken = await cryptoService.encrypt(token);
-      const encryptedSession = await cryptoService.encrypt(session);
-
-      sessionStorage.setItem('auth_token', encryptedToken);
-      sessionStorage.setItem(SESSION_KEY, encryptedSession);
+      sessionStorage.setItem('auth_token', token);
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
 
       // ✅ SECURITY: Log only the action, no PHI
       logger.audit('login_success', { patientId: patient.id });
@@ -69,39 +64,27 @@ export const authService = {
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem('auth_token');
     sessionStorage.removeItem('refresh_token');
-    // Also remove old plaintext keys if they exist from previous version
-    sessionStorage.removeItem('rejuvenate_session_v1');
-
     useProfileStore.getState().clearProfileData();
     logger.audit('logout');
   },
 
   /**
-   * Recupera la sesión actual desde el almacenamiento persistente (Desencriptando).
+   * Recupera la sesión actual desde el almacenamiento persistente.
    */
-  getCurrentUser: async (): Promise<UserSession | null> => {
-    const encryptedSession = sessionStorage.getItem(SESSION_KEY);
-    if (!encryptedSession) return null;
+  getCurrentUser: (): UserSession | null => {
+    const session = sessionStorage.getItem(SESSION_KEY);
+    if (!session) return null;
 
     try {
-      // ✅ SECURITY: Decrypt session data
-      const session = await cryptoService.decrypt(encryptedSession);
-      if (!session) {
-        // Tampering detected or key mismatch
-        authService.logout();
-        return null;
-      }
-      return session as UserSession;
+      return JSON.parse(session);
     } catch (e) {
-      logger.error('Error decrypting persisted session');
-      authService.logout();
+      logger.error('Error parsing persisted session');
       return null;
     }
   },
 
   /**
-   * Verifica si hay una sesión activa (Existencia de llave encriptada).
-   * Nota: No garantiza validez hasta desencriptar, pero sirve para chequeos rápidos de UI.
+   * Verifica si hay una sesión activa.
    */
   isAuthenticated: (): boolean => {
     return sessionStorage.getItem(SESSION_KEY) !== null;

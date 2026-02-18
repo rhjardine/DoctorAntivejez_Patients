@@ -32,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
         localStorage.clear(); // Complete cleanup to prevent data leakage
         set({ session: null });
       },
+
       checkSession: () => {
         const session = authService.getCurrentUser();
         set({ session });
