@@ -465,7 +465,6 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onI
           )}
         </div>
       </div>
-    </div >
     </>
   );
 };
