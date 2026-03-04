@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
+import { authService } from '../services/authService';
 
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
@@ -16,14 +17,14 @@ const LoginPage: React.FC = () => {
 
         setError(null);
 
-        // Full localStorage clear to avoid any session conflicts
-        localStorage.clear();
+        // Targeted cleanup: solo limpia datos de sesión previos, no todo localStorage
+        authService.clearSession();
 
         try {
             await login(documentId, password);
             navigate('/');
-        } catch (err: any) {
-            setError(err.message || "Error al iniciar sesión");
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
         }
     };
 
@@ -50,6 +51,7 @@ const LoginPage: React.FC = () => {
                             value={documentId}
                             onChange={(e) => setDocumentId(e.target.value)}
                             placeholder="Ej: 5963578"
+                            autoComplete="username"
                             className={`w-full bg-gray-50 border-2 rounded-2xl p-4 text-lg font-bold text-darkBlue focus:outline-none transition-all ${error ? 'border-red-100 focus:border-red-400' : 'border-gray-50 focus:border-primary'
                                 }`}
                             required
@@ -64,6 +66,7 @@ const LoginPage: React.FC = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
+                            autoComplete="current-password"
                             className={`w-full bg-gray-50 border-2 rounded-2xl p-4 text-lg font-bold text-darkBlue focus:outline-none transition-all ${error ? 'border-red-100 focus:border-red-400' : 'border-gray-50 focus:border-primary'
                                 }`}
                             required

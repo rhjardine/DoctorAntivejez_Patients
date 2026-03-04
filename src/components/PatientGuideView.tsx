@@ -1,11 +1,11 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PatientProtocol, TimeSlot, ProtocolCategory, COLORS } from '../types';
 import {
   Sun, Moon, Sunset, CheckCircle2, Pill, Activity, Zap, ClipboardCheck,
   Trash2, RefreshCw, Flame, Sparkles, Leaf, Droplet, Stethoscope,
   ChevronRight, Check, ClipboardList, ChevronDown, FileSearch,
-  MessageSquareQuote, AlertTriangle, Clock, Info
+  MessageSquareQuote, AlertTriangle, Clock, Info, Bell, X
 } from 'lucide-react';
 import { useProfileStore } from '../store/useProfileStore';
 
@@ -19,6 +19,8 @@ interface PatientGuideViewProps {
 
 type ViewMode = 'PLAN' | 'TRACK';
 
+const LAST_SEEN_KEY = 'rejuvenate_last_guide_seen';
+
 const CATEGORY_LABELS: Record<string, string> = {
   REMOVAL_PHASE: 'Fase de Remoción',
   REVITALIZATION_PHASE: 'Fase de Revitalización',
@@ -30,8 +32,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   METABOLIC_ACTIVATOR: 'Activador Metabólico',
   COSMECEUTICALS: 'Cosmecéuticos',
   NATURAL_FORMULAS: 'Fórmulas Naturales',
-  ANTI_AGING_SERUMS: 'Sueros - Shot Antivejez',
+  ANTI_AGING_SERUMS: 'Sueros — Shot Antivejez',
   ANTI_AGING_THERAPIES: 'Terapias Antienvejecimiento',
+  BIO_NEURAL_THERAPY: 'Terapia BioNeural',
   THERAPY_CONTROL: 'Control de Terapia',
 };
 
@@ -42,6 +45,28 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onI
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showNewGuideBanner, setShowNewGuideBanner] = useState(false);
+
+  // Check if a newer guide is available vs last seen
+  useEffect(() => {
+    if (profileData?.guides?.length > 0) {
+      const latestGuide = profileData.guides[0];
+      const latestDate = latestGuide?.createdAt;
+      if (!latestDate) return;
+      const lastSeen = localStorage.getItem(LAST_SEEN_KEY);
+      if (!lastSeen || new Date(latestDate) > new Date(lastSeen)) {
+        setShowNewGuideBanner(true);
+      }
+    }
+  }, [profileData]);
+
+  const dismissBanner = () => {
+    if (profileData?.guides?.length > 0) {
+      const latestDate = profileData.guides[0]?.createdAt;
+      if (latestDate) localStorage.setItem(LAST_SEEN_KEY, latestDate);
+    }
+    setShowNewGuideBanner(false);
+  };
 
   // Data Binding Fix: Use items from the profile store if available, or fall back to props
   const effectiveItems = useMemo(() => {
@@ -369,61 +394,79 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onI
   };
 
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden">
-      <div className="bg-white pt-12 pb-6 px-6 border-b border-slate-100 shadow-sm z-20">
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h2 className="text-2xl font-black text-[#293B64] leading-none tracking-tighter uppercase">Tu Protocolo de Longevidad</h2>
-            <div className="flex items-center gap-2 mt-2">
-              <div className={`w-2 h-2 rounded-full ${isRefreshing ? 'bg-amber-400 animate-spin' : 'bg-primary animate-pulse'}`}></div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sincronizado via Prisma</span>
+    <>
+      {/* New Guide Notification Banner */}
+      {showNewGuideBanner && (
+        <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4 bg-amber-400 shadow-lg animate-in slide-in-from-top duration-500">
+          <div className="flex items-center gap-3">
+            <Bell size={20} className="text-amber-900 animate-pulse" />
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-widest text-amber-900">Protocolo Actualizado</p>
+              <p className="text-xs font-bold text-amber-800">Tu doctor ha actualizado tu guía de tratamiento</p>
             </div>
           </div>
-          <button onClick={handleManualRefresh} className={`w-14 h-14 bg-sky-50 rounded-[1.5rem] flex items-center justify-center text-primary shadow-inner transition-transform active:rotate-180 ${isRefreshing ? 'animate-spin' : ''}`}>
-            <ClipboardCheck size={30} />
+          <button onClick={dismissBanner} className="w-8 h-8 flex items-center justify-center bg-amber-500 rounded-xl text-amber-900 hover:bg-amber-600 transition-colors">
+            <X size={16} />
           </button>
         </div>
-
-        {items.length > 0 && !loading && (
-          <div className="bg-slate-50 p-1.5 rounded-2xl flex relative h-14 shadow-inner border border-slate-100">
-            <div className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-xl shadow-md transition-all duration-300 border border-slate-100 ${viewMode === 'TRACK' ? 'left-[calc(50%+3px)]' : 'left-1.5'}`}></div>
-            <button onClick={() => setViewMode('PLAN')} className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest z-10 transition-colors ${viewMode === 'PLAN' ? 'text-primary' : 'text-slate-400'}`}>
-              <FileSearch size={16} /> Ver Guía
-            </button>
-            <button onClick={() => setViewMode('TRACK')} className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest z-10 transition-colors ${viewMode === 'TRACK' ? 'text-primary' : 'text-slate-400'}`}>
-              <CheckCircle2 size={16} /> Registrar Avances
+      )}
+      <div className="flex flex-col h-full bg-white overflow-hidden">
+        <div className="bg-white pt-12 pb-6 px-6 border-b border-slate-100 shadow-sm z-20">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h2 className="text-2xl font-black text-[#293B64] leading-none tracking-tighter uppercase">Tu Protocolo de Longevidad</h2>
+              <div className="flex items-center gap-2 mt-2">
+                <div className={`w-2 h-2 rounded-full ${isRefreshing ? 'bg-amber-400 animate-spin' : 'bg-primary animate-pulse'}`}></div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sincronizado via Prisma</span>
+              </div>
+            </div>
+            <button onClick={handleManualRefresh} className={`w-14 h-14 bg-sky-50 rounded-[1.5rem] flex items-center justify-center text-primary shadow-inner transition-transform active:rotate-180 ${isRefreshing ? 'animate-spin' : ''}`}>
+              <ClipboardCheck size={30} />
             </button>
           </div>
-        )}
-      </div>
 
-      <div className="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
-        {loading ? (
-          renderSkeleton()
-        ) : effectiveItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full p-10 text-center space-y-6 animate-in fade-in duration-700">
-            <div className="w-24 h-24 bg-sky-50 rounded-[2.5rem] flex items-center justify-center text-primary shadow-inner">
-              <Stethoscope size={48} className="animate-pulse" />
+          {items.length > 0 && !loading && (
+            <div className="bg-slate-50 p-1.5 rounded-2xl flex relative h-14 shadow-inner border border-slate-100">
+              <div className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-xl shadow-md transition-all duration-300 border border-slate-100 ${viewMode === 'TRACK' ? 'left-[calc(50%+3px)]' : 'left-1.5'}`}></div>
+              <button onClick={() => setViewMode('PLAN')} className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest z-10 transition-colors ${viewMode === 'PLAN' ? 'text-primary' : 'text-slate-400'}`}>
+                <FileSearch size={16} /> Ver Guía
+              </button>
+              <button onClick={() => setViewMode('TRACK')} className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest z-10 transition-colors ${viewMode === 'TRACK' ? 'text-primary' : 'text-slate-400'}`}>
+                <CheckCircle2 size={16} /> Registrar Avances
+              </button>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-xl font-black text-darkBlue uppercase tracking-tighter">Preparando tu Protocolo</h3>
-              <p className="text-sm font-bold text-textMedium leading-relaxed max-w-xs italic">
-                "Tu doctor está preparando tu protocolo personalizado. Pronto recibirás tus indicaciones basadas en tu ciencia biológica."
-              </p>
+          )}
+        </div>
+
+        <div className="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
+          {loading ? (
+            renderSkeleton()
+          ) : effectiveItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full p-10 text-center space-y-6 animate-in fade-in duration-700">
+              <div className="w-24 h-24 bg-sky-50 rounded-[2.5rem] flex items-center justify-center text-primary shadow-inner">
+                <Stethoscope size={48} className="animate-pulse" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-darkBlue uppercase tracking-tighter">Preparando tu Protocolo</h3>
+                <p className="text-sm font-bold text-textMedium leading-relaxed max-w-xs italic">
+                  "Tu doctor está preparando tu protocolo personalizado. Pronto recibirás tus indicaciones basadas en tu ciencia biológica."
+                </p>
+              </div>
+              <button
+                onClick={handleManualRefresh}
+                className="bg-darkBlue text-white px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 active:scale-95 transition-all"
+              >
+                <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+                Verificar Actualizaciones
+              </button>
             </div>
-            <button
-              onClick={handleManualRefresh}
-              className="bg-darkBlue text-white px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 active:scale-95 transition-all"
-            >
-              <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
-              Verificar Actualizaciones
-            </button>
-          </div>
-        ) : (
-          viewMode === 'TRACK' ? renderTrackMode() : renderPlanMode()
-        )}
+          ) : (
+            viewMode === 'TRACK' ? renderTrackMode() : renderPlanMode()
+          )}
+        </div>
       </div>
-    </div>
+    </div >
+    </>
   );
 };
 

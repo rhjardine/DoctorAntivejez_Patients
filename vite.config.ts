@@ -44,25 +44,16 @@ export default defineConfig(({ mode }) => {
           ]
         },
         workbox: {
+          // ✅ CRITICAL: Fuerza actualización inmediata del Service Worker
+          // para que los usuarios con la PWA instalada obtengan el fix de caché
+          skipWaiting: true,
+          clientsClaim: true,
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
           runtimeCaching: [
             {
-              urlPattern: ({ url }) => url.pathname.includes('mobile-profile-v1'),
-              handler: 'NetworkOnly', // NO usar cache para el perfil clínico por ahora
-            },
-            {
+              // Auth y Profile: NUNCA cachear endpoints médicos/sensibles
               urlPattern: ({ url }) => url.pathname.includes('mobile-auth-v1') || url.pathname.includes('mobile-profile-v1'),
-              handler: 'StaleWhileRevalidate',
-              options: {
-                cacheName: 'api-cache',
-                expiration: {
-                  maxEntries: 50,
-                  maxAgeSeconds: 60 * 5 // 5 minutes
-                },
-                cacheableResponse: {
-                  statuses: [0, 200]
-                }
-              }
+              handler: 'NetworkOnly',
             }
           ]
         }
