@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Settings, Info, LogOut, User, AlertCircle, Activity, Bell, BellOff, Zap, FileClock, QrCode } from 'lucide-react';
+import { X, Info, LogOut, User, AlertCircle, Activity, Bell, Zap, FileClock, QrCode } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useUIStore } from '../store/useUIStore';
 
@@ -54,15 +54,35 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
         className={`fixed top-0 left-0 h-full w-[300px] bg-white z-50 shadow-2xl transform transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
-        <div className="bg-darkBlue p-8 pt-16 text-white relative">
-          <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white"><X size={32} /></button>
-          <div className="flex flex-col gap-4">
-            <div className="w-20 h-20 rounded-3xl bg-primary flex items-center justify-center text-white shadow-xl border-4 border-white/10">
-              <User size={40} />
+        <div className="bg-darkBlue p-6 pt-14 text-white relative overflow-hidden">
+          {/* Decorative background circles */}
+          <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-primary/10 pointer-events-none" />
+          <div className="absolute top-10 -right-2 w-14 h-14 rounded-full bg-primary/15 pointer-events-none" />
+
+          <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white z-10"><X size={28} /></button>
+
+          {/* Welcome card */}
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white shadow-xl border-2 border-white/10 shrink-0">
+              <User size={32} />
             </div>
-            <div>
-              <h2 className="font-black text-xl leading-tight tracking-tighter truncate max-w-[200px]">{session?.name || 'Paciente'}</h2>
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/80">Bienvenido</span>
+              <h2 className="font-black text-lg leading-tight tracking-tight truncate max-w-[185px] text-white">
+                {session?.name || 'Paciente'}
+              </h2>
+              <div className="flex items-center gap-1.5 mt-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Sesión activa</span>
+              </div>
             </div>
+          </div>
+
+          {/* Decorative motivational strip */}
+          <div className="mt-4 bg-white/5 rounded-xl px-3 py-2 border border-white/10">
+            <p className="text-[10px] font-bold text-white/60 italic leading-snug">
+              "Cada día es una oportunidad para rejuvenecer a nivel celular."
+            </p>
           </div>
         </div>
 
@@ -92,13 +112,6 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
             <span className="font-black text-base uppercase tracking-widest">Bio-Pase (Check-in)</span>
           </button>
 
-          <button
-            onClick={() => handleNavigation('/settings')}
-            className="w-full flex items-center gap-5 px-8 py-5 hover:bg-pearlyGray transition-all text-darkBlue group"
-          >
-            <Settings size={24} className="text-textMedium group-hover:text-primary" />
-            <span className="font-black text-base uppercase tracking-widest">Personalización</span>
-          </button>
 
           <div className="px-8 py-6">
             <div className="flex items-center justify-between">

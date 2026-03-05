@@ -107,7 +107,7 @@ const HomePage: React.FC = () => {
         return (
             <div className="flex flex-col items-center mt-0 w-full px-4 relative pb-2">
                 {/* Top Row: 2 Satellites */}
-                <div className="flex justify-center gap-12 w-full px-4">
+                <div className="flex justify-center gap-8 w-full px-4">
                     <div onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
                             percentage={is5A ? 75 : 25}
@@ -180,7 +180,7 @@ const HomePage: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col w-full h-full overflow-hidden relative bg-[#F8FAFC]">
+        <div className="flex flex-col w-full relative bg-[#F8FAFC]">
             <AnimatePresence mode="wait">
                 {!activeDetail ? (
                     <motion.div
@@ -189,7 +189,7 @@ const HomePage: React.FC = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 1.02 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="flex flex-col w-full pb-2"
+                        className="flex flex-col w-full pb-20"
                     >
                         <BiologicalAgeGauge
                             biologicalAge={biophysicalAge}

@@ -168,7 +168,7 @@ const App: React.FC = () => {
         </header>
       )}
 
-      <main className="flex-1 overflow-y-auto no-scrollbar relative bg-[#F8FAFC]">
+      <main className="flex-1 overflow-y-auto no-scrollbar relative bg-[#F8FAFC] pb-20">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
 
