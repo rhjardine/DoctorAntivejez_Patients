@@ -129,7 +129,7 @@ const HomePage: React.FC = () => {
                 </div>
 
                 {/* VCoach Center Nucleus */}
-                <div className="flex justify-center -my-2 z-10">
+                <div className="flex justify-center z-10 py-2">
                     <button onClick={() => navigate('/chat')} className="active:scale-90 transition-transform bg-white rounded-full p-1 shadow-2xl shadow-blue-900/20">
                         <CircularProgress
                             percentage={adherence}
@@ -143,7 +143,7 @@ const HomePage: React.FC = () => {
                 </div>
 
                 {/* Bottom Row: 3 Satellites (5A) or 2 Satellites (4R) */}
-                <div className={`flex justify-center w-full ${is5A ? 'gap-4' : 'gap-12'}`}>
+                <div className={`flex justify-center w-full py-2 ${is5A ? 'gap-4' : 'gap-12'}`}>
                     <div onClick={() => is5A ? navigate('/attitude') : null /* Regeneración */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
                             percentage={is5A ? 60 : 40}

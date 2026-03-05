@@ -17,19 +17,17 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
   totalItems,
   onInfoPress
 }) => {
-  // Lógica de Septenios: 7-28 (Verde), 28-49 (Amarillo), 49-70 (Naranja), 70-120 (Rojo)
+  // Lógica Revisada: 7-28 (Verde), 28-70 (Amarillo), 70-120 (Rojo)
   const calculatePosition = (age: number) => {
     if (age <= 7) return 0;
     if (age >= 120) return 100;
 
-    // 0-25%: 7 a 28
-    if (age <= 28) return ((age - 7) / 21) * 25;
-    // 25-50%: 28 a 49
-    if (age <= 49) return 25 + ((age - 28) / 21) * 25;
-    // 50-75%: 49 a 70
-    if (age <= 70) return 50 + ((age - 49) / 21) * 25;
-    // 75-100%: 70 a 120
-    return 75 + ((age - 70) / 50) * 25;
+    // Verde: 7 a 28 (0% - 33.3%)
+    if (age <= 28) return ((age - 7) / 21) * 33.33;
+    // Amarillo: 28 a 70 (33.3% - 66.6%)
+    if (age <= 70) return 33.33 + ((age - 28) / 42) * 33.33;
+    // Rojo: 70 a 120 (66.6% - 100%)
+    return 66.66 + ((age - 70) / 50) * 33.33;
   };
 
   const percentagePosition = calculatePosition(biologicalAge);
@@ -78,21 +76,19 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
         </div>
       </div>
 
-      {/* Barra de Septenios Gradiente Segmentada */}
+      {/* Barra de Septenios Gradiente Segmentada (Verde, Amarillo, Rojo) */}
       <div className="relative h-9 mt-1">
         <div className="h-2.5 w-full flex rounded-full overflow-hidden shadow-inner bg-slate-100 border border-slate-200">
-          <div className="h-full bg-emerald-500 border-r border-white/20" style={{ width: '25%' }}></div>
-          <div className="h-full bg-yellow-400 border-r border-white/20" style={{ width: '25%' }}></div>
-          <div className="h-full bg-orange-400 border-r border-white/20" style={{ width: '25%' }}></div>
-          <div className="h-full bg-rose-500" style={{ width: '25%' }}></div>
+          <div className="h-full bg-emerald-500 border-r border-white/20" style={{ width: '33.33%' }}></div>
+          <div className="h-full bg-yellow-400 border-r border-white/20" style={{ width: '33.33%' }}></div>
+          <div className="h-full bg-rose-500" style={{ width: '33.34%' }}></div>
         </div>
 
         {/* Marcadores de Escala */}
         <div className="absolute w-full flex justify-between text-[9px] text-slate-400 mt-2 font-black uppercase tracking-widest">
           <span>7</span>
-          <span className="absolute left-[25%] -translate-x-1/2">28</span>
-          <span className="absolute left-[50%] -translate-x-1/2">49</span>
-          <span className="absolute left-[75%] -translate-x-1/2">70</span>
+          <span className="absolute left-[33.33%] -translate-x-1/2">28</span>
+          <span className="absolute left-[66.66%] -translate-x-1/2">70</span>
           <span>120</span>
         </div>
 
