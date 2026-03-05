@@ -32,7 +32,7 @@ export const authService = {
       // El endpoint mobile-auth-v1 vive fuera de /api, por lo tanto usamos axios directamente
       const baseUrl = import.meta.env.DEV ? '/api-render' : API_URL;
       const response = await axios.post(`${baseUrl}/mobile-auth-v1`, { identification, password });
-      const { token, patient } = response.data;
+      const { token, refreshToken, patient } = response.data;
 
       if (!token || !patient) {
         throw new Error('Respuesta del servidor incompleta: faltan token o datos de paciente.');
@@ -59,6 +59,10 @@ export const authService = {
       };
 
       sessionStorage.setItem('auth_token', token);
+      // ✅ Guardar refresh token para que apiClient.ts pueda renovar el access token
+      if (refreshToken) {
+        sessionStorage.setItem('refresh_token', refreshToken);
+      }
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
 
       // ✅ SECURITY: Log only the action, no PHI
@@ -94,6 +98,7 @@ export const authService = {
     localStorage.removeItem('rejuvenate_favorite_foods');
     localStorage.removeItem('rejuvenate_reminders_log');
     localStorage.removeItem('notifications_enabled');
+    localStorage.removeItem('rejuvenate_last_guide_seen');
 
     // Limpia store de perfil en memoria
     useProfileStore.getState().clearProfileData();

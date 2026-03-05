@@ -19,7 +19,7 @@ interface DrawerProps {
 
 const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }) => {
   const navigate = useNavigate();
-  const { logout } = useAuthStore();
+  const { logout, session } = useAuthStore();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const { notificationsEnabled, enableNotifications, disableNotifications } = notificationControls;
 
@@ -61,7 +61,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
               <User size={40} />
             </div>
             <div>
-              <h2 className="font-black text-2xl leading-none tracking-tighter">Rhys Jardine</h2>
+              <h2 className="font-black text-2xl leading-none tracking-tighter">{session?.name || 'Paciente'}</h2>
               <p className="text-sm text-primary font-bold mt-1">Nivel: Bio-Hacker</p>
             </div>
           </div>
