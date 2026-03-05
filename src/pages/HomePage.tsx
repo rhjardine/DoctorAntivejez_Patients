@@ -105,61 +105,61 @@ const HomePage: React.FC = () => {
         const is5A = currentMainTab === MainTab.KEYS_5A;
 
         return (
-            <div className="flex flex-col items-center mt-2 w-full px-4 relative pb-10">
+            <div className="flex flex-col items-center mt-0 w-full px-4 relative pb-2">
                 {/* Top Row: 2 Satellites */}
                 <div className="flex justify-center gap-12 w-full px-4">
                     <div onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
                             percentage={is5A ? 75 : 25}
                             label={is5A ? "Alimentación" : "Remoción"}
-                            icon={is5A ? getIcon('NUTRITION') : <Trash2 size={20} />}
+                            icon={is5A ? getIcon('NUTRITION') : <Trash2 size={18} />}
                             color={COLORS.PrimaryBlue}
-                            size={90}
+                            size={82}
                         />
                     </div>
                     <div onClick={() => is5A ? navigate('/activity') : navigate('/restoration')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
                             percentage={is5A ? 40 : 35}
                             label={is5A ? "Actividad" : "Restauración"}
-                            icon={is5A ? getIcon('ACTIVITY') : <RefreshCw size={20} />}
+                            icon={is5A ? getIcon('ACTIVITY') : <RefreshCw size={18} />}
                             color={COLORS.PrimaryBlue}
-                            size={90}
+                            size={82}
                         />
                     </div>
                 </div>
 
                 {/* VCoach Center Nucleus */}
-                <div className="flex justify-center -my-6 z-10">
+                <div className="flex justify-center -my-4 z-10">
                     <button onClick={() => navigate('/chat')} className="active:scale-90 transition-transform bg-white rounded-full p-1 shadow-2xl shadow-blue-900/20">
                         <CircularProgress
                             percentage={adherence}
                             label="VCoach IA"
-                            icon={<MessageCircle size={32} />}
+                            icon={<MessageCircle size={28} />}
                             color={COLORS.DarkBlue}
                             isCenter={true}
-                            size={120}
+                            size={108}
                         />
                     </button>
                 </div>
 
                 {/* Bottom Row: 3 Satellites (5A) or 2 Satellites (4R) */}
-                <div className={`flex justify-center w-full mt-4 ${is5A ? 'gap-3' : 'gap-12'}`}>
+                <div className={`flex justify-center w-full mt-2 ${is5A ? 'gap-2' : 'gap-10'}`}>
                     <div onClick={() => is5A ? navigate('/attitude') : null /* Regeneración */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
                             percentage={is5A ? 60 : 40}
                             label={is5A ? "Actitud" : "Regeneración"}
-                            icon={is5A ? getIcon('ATTITUDE') : <Activity size={20} />}
+                            icon={is5A ? getIcon('ATTITUDE') : <Activity size={18} />}
                             color={COLORS.PrimaryBlue}
-                            size={is5A ? 85 : 90}
+                            size={is5A ? 78 : 82}
                         />
                     </div>
                     <div onClick={() => is5A ? navigate('/environment') : null /* Revitalización */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
                             percentage={is5A ? 30 : 60}
                             label={is5A ? "Ambiente" : "Revitalización"}
-                            icon={is5A ? getIcon('ENVIRONMENT') : <Flame size={20} />}
+                            icon={is5A ? getIcon('ENVIRONMENT') : <Flame size={18} />}
                             color={COLORS.PrimaryBlue}
-                            size={is5A ? 85 : 90}
+                            size={is5A ? 78 : 82}
                         />
                     </div>
                     {/* The 5th Element: Asueto (Only in 5A) */}
@@ -168,9 +168,9 @@ const HomePage: React.FC = () => {
                             <CircularProgress
                                 percentage={55}
                                 label="Asueto"
-                                icon={getIcon('REST') || <Bed size={20} />}
+                                icon={getIcon('REST') || <Bed size={18} />}
                                 color={COLORS.PrimaryBlue}
-                                size={85}
+                                size={78}
                             />
                         </div>
                     )}
@@ -180,7 +180,7 @@ const HomePage: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col w-full h-full overflow-y-auto no-scrollbar relative bg-[#F8FAFC]">
+        <div className="flex flex-col w-full h-full overflow-hidden relative bg-[#F8FAFC]">
             <AnimatePresence mode="wait">
                 {!activeDetail ? (
                     <motion.div
@@ -189,7 +189,7 @@ const HomePage: React.FC = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 1.02 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="flex flex-col w-full pb-32"
+                        className="flex flex-col w-full pb-2"
                     >
                         <BiologicalAgeGauge
                             biologicalAge={biophysicalAge}

@@ -61,8 +61,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
               <User size={40} />
             </div>
             <div>
-              <h2 className="font-black text-2xl leading-none tracking-tighter">{session?.name || 'Paciente'}</h2>
-              <p className="text-sm text-primary font-bold mt-1">Nivel: Bio-Hacker</p>
+              <h2 className="font-black text-xl leading-tight tracking-tighter truncate max-w-[200px]">{session?.name || 'Paciente'}</h2>
             </div>
           </div>
         </div>
