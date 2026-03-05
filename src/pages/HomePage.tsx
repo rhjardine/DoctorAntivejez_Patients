@@ -105,9 +105,9 @@ const HomePage: React.FC = () => {
         const is5A = currentMainTab === MainTab.KEYS_5A;
 
         return (
-            <div className="flex flex-col items-center mt-0 w-full px-4 relative pb-2">
+            <div className="flex flex-col items-center justify-center w-full px-4 relative pb-2 min-h-[320px]">
                 {/* Top Row: 2 Satellites */}
-                <div className="flex justify-center gap-8 w-full px-4">
+                <div className="flex justify-center gap-12 w-full px-4">
                     <div onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
                             percentage={is5A ? 75 : 25}
@@ -129,7 +129,7 @@ const HomePage: React.FC = () => {
                 </div>
 
                 {/* VCoach Center Nucleus */}
-                <div className="flex justify-center -my-4 z-10">
+                <div className="flex justify-center -my-2 z-10">
                     <button onClick={() => navigate('/chat')} className="active:scale-90 transition-transform bg-white rounded-full p-1 shadow-2xl shadow-blue-900/20">
                         <CircularProgress
                             percentage={adherence}
@@ -143,7 +143,7 @@ const HomePage: React.FC = () => {
                 </div>
 
                 {/* Bottom Row: 3 Satellites (5A) or 2 Satellites (4R) */}
-                <div className={`flex justify-center w-full mt-2 ${is5A ? 'gap-2' : 'gap-10'}`}>
+                <div className={`flex justify-center w-full ${is5A ? 'gap-4' : 'gap-12'}`}>
                     <div onClick={() => is5A ? navigate('/attitude') : null /* Regeneración */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
                             percentage={is5A ? 60 : 40}
@@ -233,29 +233,6 @@ const HomePage: React.FC = () => {
                                         {renderDashboardMatrix()}
                                     </div>
 
-                                    {currentMainTab !== MainTab.THERAPIES_4R && (
-                                        <BioAgeAlert
-                                            bioAge={biophysicalAge}
-                                            chronoAge={chronologicalAge}
-                                            onAction={() => navigate('/guide')}
-                                        />
-                                    )}
-
-                                    {currentMainTab !== MainTab.THERAPIES_4R && (
-                                        <div
-                                            onClick={() => navigate('/guide')}
-                                            className="mx-6 mb-6 mt-6 bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all"
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><ClipboardList size={28} /></div>
-                                                <div>
-                                                    <h3 className="font-black text-darkBlue text-base leading-tight">Continuar Plan</h3>
-                                                    <p className="text-[10px] font-bold text-textMedium uppercase tracking-tighter">{totalCount - completedCount} tareas pendientes</p>
-                                                </div>
-                                            </div>
-                                            <ChevronRight className="text-slate-300" size={20} />
-                                        </div>
-                                    )}
                                 </div>
                             )}
                         </div>
