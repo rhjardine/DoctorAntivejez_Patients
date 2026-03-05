@@ -189,7 +189,7 @@ const HomePage: React.FC = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 1.02 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="flex flex-col w-full pb-20"
+                        className="flex flex-col w-full h-full"
                     >
                         <BiologicalAgeGauge
                             biologicalAge={biophysicalAge}
@@ -228,8 +228,10 @@ const HomePage: React.FC = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <>
-                                    {renderDashboardMatrix()}
+                                <div className="flex flex-col flex-1">
+                                    <div className="flex items-center justify-center py-2">
+                                        {renderDashboardMatrix()}
+                                    </div>
 
                                     {currentMainTab !== MainTab.THERAPIES_4R && (
                                         <BioAgeAlert
@@ -254,7 +256,7 @@ const HomePage: React.FC = () => {
                                             <ChevronRight className="text-slate-300" size={20} />
                                         </div>
                                     )}
-                                </>
+                                </div>
                             )}
                         </div>
                     </motion.div>

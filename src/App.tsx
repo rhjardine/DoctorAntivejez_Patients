@@ -36,7 +36,8 @@ import BioPaseView from './components/BioPaseView';
 import ClinicalInfoModal from './components/ClinicalInfoModal';
 import PrivacyConsentModal from './components/PrivacyConsentModal';
 import Drawer from './components/Drawer';
-import { useReminders } from './hooks/useReminders'; // We might need to refactor this hook later
+import OnboardingModal, { ONBOARDING_KEY } from './components/OnboardingModal';
+import { useReminders } from './hooks/useReminders';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { session } = useAuthStore();
@@ -59,10 +60,16 @@ const App: React.FC = () => {
   const { forceRefresh, profileData } = useProfileStore();
   const [isOnline, setIsOnline] = React.useState(navigator.onLine);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [showOnboarding, setShowOnboarding] = React.useState(false);
 
   // Initialize session check
   useEffect(() => {
     checkSession();
+
+    // Show onboarding after first login
+    if (session && !localStorage.getItem(ONBOARDING_KEY)) {
+      setShowOnboarding(true);
+    }
 
     // SESSION HEARTBEAT: Clear PHI on tab close
     const handleBeforeUnload = () => {
@@ -76,7 +83,13 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // Monitor online/offline status
+  // Show onboarding when session becomes available for the first time
+  React.useEffect(() => {
+    if (session && !localStorage.getItem(ONBOARDING_KEY)) {
+      setShowOnboarding(true);
+    }
+  }, [session?.id]);
+
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -114,6 +127,9 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-[#F8FAFC] overflow-hidden font-sans">
+      {showOnboarding && session && (
+        <OnboardingModal onComplete={() => setShowOnboarding(false)} />
+      )}
       <Drawer
         isOpen={isDrawerOpen}
         onClose={() => toggleDrawer(false)}
@@ -168,7 +184,7 @@ const App: React.FC = () => {
         </header>
       )}
 
-      <main className="flex-1 overflow-y-auto no-scrollbar relative bg-[#F8FAFC] pb-20">
+      <main className="flex-1 overflow-y-auto no-scrollbar relative bg-[#F8FAFC]" style={{ paddingBottom: 'max(80px, env(safe-area-inset-bottom, 0px) + 64px)' }}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
 
