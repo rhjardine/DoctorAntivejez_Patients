@@ -90,34 +90,34 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
 
           <button
             onClick={() => handleNavigation('/biometrics')}
-            className="w-full flex items-center gap-5 px-8 py-5 hover:bg-pearlyGray transition-all text-darkBlue group"
+            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group"
           >
-            <Activity size={24} className="text-textMedium group-hover:text-primary" />
-            <span className="font-black text-base uppercase tracking-widest">Mis Biométricos</span>
+            <Activity size={22} className="text-textMedium group-hover:text-primary" />
+            <span className="font-black text-[13px] uppercase tracking-widest">Mis Biométricos</span>
           </button>
 
           <button
             onClick={() => handleNavigation('/history')}
-            className="w-full flex items-center gap-5 px-8 py-5 hover:bg-pearlyGray transition-all text-darkBlue group"
+            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group"
           >
-            <FileClock size={24} className="text-textMedium group-hover:text-primary" />
-            <span className="font-black text-base uppercase tracking-widest">Historial Médico</span>
+            <FileClock size={22} className="text-textMedium group-hover:text-primary" />
+            <span className="font-black text-[13px] uppercase tracking-widest">Historial Médico</span>
           </button>
 
           <button
             onClick={() => handleNavigation('/biopase')}
-            className="w-full flex items-center gap-5 px-8 py-5 hover:bg-pearlyGray transition-all text-darkBlue group"
+            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group"
           >
-            <QrCode size={24} className="text-textMedium group-hover:text-primary" />
-            <span className="font-black text-base uppercase tracking-widest">Bio-Pase (Check-in)</span>
+            <QrCode size={22} className="text-textMedium group-hover:text-primary" />
+            <span className="font-black text-[13px] uppercase tracking-widest">Bio-Pase (Check-in)</span>
           </button>
 
 
-          <div className="px-8 py-6">
+          <div className="px-6 py-5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-5">
-                <Bell size={24} className={notificationsEnabled ? 'text-primary' : 'text-textMedium'} />
-                <span className="font-black text-base text-darkBlue uppercase tracking-widest">Avisos</span>
+              <div className="flex items-center gap-4">
+                <Bell size={22} className={notificationsEnabled ? 'text-primary' : 'text-textMedium'} />
+                <span className="font-black text-[13px] text-darkBlue uppercase tracking-widest">Avisos</span>
               </div>
               <div
                 onClick={toggleNotifications}
@@ -128,16 +128,16 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
             </div>
           </div>
 
-          <div className="h-px bg-gray-100 mx-8 my-4"></div>
+          <div className="h-px bg-gray-100 mx-6 my-3"></div>
 
-          <button onClick={() => handleNavigation('/about')} className="w-full flex items-center gap-5 px-8 py-5 hover:bg-pearlyGray transition-all text-darkBlue group">
-            <Info size={24} className="text-textMedium group-hover:text-primary" />
-            <span className="font-black text-base uppercase tracking-widest">Sobre la App</span>
+          <button onClick={() => handleNavigation('/about')} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group">
+            <Info size={22} className="text-textMedium group-hover:text-primary" />
+            <span className="font-black text-[13px] uppercase tracking-widest">Sobre la App</span>
           </button>
 
-          <button onClick={() => setShowLogoutConfirm(true)} className="w-full flex items-center gap-5 px-8 py-5 hover:bg-red-50 transition-all text-accentRed group">
-            <LogOut size={24} className="group-hover:text-red-600" />
-            <span className="font-black text-base uppercase tracking-widest">Cerrar Sesión</span>
+          <button onClick={() => setShowLogoutConfirm(true)} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-red-50 transition-all text-accentRed group">
+            <LogOut size={22} className="group-hover:text-red-600" />
+            <span className="font-black text-[13px] uppercase tracking-widest">Cerrar Sesión</span>
           </button>
 
           <div className="mt-auto mb-10 px-8 text-center">

@@ -35,8 +35,6 @@ const HomePage: React.FC = () => {
     const { session } = useAuthStore();
     const { profileData, setProfileData, isCacheValid } = useProfileStore();
 
-    const [biophysicalAge, setBiophysicalAge] = useState<number | string>('--');
-    const [chronologicalAge, setChronologicalAge] = useState<number | string>('--');
     const [completedCount, setCompletedCount] = useState(0);
     const [totalCount, setTotalCount] = useState(0);
     const [adherence, setAdherence] = useState(0);
@@ -57,8 +55,6 @@ const HomePage: React.FC = () => {
             // Check if we have valid cached data
             if (profileData && isCacheValid()) {
                 console.log('✅ Using cached profile data (< 5 min old)');
-                setBiophysicalAge(profileData.biologicalAge ?? '--');
-                setChronologicalAge(profileData.chronologicalAge ?? '--');
 
                 // Still need to fetch protocol items for adherence
                 const items = await ProtocolService.fetchActiveProtocol(session.id);
@@ -78,10 +74,6 @@ const HomePage: React.FC = () => {
                 if (profile) {
                     // Cache the profile data
                     setProfileData(profile);
-
-                    // Update UI
-                    setBiophysicalAge(profile.biologicalAge ?? '--');
-                    setChronologicalAge(profile.chronologicalAge ?? '--');
                 }
 
                 const items = await ProtocolService.fetchActiveProtocol(session.id);
@@ -197,8 +189,8 @@ const HomePage: React.FC = () => {
                         className="flex flex-col w-full h-full"
                     >
                         <BiologicalAgeGauge
-                            biologicalAge={biophysicalAge}
-                            chronologicalAge={chronologicalAge}
+                            biologicalAge={profileData?.biologicalAge ?? '--'}
+                            chronologicalAge={profileData?.chronologicalAge ?? '--'}
                             completedItems={completedCount}
                             totalItems={totalCount}
                             onInfoPress={() => toggleClinicalInfo(true)}
