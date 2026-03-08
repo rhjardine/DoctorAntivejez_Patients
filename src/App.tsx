@@ -169,14 +169,14 @@ const App: React.FC = () => {
           </div>
 
           {isHome && (
-            <div className="flex bg-primary">
-              <button onClick={() => setMainTab(MainTab.KEYS_5A)} className={`flex-1 py-2 text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.KEYS_5A ? 'border-white text-white' : 'border-transparent text-white/40'}`}>
+            <div className="flex bg-white border-b border-gray-200 shadow-sm">
+              <button onClick={() => setMainTab(MainTab.KEYS_5A)} className={`flex-1 py-3 px-2 text-[11px] font-bold uppercase tracking-wide flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.KEYS_5A ? 'text-[#1a3a5c] border-[#1a3a5c] bg-blue-50' : 'text-[#6B7280] border-transparent hover:text-[#1a3a5c] hover:border-gray-300'}`}>
                 <Shield size={13} /> Claves 5A
               </button>
-              <button onClick={() => setMainTab(MainTab.THERAPIES_4R)} className={`flex-1 py-2 text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.THERAPIES_4R ? 'border-white text-white' : 'border-transparent text-white/40'}`}>
+              <button onClick={() => setMainTab(MainTab.THERAPIES_4R)} className={`flex-1 py-3 px-2 text-[11px] font-bold uppercase tracking-wide flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.THERAPIES_4R ? 'text-[#1a3a5c] border-[#1a3a5c] bg-blue-50' : 'text-[#6B7280] border-transparent hover:text-[#1a3a5c] hover:border-gray-300'}`}>
                 <RefreshCw size={13} /> Terapias 4R
               </button>
-              <button onClick={() => setMainTab(MainTab.CHALLENGE)} className={`flex-1 py-2 text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.CHALLENGE ? 'border-white text-white' : 'border-transparent text-white/40'}`}>
+              <button onClick={() => setMainTab(MainTab.CHALLENGE)} className={`flex-1 py-3 px-2 text-[11px] font-bold uppercase tracking-wide flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.CHALLENGE ? 'text-[#1a3a5c] border-[#1a3a5c] bg-blue-50' : 'text-[#6B7280] border-transparent hover:text-[#1a3a5c] hover:border-gray-300'}`}>
                 <Trophy size={13} /> Reto
               </button>
             </div>
