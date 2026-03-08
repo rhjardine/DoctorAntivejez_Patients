@@ -3,8 +3,8 @@ import React from 'react';
 import { Info, Zap } from 'lucide-react';
 
 interface BiologicalAgeGaugeProps {
-  biologicalAge: number;
-  chronologicalAge: number;
+  biologicalAge: number | string;
+  chronologicalAge: number | string;
   completedItems: number;
   totalItems: number;
   onInfoPress?: () => void;
@@ -18,7 +18,9 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
   onInfoPress
 }) => {
   // Lógica Revisada: 7-28 (Verde), 28-70 (Amarillo), 70-120 (Rojo)
-  const calculatePosition = (age: number) => {
+  const calculatePosition = (ageVal: number | string) => {
+    const age = Number(ageVal);
+    if (isNaN(age)) return 0; // Handle '--' or empty fallback
     if (age <= 7) return 0;
     if (age >= 120) return 100;
 
@@ -32,8 +34,12 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
 
   const percentagePosition = calculatePosition(biologicalAge);
   const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
-  const yearsDifference = chronologicalAge - biologicalAge;
+
+  const bio = Number(biologicalAge);
+  const chrono = Number(chronologicalAge);
+  const yearsDifference = (!isNaN(chrono) && !isNaN(bio)) ? chrono - bio : 0;
   const isOptimal = yearsDifference > 0;
+
 
   return (
     <div className="w-full px-6 py-2.5 bg-white border-b border-slate-100 shadow-sm animate-in fade-in slide-in-from-top duration-700">
