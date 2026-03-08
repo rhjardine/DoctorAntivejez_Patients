@@ -177,7 +177,7 @@ const App: React.FC = () => {
                 <RefreshCw size={13} strokeWidth={currentMainTab === MainTab.THERAPIES_4R ? 3 : 2} /> Terapias 4R
               </button>
               <button onClick={() => setMainTab(MainTab.CHALLENGE)} className={`flex-1 py-3 px-2 text-[11px] uppercase tracking-wide flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.CHALLENGE ? 'font-black text-[#1a3a5c] border-[#1a3a5c] bg-blue-50/50' : 'font-semibold text-[#334155] border-transparent hover:text-[#1a3a5c] hover:bg-slate-50'}`}>
-                <Trophy size={13} strokeWidth={currentMainTab === MainTab.CHALLENGE ? 3 : 2} /> Reto
+                <Trophy size={13} strokeWidth={currentMainTab === MainTab.CHALLENGE ? 3 : 2} /> Mi Guía
               </button>
             </div>
           )}

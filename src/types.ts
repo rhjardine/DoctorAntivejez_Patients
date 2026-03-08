@@ -25,7 +25,7 @@ export const COLORS = {
 export enum MainTab {
   KEYS_5A = 'Claves 5A',
   THERAPIES_4R = 'Terapias 4R',
-  CHALLENGE = 'Reto Antivejez'
+  CHALLENGE = 'Mi Guía Antivejez'
 }
 
 export type DetailView =

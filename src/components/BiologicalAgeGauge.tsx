@@ -32,7 +32,8 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
     return 66.66 + ((age - 70) / 50) * 33.33;
   };
 
-  const percentagePosition = calculatePosition(biologicalAge);
+  const bioPercentage = calculatePosition(biologicalAge);
+  const chronoPercentage = calculatePosition(chronologicalAge);
   const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   const bio = Number(biologicalAge);
@@ -54,7 +55,7 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
           <div className="flex items-baseline gap-1.5">
             <span className="text-[11px] font-bold text-darkBlue uppercase">Edad Bio:</span>
             <span className="text-xl font-black text-primary leading-none">{biologicalAge}</span>
-            <span className="text-xs font-bold text-slate-300">/ {chronologicalAge}</span>
+            <span className="text-xs font-bold text-slate-400">/ {chronologicalAge} real</span>
           </div>
         </div>
 
@@ -64,6 +65,7 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
               <button
                 onClick={onInfoPress}
                 className="p-1.5 bg-slate-50 text-slate-300 rounded-lg hover:text-primary transition-colors"
+                title="Información"
               >
                 <Info size={14} />
               </button>
@@ -74,16 +76,16 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
           </div>
           <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-tighter">
             {isOptimal ? (
-              <span className="text-emerald-500">+{yearsDifference} años de vitalidad</span>
+              <span className="text-emerald-500">+{yearsDifference} Años de Vitalidad</span>
             ) : (
-              <span className="text-amber-500">{Math.abs(yearsDifference)} años de rezago</span>
+              <span className="text-amber-500">{Math.abs(yearsDifference)} Años de Rezago</span>
             )}
           </div>
         </div>
       </div>
 
       {/* Barra de Septenios Gradiente Segmentada (Verde, Amarillo, Rojo) */}
-      <div className="relative h-9 mt-1">
+      <div className="relative h-10 mt-1">
         <div className="h-2.5 w-full flex rounded-full overflow-hidden shadow-inner bg-slate-100 border border-slate-200">
           <div className="h-full bg-emerald-500 border-r border-white/20" style={{ width: '33.33%' }}></div>
           <div className="h-full bg-yellow-400 border-r border-white/20" style={{ width: '33.33%' }}></div>
@@ -98,16 +100,31 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
           <span>120</span>
         </div>
 
-        {/* Indicador Biofísico (Pointer) */}
-        <div
-          className="absolute top-0 transition-all duration-1000 cubic-bezier(0.34, 1.56, 0.64, 1) z-10 flex flex-col items-center"
-          style={{ left: `${percentagePosition}%`, transform: 'translateX(-50%)' }}
-        >
-          <div className="bg-darkBlue w-1 h-6 rounded-full shadow-lg"></div>
-          <div className="bg-darkBlue text-white text-[8px] font-black px-1.5 py-0.5 rounded-md mt-1 shadow-md border border-white/10 uppercase">
-            Tú
+        {/* Marcador Edad Cronológica (Referencia) */}
+        {!isNaN(chrono) && (
+          <div
+            className="absolute top-0 transition-all duration-1000 cubic-bezier(0.34, 1.56, 0.64, 1) z-0 flex flex-col items-center"
+            style={{ left: `${chronoPercentage}%`, transform: 'translateX(-50%)' }}
+          >
+            <div className="bg-slate-300 w-0.5 h-6 rounded-full opacity-60"></div>
+            <div className="bg-slate-100 text-slate-400 text-[7px] font-black px-1 py-0.5 rounded border border-slate-200 uppercase mt-0.5">
+              Ref ({chrono})
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Indicador Biofísico (Tú) */}
+        {!isNaN(bio) && (
+          <div
+            className="absolute top-0 transition-all duration-1000 cubic-bezier(0.34, 1.56, 0.64, 1) z-10 flex flex-col items-center"
+            style={{ left: `${bioPercentage}%`, transform: 'translateX(-50%)' }}
+          >
+            <div className="bg-darkBlue w-[3px] h-6 rounded-full shadow-lg border border-white/40"></div>
+            <div className="bg-darkBlue text-white text-[8px] font-black px-1.5 py-0.5 rounded-md mt-0.5 shadow-md border border-white/10 uppercase">
+              Tú ({bio})
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

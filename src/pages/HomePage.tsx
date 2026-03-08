@@ -24,6 +24,11 @@ const ICON_MAP: Record<string, any> = {
     Bed, Moon, Clock, Bell, Check
 };
 
+const CATEGORY_ICON_MAP: Record<string, any> = {
+    ...ICON_MAP,
+    'ACTIVITY': Dumbbell
+};
+
 const HomePage: React.FC = () => {
     const navigate = useNavigate();
     const { currentMainTab, userPreferences, toggleClinicalInfo } = useUIStore();
@@ -97,7 +102,7 @@ const HomePage: React.FC = () => {
 
     const getIcon = (category: keyof typeof userPreferences.icons) => {
         const iconId = userPreferences.icons[category];
-        const IconComponent = ICON_MAP[iconId] || ICON_MAP['Apple']; // Fallback
+        const IconComponent = CATEGORY_ICON_MAP[iconId] || CATEGORY_ICON_MAP[category] || CATEGORY_ICON_MAP['Apple']; // Fallback
         return <IconComponent size={20} />;
     };
 
