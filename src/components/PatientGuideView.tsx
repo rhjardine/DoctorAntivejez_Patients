@@ -251,19 +251,16 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onI
         {/* Branded Collapsible Note Area */}
         {hasNotes && isNoteExpanded && (
           <div className="px-5 pb-5 animate-in slide-in-from-top-2 duration-300">
-            <div className={`p-4 rounded-2xl border-l-4 flex gap-3 transition-all ${isUrgent ? 'bg-amber-50 border-amber-400 shadow-sm' : 'bg-slate-50 border-primary shadow-inner'
-              }`}>
-              <div className={`shrink-0 ${isUrgent ? 'text-amber-500' : 'text-primary'}`}>
-                {isUrgent ? <AlertTriangle size={18} /> : <MessageSquareQuote size={18} />}
+            <div className="p-4 rounded-2xl border flex gap-3 shadow-inner bg-amber-50 border-amber-100">
+              <div className="shrink-0 text-amber-500">
+                <MessageSquareQuote size={18} />
               </div>
-              <div className="flex-1">
-                <span className={`text-[9px] font-black uppercase tracking-widest block mb-1 ${isUrgent ? 'text-amber-700' : 'text-primary/70'
-                  }`}>
-                  Nota del Dr. Antivejez
+              <div className="flex-1 min-w-0">
+                <span className="text-[9px] font-black uppercase tracking-widest block mb-1 text-amber-700">
+                  Observación del Médico
                 </span>
-                <p className={`text-xs leading-relaxed font-bold italic ${isUrgent ? 'text-amber-900' : 'text-darkBlue'
-                  }`}>
-                  "{item.observations}"
+                <p className="text-xs leading-relaxed font-bold italic text-amber-900 whitespace-pre-wrap break-words">
+                  {item.observations}
                 </p>
               </div>
             </div>
@@ -374,11 +371,11 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onI
                         )}
                       </div>
                       {item.observations && (
-                        <div className="p-4 rounded-2xl border-l-4 bg-white border-primary flex gap-3 shadow-inner">
-                          <MessageSquareQuote size={16} className="text-primary shrink-0" />
-                          <div>
-                            <span className="text-[9px] font-black uppercase block mb-1 text-slate-300 tracking-widest">Nota Médica</span>
-                            <p className="text-xs leading-relaxed font-bold italic text-textMedium">"{item.observations}"</p>
+                        <div className="p-4 rounded-2xl border flex gap-3 shadow-inner bg-amber-50 border-amber-100">
+                          <MessageSquareQuote size={16} className="text-amber-500 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-[9px] font-black uppercase block mb-1 text-amber-700 tracking-widest">Observación del Médico</span>
+                            <p className="text-xs leading-relaxed font-bold italic text-amber-900 whitespace-pre-wrap break-words">{item.observations}</p>
                           </div>
                         </div>
                       )}

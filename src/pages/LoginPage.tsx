@@ -33,12 +33,11 @@ const LoginPage: React.FC = () => {
 
             {/* Branding */}
             <div className="flex flex-col items-center mb-12">
-                <div className="w-24 h-24 bg-gradient-to-br from-primary to-blue-600 rounded-[2.5rem] shadow-2xl flex items-center justify-center text-white mb-6 transform hover:scale-105 transition-transform">
-                    <ShieldCheck size={48} strokeWidth={2.5} />
-                </div>
-                <h1 className="text-4xl font-black text-darkBlue tracking-tighter">DOCTOR</h1>
-                <h1 className="text-5xl font-black text-primary tracking-tighter -mt-2">ANTIVEJEZ</h1>
-                <p className="text-sm font-bold text-darkBlue/60 uppercase tracking-[0.2em] mt-3">Medicina Antienvejecimiento</p>
+                <img
+                    src="/logo.png"
+                    alt="Doctor Antivejez"
+                    className="w-48 h-auto object-contain animate-in zoom-in duration-700"
+                />
             </div>
 
             {/* Form */}
