@@ -11,7 +11,7 @@ const NutritionView: React.FC = () => {
     const [showNutrigenomics, setShowNutrigenomics] = useState(false);
     const { profileData } = useProfileStore();
 
-    const hasFoodPlan = profileData?.foodPlans && profileData.foodPlans.length > 0;
+    const hasFoodPlan = !!profileData?.alimentacion || (profileData?.foodPlans && profileData.foodPlans.length > 0);
 
     if (showNutrigenomics) {
         return <NutrigenomicsView onBack={() => setShowNutrigenomics(false)} />;

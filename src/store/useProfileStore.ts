@@ -9,6 +9,7 @@ interface ProfileData {
     latestNlr: any | null;
     fetchedAt: number;
     firstName?: string;
+    alimentacion?: any;
 }
 
 interface ProfileState {
