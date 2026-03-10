@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
+import { useUIStore } from '../store/useUIStore';
 import { authService } from '../services/authService';
 
 const LoginPage: React.FC = () => {
@@ -22,6 +23,7 @@ const LoginPage: React.FC = () => {
 
         try {
             await login(documentId, password);
+            useUIStore.getState().setMainTab("Claves 5A" as any); // Reset to Claves 5A (MainTab.KEYS_5A)
             navigate('/');
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
