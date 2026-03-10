@@ -36,7 +36,7 @@ const LoginPage: React.FC = () => {
             {/* Branding */}
             <div className="flex flex-col items-center mb-12">
                 <img
-                    src="/logo.png"
+                    src="/Icono_app.jpeg"
                     alt="Doctor Antivejez"
                     className="w-64 h-auto object-contain animate-in zoom-in duration-700 drop-shadow-sm"
                 />
