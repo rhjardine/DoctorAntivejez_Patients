@@ -17,27 +17,7 @@ const NutritionView: React.FC = () => {
         return <NutrigenomicsView onBack={() => setShowNutrigenomics(false)} />;
     }
 
-    // Empty State - Clinical Message for Richard
-    if (!hasFoodPlan) {
-        return (
-            <div className="flex flex-col items-center justify-center p-8 text-center space-y-8 h-full bg-[#F8FAFC]">
-                <div className="bg-sky-50 p-8 rounded-[3rem] shadow-inner relative">
-                    <div className="absolute inset-0 bg-primary/5 rounded-[3rem] animate-pulse"></div>
-                    <ClipboardList size={64} className="text-primary relative z-10" />
-                </div>
-                <div className="space-y-4 max-w-sm">
-                    <h3 className="text-xl font-black text-darkBlue uppercase tracking-tighter">Validación en Curso</h3>
-                    <p className="text-sm font-bold text-textMedium leading-relaxed italic">
-                        "Richard, tu plan nutricional A+ está en fase de diseño genético por el Dr. Admin. Te avisaremos en cuanto esté listo."
-                    </p>
-                </div>
-                <div className="bg-white p-4 rounded-2xl border border-blue-100 flex items-center gap-3 shadow-sm">
-                    <Stethoscope size={20} className="text-primary" />
-                    <span className="text-[10px] font-black text-darkBlue tracking-widest uppercase">Protocolo Doctor Antivejez</span>
-                </div>
-            </div>
-        );
-    }
+    // Empty State eliminado para permitir siempre ver el Action Menu (Botón de Plan Nutrigenómico)
 
     return (
         <div className="flex flex-col pb-32 space-y-6 pt-4 animate-in fade-in duration-500">

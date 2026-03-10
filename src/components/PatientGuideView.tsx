@@ -40,7 +40,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onInfoPress, onToggleItem, onRefresh }) => {
   const { profileData } = useProfileStore();
-  const [viewMode, setViewMode] = useState<ViewMode>('TRACK');
+  const [viewMode, setViewMode] = useState<ViewMode>('PLAN');
   const [activeTab, setActiveTab] = useState<TimeSlot>('MORNING');
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
@@ -278,7 +278,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onI
 
     return (
       <div className="flex flex-col flex-1 animate-in fade-in duration-300 bg-[#F8FAFC]">
-        <div className="px-6 py-5 bg-white border-b border-slate-100 shadow-sm">
+        <div className="px-6 py-3 bg-white border-b border-slate-100 shadow-sm">
           <div className="flex justify-between items-center mb-2.5">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Adherencia al Tratamiento</span>
             <span className="text-sm font-black text-primary">{progressPercent}%</span>
@@ -332,7 +332,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onI
 
   const renderPlanMode = () => {
     return (
-      <div className="flex-1 bg-[#F8FAFC] px-4 py-6 space-y-4 overflow-y-auto no-scrollbar animate-in slide-in-from-right duration-300 pb-32">
+      <div className="flex-1 bg-[#F8FAFC] px-4 py-3 space-y-4 overflow-y-auto no-scrollbar animate-in slide-in-from-right duration-300 pb-32">
         {sortedActiveCategoryTypes.map((catType) => {
           const categoryItems = activeCategories[catType];
           const isExpanded = expandedCategories[catType] ?? true;
@@ -408,28 +408,28 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({ items, loading, onI
         </div>
       )}
       <div className="flex flex-col h-full bg-white overflow-hidden">
-        <div className="bg-white pt-12 pb-6 px-6 border-b border-slate-100 shadow-sm z-20">
-          <div className="flex justify-between items-start mb-6">
+        <div className="bg-white pt-6 pb-4 px-6 border-b border-slate-100 shadow-sm z-20">
+          <div className="flex justify-between items-start mb-4">
             <div>
-              <h2 className="text-2xl font-black text-[#293B64] leading-none tracking-tighter uppercase">Tu Protocolo de Longevidad</h2>
-              <div className="flex items-center gap-2 mt-2">
+              <h2 className="text-[20px] font-black text-[#293B64] leading-none tracking-tighter uppercase">Tu Guía de Salud Personalizada</h2>
+              <div className="flex items-center gap-2 mt-1.5">
                 <div className={`w-2 h-2 rounded-full ${isRefreshing ? 'bg-amber-400 animate-spin' : 'bg-primary animate-pulse'}`}></div>
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sincronizado via Prisma</span>
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sincronizado via Prisma</span>
               </div>
             </div>
-            <button onClick={handleManualRefresh} className={`w-14 h-14 bg-sky-50 rounded-[1.5rem] flex items-center justify-center text-primary shadow-inner transition-transform active:rotate-180 ${isRefreshing ? 'animate-spin' : ''}`}>
-              <ClipboardCheck size={30} />
+            <button onClick={handleManualRefresh} className={`w-12 h-12 bg-sky-50 rounded-[1.25rem] flex items-center justify-center text-primary shadow-inner transition-transform active:rotate-180 ${isRefreshing ? 'animate-spin' : ''}`}>
+              <ClipboardCheck size={24} />
             </button>
           </div>
 
           {items.length > 0 && !loading && (
-            <div className="bg-slate-50 p-1.5 rounded-2xl flex relative h-14 shadow-inner border border-slate-100">
-              <div className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-xl shadow-md transition-all duration-300 border border-slate-100 ${viewMode === 'TRACK' ? 'left-[calc(50%+3px)]' : 'left-1.5'}`}></div>
-              <button onClick={() => setViewMode('PLAN')} className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest z-10 transition-colors ${viewMode === 'PLAN' ? 'text-primary' : 'text-slate-400'}`}>
-                <FileSearch size={16} /> Ver Guía
+            <div className="bg-slate-50 p-1 rounded-2xl flex relative h-11 shadow-inner border border-slate-100 mt-2">
+              <div className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-xl shadow-md transition-all duration-300 border border-slate-100 ${viewMode === 'TRACK' ? 'left-[calc(50%+2px)]' : 'left-1'}`}></div>
+              <button onClick={() => setViewMode('PLAN')} className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[9.5px] font-black uppercase tracking-widest z-10 transition-colors ${viewMode === 'PLAN' ? 'text-primary' : 'text-slate-400'}`}>
+                <FileSearch size={14} /> Ver Guía
               </button>
-              <button onClick={() => setViewMode('TRACK')} className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[10px] font-black uppercase tracking-widest z-10 transition-colors ${viewMode === 'TRACK' ? 'text-primary' : 'text-slate-400'}`}>
-                <CheckCircle2 size={16} /> Registrar Avances
+              <button onClick={() => setViewMode('TRACK')} className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[9.5px] font-black uppercase tracking-widest z-10 transition-colors ${viewMode === 'TRACK' ? 'text-primary' : 'text-slate-400'}`}>
+                <CheckCircle2 size={14} /> Registrar Avances
               </button>
             </div>
           )}
