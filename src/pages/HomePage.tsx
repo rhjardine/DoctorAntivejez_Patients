@@ -14,7 +14,7 @@ import CircularProgress from '../components/CircularProgress';
 import BiologicalAgeGauge from '../components/BiologicalAgeGauge';
 import BioAgeAlert from '../components/BioAgeAlert';
 import RemovalView from '../components/Therapies/RemovalView';
-import { Apple, Utensils, Coffee, Salad, Grape, Zap, Dumbbell, Trophy, Bike, Smile, Brain, Heart, Sparkles, Star, Sprout, Leaf, Home, CloudSun, Wind, Bed, Moon, Clock, Bell, Check } from 'lucide-react';
+import { Apple, Utensils, Coffee, Salad, Grape, Zap, Dumbbell, Trophy, Bike, Smile, Brain, Heart, Sparkles, Star, Sprout, Leaf, Home, CloudSun, Wind, Bed, Moon, Clock, Bell, Check, Dna } from 'lucide-react';
 
 const ICON_MAP: Record<string, any> = {
     Apple, Utensils, Coffee, Salad, Grape,
@@ -202,7 +202,7 @@ const HomePage: React.FC = () => {
                                     <div className="w-full bg-white/70 backdrop-blur-sm rounded-3xl p-4 mb-6 border border-white/50 text-center shadow-sm">
                                         <p className="text-[11px] font-bold text-darkBlue italic">"La consistencia es la clave de la regeneración celular."</p>
                                     </div>
-                                    <div onClick={() => navigate('/guide')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-6 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
+                                    <div onClick={() => navigate('/guide')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-4 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
                                         <div className="flex items-center gap-4">
                                             <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><ClipboardCheck size={28} /></div>
                                             <div>
@@ -212,6 +212,18 @@ const HomePage: React.FC = () => {
                                         </div>
                                         <div className="bg-red-50 text-accentRed text-[9px] font-black px-3 py-2 rounded-xl uppercase tracking-tighter">
                                             {totalCount - completedCount} Pendientes
+                                        </div>
+                                    </div>
+                                    <div onClick={() => navigate('/nutrition')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-6 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><Dna size={28} /></div>
+                                            <div>
+                                                <h3 className="font-black text-darkBlue text-lg">Alimentación</h3>
+                                                <p className="text-[10px] font-bold text-textMedium uppercase">Nutrigenómica</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-primary pr-2">
+                                            <ChevronRight size={24} />
                                         </div>
                                     </div>
                                     <div className="w-full bg-white rounded-[2rem] p-5 shadow-sm border border-gray-50 mb-6">
