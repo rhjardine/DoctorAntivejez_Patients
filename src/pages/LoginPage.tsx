@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-[#E0F7FA] px-8 pt-safe-top pb-safe-bottom items-center justify-center animate-in fade-in duration-700 min-h-screen">
+        <div className="flex flex-col h-full w-full bg-[#23BCEF] px-8 pt-safe-top pb-safe-bottom items-center justify-center animate-in fade-in duration-700 min-h-screen">
 
             {/* Branding */}
             <div className="flex flex-col items-center mb-12">
@@ -46,14 +46,14 @@ const LoginPage: React.FC = () => {
             <form onSubmit={handleLogin} className="w-full max-w-sm space-y-6">
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <label className="text-xs font-black text-[#1a3a5c] uppercase tracking-widest ml-1">Documento de Identidad</label>
+                        <label className="text-xs font-black text-[#293b64] uppercase tracking-widest ml-1">Documento de Identidad</label>
                         <input
                             type="text"
                             value={documentId}
                             onChange={(e) => setDocumentId(e.target.value)}
                             placeholder="Ej: 5963578"
                             autoComplete="username"
-                            className={`w-full bg-white border-2 rounded-3xl p-4 text-lg font-black text-black placeholder:text-slate-300 focus:outline-none transition-all ${error ? 'border-red-500 focus:border-red-600' : 'border-[#1a3a5c] focus:border-[#23BCEF]'
+                            className={`w-full bg-white border-2 rounded-3xl p-4 text-lg font-black text-black placeholder:text-slate-300 focus:outline-none transition-all ${error ? 'border-red-500 focus:border-red-600' : 'border-[#293b64] focus:border-[#293b64]/50'
                                 } shadow-md`}
                             required
                             autoFocus
@@ -61,14 +61,14 @@ const LoginPage: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-black text-[#1a3a5c] uppercase tracking-widest ml-1">Contraseña</label>
+                        <label className="text-xs font-black text-[#293b64] uppercase tracking-widest ml-1">Contraseña</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
                             autoComplete="current-password"
-                            className={`w-full bg-white border-2 rounded-3xl p-4 text-lg font-black text-black placeholder:text-slate-300 focus:outline-none transition-all ${error ? 'border-red-500 focus:border-red-600' : 'border-[#1a3a5c] focus:border-[#23BCEF]'
+                            className={`w-full bg-white border-2 rounded-3xl p-4 text-lg font-black text-black placeholder:text-slate-300 focus:outline-none transition-all ${error ? 'border-red-500 focus:border-red-600' : 'border-[#293b64] focus:border-[#293b64]/50'
                                 } shadow-md`}
                             required
                         />
@@ -103,7 +103,7 @@ const LoginPage: React.FC = () => {
 
 
             <div className="mt-20 text-center">
-                <p className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">Acceso Seguro para Pacientes</p>
+                <p className="text-[11px] font-black text-[#293b64] uppercase tracking-[0.2em]">Acceso Seguro para Pacientes</p>
             </div>
 
         </div>
