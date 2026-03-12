@@ -61,27 +61,7 @@ const NutritionView: React.FC = () => {
                     <h3 className="text-darkBlue font-black text-xl tracking-tight">Acciones Rápidas</h3>
                 </div>
 
-                {/* Plan Nutrigenómico - High Priority Card */}
-                <button
-                    onClick={() => setShowNutrigenomics(true)}
-                    aria-label="Abrir plan de alimentación basado en ADN"
-                    className="w-full bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-slate-700 p-5 rounded-[2.5rem] shadow-sm relative overflow-hidden group active:scale-[0.97] transition-all text-left flex items-center gap-5"
-                >
-                    <div className="w-16 h-16 bg-purple-600 rounded-2xl shadow-lg flex items-center justify-center text-white flex-shrink-0 group-hover:rotate-6 transition-transform">
-                        <Dna size={32} strokeWidth={2.5} />
-                    </div>
-
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                            <h4 className="text-lg font-black text-darkBlue dark:text-white leading-tight">Plan Nutrigenómico</h4>
-                            <span className="bg-purple-100 text-purple-700 text-[10px] font-black px-2 py-0.5 rounded-full uppercase">Vital</span>
-                        </div>
-                        <p className="text-sm text-textMedium dark:text-slate-400 font-medium leading-tight mt-1">
-                            Alimentación Sana Antienvejecimiento Personalizada
-                        </p>
-                    </div>
-                    <ChevronRight size={24} className="text-gray-300 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" />
-                </button>
+                {/* Plan Nutrigenómico eliminado de aquí - Movido a Mi Guía para evitar duplicidad */}
 
                 <div className="grid grid-cols-1 gap-4">
                     {/* Mi Menú Saludable - Large Block */}
