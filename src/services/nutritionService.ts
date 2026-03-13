@@ -8,8 +8,8 @@ export const nutritionService = {
         const profileData = useProfileStore.getState().profileData;
         const alimentacion = profileData?.alimentacion;
 
-        if (!alimentacion || !alimentacion.enviada) {
-            throw new Error("No hay un plan de nutrición nutrigenómica activo o el médico aún no lo ha sincronizado.");
+        if (!alimentacion) {
+            throw new Error("No hay un plan de nutrición nutrigenómica configurado por el médico.");
         }
 
         const bloodGrpGroup = alimentacion.grupoSanguineo; // 'O_B' | 'A_AB'

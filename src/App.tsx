@@ -22,6 +22,7 @@ import BiomicsPage from './pages/BiomicsPage';
 
 // Components (Views mapped to routes)
 import NutritionView from './components/NutritionView';
+import DoctorNutritionPlanView from './components/DoctorNutritionPlanView';
 import AttitudeView from './components/AttitudeView';
 import ActivityView from './components/ActivityView';
 import EnvironmentView from './components/EnvironmentView';
@@ -198,6 +199,7 @@ const App: React.FC = () => {
 
           {/* Detail Views */}
           <Route path="/nutrition" element={<ProtectedRoute><NutritionView /></ProtectedRoute>} />
+          <Route path="/mi-guia/alimentacion" element={<ProtectedRoute><DoctorNutritionPlanView onBack={() => navigate(-1)} /></ProtectedRoute>} />
           <Route path="/attitude" element={<ProtectedRoute><AttitudeView /></ProtectedRoute>} />
           <Route path="/activity" element={<ProtectedRoute><ActivityView /></ProtectedRoute>} />
           <Route path="/environment" element={<ProtectedRoute><EnvironmentView /></ProtectedRoute>} />

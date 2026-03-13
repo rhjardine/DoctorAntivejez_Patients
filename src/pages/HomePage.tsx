@@ -214,7 +214,7 @@ const HomePage: React.FC = () => {
                                             {totalCount - completedCount} Pendientes
                                         </div>
                                     </div>
-                                    <div onClick={() => navigate('/nutrition')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-6 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
+                                    <div onClick={() => navigate('/mi-guia/alimentacion')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-6 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
                                         <div className="flex items-center gap-4">
                                             <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><Dna size={28} /></div>
                                             <div>
