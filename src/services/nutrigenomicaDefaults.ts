@@ -54,4 +54,87 @@ export const DEFAULTS_COMUNES = {
         'Tubérculos.',
         'Gluten: trigo, avena, cebada, centeno integral.'
     ],
+    sustitutos: [
+        'Carnes a la plancha, sancocho o al horno.',
+        'Huevos sancochados, revueltos o en agua.',
+        'Quesos blancos, fresco o yogurt de cabra.',
+        'Leches vegetales (soya, almendra, coco).',
+        'Infusiones de plantas: malojillo, toronjil, té verde, café.',
+        'Frutas frescas o secas, harinas integrales.',
+        'Germinados, verduras frescas.',
+        'Semillas tostadas: almendras, avellanas, nueces, merey, ajonjolí.',
+        'Enlatados en agua o aceite. Suero o ricota sin sal.',
+        'Lácteos de cabra, Pecorino o Manchego.',
+        'Productos sin gluten: pan, maíz, fororo, arroz, yuca, plátano, papa, batata, granola, avena.'
+    ],
+    claves5a: [
+        {
+            clave: 'ALIMENTACIÓN Sana',
+            icono: '🥗',
+            items: [
+                'Frutas de Bajo Índice Glicémico en el desayuno',
+                'Ayuno Intermitente (2-3 veces por semana)',
+                'Tomar 6-8 vasos de agua de limón',
+                'Merienda a media mañana y media tarde'
+            ],
+        },
+        {
+            clave: 'ACTIVIDAD Física',
+            icono: '🏃',
+            items: [
+                'Actividad física 3 a 6 veces por semana',
+                'Cardiovascular en la mañana o tarde',
+                'Musculación 10 minutos',
+                'Frecuencia Cardíaca Controlada'
+            ],
+        },
+        {
+            clave: 'ASUETO Reparador',
+            icono: '😴',
+            items: [
+                'Acostarse antes de las 10 PM',
+                'Dormir de 6 a 8 horas',
+                'Recrearse periódicamente'
+            ],
+        },
+        {
+            clave: 'ACTITUD Adecuada',
+            icono: '🧘',
+            items: [
+                'Cultivar pensamientos positivos',
+                'Gestión del estrés'
+            ],
+        },
+        {
+            clave: 'AMBIENTE Armónico',
+            icono: '🏡',
+            items: [
+                'Ambiente familiar y laboral armónico',
+                'Evitar estimulantes, licor o cigarrillo',
+                'Socialización saludable'
+            ],
+        },
+    ],
+    terapias4r: [
+        {
+            nombre: 'Remoción',
+            slogan: 'Elimina lo que te sobra',
+            items: ['Oxidación', 'Acidez', 'Caramelización', 'Calcificación', 'Contaminación']
+        },
+        {
+            nombre: 'Revitalización',
+            slogan: 'Recupera lo que te hace falta',
+            items: ['Sustratos', 'Minerales', 'Oligoelementos', 'Vitaminas']
+        },
+        {
+            nombre: 'Regeneración',
+            slogan: 'Revertir las lesiones',
+            items: ['Terapia Celular', 'Factores Autólogos', 'Células Madre']
+        },
+        {
+            nombre: 'Restauración',
+            slogan: 'Mantente joven y saludable',
+            items: ['Claves 5A Adaptadas', 'Longevidad Óptima']
+        }
+    ]
 };
