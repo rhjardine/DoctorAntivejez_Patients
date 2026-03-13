@@ -48,23 +48,14 @@ const HomePage: React.FC = () => {
     }, [currentMainTab]);
 
     useEffect(() => {
-        if (isLoadingMetrics || profileData) return;
+        // Si el perfil ya existe Y tiene alimentacion, no re-fetch (datos completos en caché)
+        // Si existe pero le falta alimentacion, forzar re-fetch para obtenerlo
+        if (isLoadingMetrics) return;
+        const needsFullRefetch = profileData && profileData.alimentacion === undefined;
+        if (profileData && !needsFullRefetch) return;
+
         const loadMetrics = async () => {
-            if (!session || isLoadingMetrics || profileData) return;
-
-            // Check if we have valid cached data
-            if (profileData && isCacheValid()) {
-                console.log('✅ Using cached profile data (< 5 min old)');
-
-                // Still need to fetch protocol items for adherence
-                const items = await ProtocolService.fetchActiveProtocol(session.id);
-                const completed = items.filter(i => i.status === 'completed').length;
-                const total = items.length;
-                setCompletedCount(completed);
-                setTotalCount(total);
-                setAdherence(total > 0 ? Math.round((completed / total) * 100) : 0);
-                return;
-            }
+            if (!session || isLoadingMetrics) return;
 
             setIsLoadingMetrics(true);
             console.log('🌐 Fetching fresh profile data from API');
@@ -72,8 +63,17 @@ const HomePage: React.FC = () => {
             try {
                 const profile = await ProtocolService.getMyProfile();
                 if (profile) {
-                    // Cache the profile data
-                    setProfileData(profile);
+                    setProfileData({
+                        biologicalAge: profile.biophysics?.biologicalAge ?? profile.biologicalAge ?? null,
+                        chronologicalAge: profile.chronologicalAge ?? null,
+                        guides: profile.guides || [],
+                        foodPlans: profile.foodPlans || [],
+                        bloodType: profile.bloodType || null,
+                        latestNlr: profile.latestNlr || null,
+                        firstName: profile.firstName,
+                        alimentacion: profile.alimentacion ?? null,
+                        fetchedAt: Date.now()
+                    });
                 }
 
                 const items = await ProtocolService.fetchActiveProtocol(session.id);

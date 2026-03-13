@@ -2,6 +2,7 @@
 import { UserSession } from '../types';
 import { useProfileStore } from '../store/useProfileStore';
 import { logger } from '../utils/logger';
+import { ProtocolService } from './protocolService';
 
 // ✅ SECURITY: URL centralizada via variable de entorno
 const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com';
@@ -38,16 +39,45 @@ export const authService = {
         throw new Error('Respuesta del servidor incompleta: faltan token o datos de paciente.');
       }
 
-      // Almacenamos los datos consolidados del perfil en el store global
-      useProfileStore.getState().setProfileData({
-        biologicalAge: patient.biophysicsTests?.[0]?.biologicalAge || null,
-        chronologicalAge: patient.chronologicalAge,
-        guides: patient.guides || [],
-        foodPlans: patient.foodPlans || [],
-        bloodType: patient.bloodType,
-        latestNlr: null,
-        fetchedAt: Date.now()
-      });
+      // Guardar tokens primero para que getMyProfile() pueda autenticarse
+      sessionStorage.setItem('auth_token', token);
+      if (refreshToken) {
+        sessionStorage.setItem('refresh_token', refreshToken);
+      }
+
+      // ✅ FIX CRÍTICO: Obtener el perfil COMPLETO desde mobile-profile-v1
+      // (incluye alimentacion, guides, foodPlans, etc. con todos los campos del médico)
+      // Nunca poblar el store con datos parciales del login, siempre usar el perfil completo.
+      try {
+        const fullProfile = await ProtocolService.getMyProfile();
+        if (fullProfile) {
+          useProfileStore.getState().setProfileData({
+            biologicalAge: fullProfile.biophysics?.biologicalAge ?? fullProfile.biologicalAge ?? null,
+            chronologicalAge: fullProfile.chronologicalAge ?? null,
+            guides: fullProfile.guides || [],
+            foodPlans: fullProfile.foodPlans || [],
+            bloodType: fullProfile.bloodType || patient.bloodType || null,
+            latestNlr: fullProfile.latestNlr || null,
+            firstName: fullProfile.firstName || patient.firstName,
+            alimentacion: fullProfile.alimentacion ?? null,
+            fetchedAt: Date.now()
+          });
+        }
+      } catch (profileError) {
+        // Si falla el fetch del perfil completo, almacenar datos mínimos del login
+        logger.error('Profile fetch after login failed', { message: (profileError as Error).message });
+        useProfileStore.getState().setProfileData({
+          biologicalAge: null,
+          chronologicalAge: patient.chronologicalAge,
+          guides: patient.guides || [],
+          foodPlans: patient.foodPlans || [],
+          bloodType: patient.bloodType,
+          latestNlr: null,
+          firstName: patient.firstName,
+          alimentacion: null,
+          fetchedAt: Date.now()
+        });
+      }
 
       const session: UserSession = {
         id: patient.id,
@@ -58,11 +88,6 @@ export const authService = {
         lastLoginAt: new Date().toISOString()
       };
 
-      sessionStorage.setItem('auth_token', token);
-      // ✅ Guardar refresh token para que apiClient.ts pueda renovar el access token
-      if (refreshToken) {
-        sessionStorage.setItem('refresh_token', refreshToken);
-      }
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
 
       // ✅ SECURITY: Log only the action, no PHI
