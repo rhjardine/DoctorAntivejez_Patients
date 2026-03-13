@@ -18,8 +18,14 @@ export const nutritionService = {
         const foods: NutrigenomicFood[] = [];
         let idCounter = 1;
 
+        // Dynamic Lists from Database or Defaults
+        const lDesayuno = alimentacion.planAlimentario?.desayuno || defaults.desayuno;
+        const lAlmuerzo = alimentacion.planAlimentario?.almuerzo || defaults.almuerzo;
+        const lCena = alimentacion.planAlimentario?.cenaComunes || defaults.cena.comunes;
+        const lMeriendas = alimentacion.planAlimentario?.meriendas || DEFAULTS_COMUNES.meriendas;
+
         // Mapear Desayuno
-        defaults.desayuno.forEach(item => {
+        lDesayuno.forEach((item: string) => {
             foods.push({
                 id: `bf_${idCounter++}`,
                 name: item,
@@ -30,7 +36,7 @@ export const nutritionService = {
         });
 
         // Mapear Almuerzo
-        defaults.almuerzo.forEach(item => {
+        lAlmuerzo.forEach((item: string) => {
             foods.push({
                 id: `l_${idCounter++}`,
                 name: item,
@@ -41,7 +47,7 @@ export const nutritionService = {
         });
 
         // Mapear Cena
-        defaults.cena.comunes.forEach(item => {
+        lCena.forEach((item: string) => {
             foods.push({
                 id: `d_${idCounter++}`,
                 name: item,
@@ -51,8 +57,8 @@ export const nutritionService = {
             });
         });
 
-        // Mapear Meriendas Comunes
-        DEFAULTS_COMUNES.meriendas.forEach(item => {
+        // Mapear Meriendas
+        lMeriendas.forEach((item: string) => {
             foods.push({
                 id: `s_${idCounter++}`,
                 name: item,

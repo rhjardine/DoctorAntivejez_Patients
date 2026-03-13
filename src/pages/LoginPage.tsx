@@ -85,11 +85,11 @@ const LoginPage: React.FC = () => {
                 <button
                     type="submit"
                     disabled={!documentId || !password || isLoading}
-                    className="w-full bg-[#D97706] text-black py-5 rounded-[2rem] font-black text-base uppercase tracking-widest shadow-xl shadow-amber-900/20 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
+                    className="w-full bg-[#293b64] text-white py-5 rounded-[2rem] font-black text-base uppercase tracking-widest shadow-xl shadow-blue-900/30 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
                 >
                     {isLoading ? (
                         <>
-                            <Loader2 size={24} className="animate-spin text-black" />
+                            <Loader2 size={24} className="animate-spin text-white" />
                             <span>Conectando...</span>
                         </>
                     ) : (
