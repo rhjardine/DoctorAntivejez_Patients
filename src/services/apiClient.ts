@@ -13,7 +13,8 @@ const apiClient = axios.create({
 
 // Interceptor para inyectar el Token en cada llamada médica
 apiClient.interceptors.request.use((config) => {
-    const token = sessionStorage.getItem('auth_token');
+    // Preferencia a localStorage (donde ahora viven los tokens persistentes)
+    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -33,7 +34,7 @@ apiClient.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const refreshToken = sessionStorage.getItem('refresh_token');
+                const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
                 if (!refreshToken) throw new Error('No refresh token');
 
                 // Llamar endpoint de refresh (backend debe implementarlo)
@@ -42,10 +43,10 @@ apiClient.interceptors.response.use(
                     { refreshToken }
                 );
 
-                // Actualizar tokens
-                sessionStorage.setItem('auth_token', data.accessToken);
+                // Actualizar tokens en localStorage
+                localStorage.setItem('auth_token', data.accessToken);
                 if (data.refreshToken) {
-                    sessionStorage.setItem('refresh_token', data.refreshToken);
+                    localStorage.setItem('refresh_token', data.refreshToken);
                 }
 
                 // Reintentar request original
@@ -56,6 +57,9 @@ apiClient.interceptors.response.use(
             } catch (refreshError) {
                 // NUCLEAR RESET: Limpieza total por seguridad
                 logger.warn('Session expired, forcing logout');
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('rejuvenate_session_v1');
                 sessionStorage.clear();
                 useProfileStore.getState().clearProfileData();
                 window.location.href = '/login';

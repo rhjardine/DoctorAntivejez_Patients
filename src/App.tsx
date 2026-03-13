@@ -72,16 +72,9 @@ const App: React.FC = () => {
       setShowOnboarding(true);
     }
 
-    // SESSION HEARTBEAT: Clear PHI on tab close
-    const handleBeforeUnload = () => {
-      sessionStorage.clear();
-      useProfileStore.getState().clearProfileData();
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
+    // ✅ SESSION PERSISTENCE: Removed beforeunload listener that cleared
+    // sessionStorage and profileData. We now rely on localStorage (via authService)
+    // and Zustand persist (via profileStore) for a seamless refresh experience.
   }, []);
 
   // Show onboarding when session becomes available for the first time
