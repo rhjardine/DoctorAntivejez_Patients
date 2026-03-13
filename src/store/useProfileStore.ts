@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface ProfileData {
     biologicalAge: number | null;
@@ -22,34 +23,45 @@ interface ProfileState {
     updateAdherence: (type: string, data: any) => void;
 }
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-export const useProfileStore = create<ProfileState>((set, get) => ({
-    profileData: null,
-    isLoading: false,
+export const useProfileStore = create<ProfileState>()(
+    persist(
+        (set, get) => ({
+            profileData: null,
+            isLoading: false,
 
-    setProfileData: (data: ProfileData) => {
-        set({ profileData: { ...data, fetchedAt: Date.now() } });
-    },
+            setProfileData: (data: ProfileData) => {
+                set({ profileData: { ...data, fetchedAt: Date.now() } });
+            },
 
-    clearProfileData: () => {
-        set({ profileData: null });
-    },
+            clearProfileData: () => {
+                set({ profileData: null });
+            },
 
-    isCacheValid: () => {
-        const { profileData } = get();
-        if (!profileData) return false;
-        const age = Date.now() - profileData.fetchedAt;
-        return age < CACHE_DURATION;
-    },
+            // Cache is valid if data exists and was fetched within the last 5 minutes
+            isCacheValid: () => {
+                const { profileData } = get();
+                if (!profileData) return false;
+                const age = Date.now() - profileData.fetchedAt;
+                return age < CACHE_DURATION;
+            },
 
-    forceRefresh: () => {
-        set({ profileData: null }); // Clear cache to force new fetch
-    },
+            forceRefresh: () => {
+                set({ profileData: null });
+            },
 
-    updateAdherence: (type: string, data: any) => {
-        console.log(`[Store] Updating adherence for ${type}:`, data);
-        // In a real app, this might involve an API call or updating a specific adherence field
-        // For now, we'll just log it as requested for the simulation
-    }
-}));
+            updateAdherence: (type: string, data: any) => {
+                console.log(`[Store] Updating adherence for ${type}:`, data);
+            }
+        }),
+        {
+            name: 'rejuvenate_profile_v1',   // localStorage key
+            storage: createJSONStorage(() => localStorage),
+            // Only persist essential profile fields — never persist loading state
+            partialize: (state) => ({
+                profileData: state.profileData,
+            }),
+        }
+    )
+);
