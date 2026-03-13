@@ -8,10 +8,12 @@ import { useProfileStore } from '../store/useProfileStore';
 
 const NutritionView: React.FC = () => {
     const [isScannerOpen, setIsScannerOpen] = useState(false);
-    const [showNutrigenomics, setShowNutrigenomics] = useState(false);
     const { profileData } = useProfileStore();
 
-    const hasFoodPlan = !!profileData?.alimentacion || (profileData?.foodPlans && profileData.foodPlans.length > 0);
+    // Si el médico ya configuró y envió un plan de alimentación, ir directamente
+    // al plan nutrigenómico personalizado, saltando el menú genérico
+    const hasPersonalizedPlan = !!profileData?.alimentacion;
+    const [showNutrigenomics, setShowNutrigenomics] = useState(hasPersonalizedPlan);
 
     if (showNutrigenomics) {
         return <NutrigenomicsView onBack={() => setShowNutrigenomics(false)} />;
