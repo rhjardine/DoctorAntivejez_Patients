@@ -9,7 +9,7 @@ const PHI_FIELDS = [
     'biologicalAge',
     'chronologicalAge',
     'bloodType',
-    'email',
+    'email',       // S-04 fix: email is PHI
     'name',
     'firstName',
     'lastName',
@@ -59,9 +59,12 @@ export const logger = {
         console.error(`[ERROR] ${msg}`, context ? sanitizePHI(context) : '');
     },
 
-    /** Log an event that is safe to send to external services (no PHI). */
+    /** Log an event that is safe to send to external services (no PHI).
+     *  Auth events (login_*, logout) are always emitted — even in production.
+     *  Other audit events are DEV-only to avoid noise. */
     audit: (action: string, metadata?: Record<string, string | number | boolean>) => {
-        if (import.meta.env.DEV) {
+        const isAuthEvent = action.startsWith('auth_') || action === 'login_success' || action === 'logout' || action === 'token_refreshed';
+        if (import.meta.env.DEV || isAuthEvent) {
             console.log(`[AUDIT] ${action}`, metadata || '');
         }
     },

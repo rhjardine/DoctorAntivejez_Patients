@@ -111,8 +111,13 @@ export interface UserPreferences {
     ATTITUDE: string;
     ENVIRONMENT: string;
     REST: string;
-  }
+  };
+  /** Color scheme preference: auto follows OS, light/dark are manual overrides. Default: 'auto' */
+  colorScheme?: 'auto' | 'light' | 'dark';
+  /** UI language. Default: 'es' (Spanish). Only affects UI chrome, not clinical content. */
+  locale?: 'es' | 'en';
 }
+
 
 export interface PatientGuideResponse {
   patientId: string;

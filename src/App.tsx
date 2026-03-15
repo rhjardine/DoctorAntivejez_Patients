@@ -40,6 +40,8 @@ import Drawer from './components/Drawer';
 import OnboardingModal, { ONBOARDING_KEY } from './components/OnboardingModal';
 import { useReminders } from './hooks/useReminders';
 
+import { useDarkMode } from './hooks/useDarkMode';
+
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { session } = useAuthStore();
   if (!session) {
@@ -52,6 +54,10 @@ const App: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { session, logout, checkSession } = useAuthStore();
+
+  // ✅ ENHANCEMENT: Activate Dark Mode management
+  useDarkMode();
+
   const {
     isDrawerOpen, toggleDrawer,
     isClinicalInfoOpen, toggleClinicalInfo,

@@ -55,13 +55,10 @@ apiClient.interceptors.response.use(
                 return apiClient(originalRequest);
 
             } catch (refreshError) {
-                // NUCLEAR RESET: Limpieza total por seguridad
+                // NUCLEAR RESET: Limpieza selectiva y segura via authService
                 logger.warn('Session expired, forcing logout');
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('refresh_token');
-                localStorage.removeItem('rejuvenate_session_v1');
-                sessionStorage.clear();
-                useProfileStore.getState().clearProfileData();
+                const { authService } = await import('./authService');
+                authService.logout();
                 window.location.href = '/login';
                 return Promise.reject(refreshError);
             }

@@ -15,6 +15,8 @@ interface UIState {
     togglePrivacyConsent: (isOpen?: boolean) => void;
     setMainTab: (tab: MainTab) => void;
     updatePreferences: (prefs: UserPreferences) => void;
+    setColorScheme: (scheme: 'auto' | 'light' | 'dark') => void;
+    setLocale: (locale: 'es' | 'en') => void;
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {
@@ -24,7 +26,9 @@ const DEFAULT_PREFERENCES: UserPreferences = {
         ATTITUDE: 'Smile',
         ENVIRONMENT: 'Sprout',
         REST: 'Bed'
-    }
+    },
+    colorScheme: 'auto',
+    locale: 'es',
 };
 
 export const useUIStore = create<UIState>()(
@@ -41,6 +45,12 @@ export const useUIStore = create<UIState>()(
             togglePrivacyConsent: (isOpen) => set((state) => ({ isPrivacyConsentOpen: isOpen ?? !state.isPrivacyConsentOpen })),
             setMainTab: (tab) => set({ currentMainTab: tab }),
             updatePreferences: (prefs) => set({ userPreferences: prefs }),
+            setColorScheme: (scheme) => set((state) => ({
+                userPreferences: { ...state.userPreferences, colorScheme: scheme }
+            })),
+            setLocale: (locale) => set((state) => ({
+                userPreferences: { ...state.userPreferences, locale }
+            })),
         }),
         {
             name: 'ui-storage',
