@@ -1,6 +1,7 @@
 ﻿import axios from 'axios';
 import { useProfileStore } from '../store/useProfileStore';
 import { logger } from '../utils/logger';
+import { tokenStore } from './authService';
 
 // ✅ SECURITY: URL centralizada via variable de entorno
 // Fallback hardcoded para garantizar funcionamiento en producción si la env var no está configurada
@@ -13,8 +14,8 @@ const apiClient = axios.create({
 
 // Interceptor para inyectar el Token en cada llamada médica
 apiClient.interceptors.request.use((config) => {
-    // Preferencia a localStorage (donde ahora viven los tokens persistentes)
-    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    // Preferencia a memoria (donde ahora vive de forma segura)
+    const token = tokenStore.getAccessToken();
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }

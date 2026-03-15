@@ -24,7 +24,7 @@ class CryptoService {
     /**
      * Inicializa el servicio derivando la llave de encriptación.
      */
-    private async init() {
+    async init() {
         try {
             // 1. Obtener huella digital del dispositivo
             const fp = await FingerprintJS.load();
@@ -96,7 +96,7 @@ class CryptoService {
             );
 
             // Convertir a base64 para almacenamiento
-            const ivBase64 = this.arrayBufferToBase64(iv);
+            const ivBase64 = this.arrayBufferToBase64(iv.buffer);
             const contentBase64 = this.arrayBufferToBase64(encryptedBuffer);
 
             return `${ivBase64}:${contentBase64}`;
@@ -112,6 +112,12 @@ class CryptoService {
     async decrypt(cipherString: string): Promise<any> {
         await this.ensureInitialized();
         if (!this.key) throw new Error('Crypto not ready');
+
+        // Allow graceful fallback if the string is clearly not an encrypted token
+        if (!cipherString.includes(':')) {
+            console.warn('[CryptoService] cipherString missing colon delimiter, ignoring decryption attempt.');
+            return null;
+        }
 
         try {
             const [ivBase64, contentBase64] = cipherString.split(':');

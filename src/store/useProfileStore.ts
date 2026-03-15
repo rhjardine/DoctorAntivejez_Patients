@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
+import { cryptoService } from '../services/cryptoService';
 
 interface ProfileData {
     biologicalAge: number | null;
@@ -21,15 +22,47 @@ interface ProfileState {
     isCacheValid: () => boolean;
     forceRefresh: () => void;
     updateAdherence: (type: string, data: any) => void;
+    isReady: boolean;
+    setReady: (ready: boolean) => void;
 }
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+const encryptedStorage: StateStorage = {
+    getItem: async (name: string) => {
+        const raw = localStorage.getItem(name);
+        if (!raw) return null;
+        try {
+            const decrypted = await cryptoService.decrypt(raw);
+            if (decrypted) {
+                return JSON.stringify(decrypted);
+            }
+            return null;
+        } catch {
+            console.error('[encryptedStorage] Decrypt failed, discarding corrupted persist cache');
+            localStorage.removeItem(name);
+            return null;
+        }
+    },
+    setItem: async (name: string, value: string) => {
+        try {
+            const encrypted = await cryptoService.encrypt(JSON.parse(value));
+            localStorage.setItem(name, encrypted);
+        } catch (e) {
+            console.error('[encryptedStorage] Encrypt failed', e);
+        }
+    },
+    removeItem: (name: string) => localStorage.removeItem(name),
+};
 
 export const useProfileStore = create<ProfileState>()(
     persist(
         (set, get) => ({
             profileData: null,
             isLoading: false,
+            isReady: false,
+
+            setReady: (ready: boolean) => set({ isReady: ready }),
 
             setProfileData: (data: ProfileData) => {
                 set({ profileData: { ...data, fetchedAt: Date.now() } });
@@ -57,11 +90,16 @@ export const useProfileStore = create<ProfileState>()(
         }),
         {
             name: 'rejuvenate_profile_v1',   // localStorage key
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(() => encryptedStorage), // Now uses AES-GCM encrypted persistence
             // Only persist essential profile fields — never persist loading state
             partialize: (state) => ({
                 profileData: state.profileData,
-            }),
+            } as unknown as ProfileState),
+            // onRehydrateStorage is called during Zustand hydration
+            onRehydrateStorage: () => (state) => {
+                // Ensure state is marked ready when initialization finishes
+                state?.setReady(true);
+            },
         }
     )
 );

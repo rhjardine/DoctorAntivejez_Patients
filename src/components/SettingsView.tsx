@@ -5,7 +5,7 @@ import {
   Zap, Activity, Dumbbell, Trophy, Bike,
   Smile, Brain, Heart, Sparkles, Star,
   Sprout, Leaf, Home, CloudSun, Wind,
-  Bed, Moon, Clock, Bell, Check
+  Bed, Clock, Bell, Check
 } from 'lucide-react';
 import { UserPreferences, COLORS } from '../types';
 import { PrivacySettings } from './Settings/PrivacySettings';
@@ -128,8 +128,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ preferences, onUpdatePrefer
                 key={scheme.id}
                 onClick={() => setColorScheme(scheme.id as any)}
                 className={`flex flex-col items-center gap-2 p-4 rounded-3xl border-2 transition-all ${colorScheme === scheme.id
-                    ? 'bg-primary border-primary text-white shadow-md'
-                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)]'
+                  ? 'bg-primary border-primary text-white shadow-md'
+                  : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)]'
                   }`}
               >
                 <scheme.icon size={20} />
@@ -157,8 +157,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ preferences, onUpdatePrefer
                 key={lang.id}
                 onClick={() => setLocale(lang.id as any)}
                 className={`p-4 rounded-3xl border-2 font-bold uppercase text-xs transition-all ${locale === lang.id
-                    ? 'bg-primary border-primary text-white shadow-md'
-                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)]'
+                  ? 'bg-primary border-primary text-white shadow-md'
+                  : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)]'
                   }`}
               >
                 {lang.label}

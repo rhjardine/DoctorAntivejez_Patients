@@ -90,7 +90,7 @@ const HomePage: React.FC = () => {
         };
 
         loadMetrics();
-    }, [session?.token]);
+    }, [session?.id]);
 
     const getIcon = (category: keyof typeof userPreferences.icons) => {
         const iconId = userPreferences.icons[category];

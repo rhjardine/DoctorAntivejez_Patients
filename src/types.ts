@@ -75,7 +75,6 @@ export interface PatientProtocol {
 
 export interface UserSession {
   id: string;
-  token: string;
   name: string;
   email: string;
   avatarUrl?: string;

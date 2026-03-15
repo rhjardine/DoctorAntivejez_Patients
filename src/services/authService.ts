@@ -10,13 +10,19 @@ const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.on
 const SESSION_KEY = 'rejuvenate_session_v1';
 
 // ⚠️ NOTE ON STORAGE STRATEGY:
-// We use localStorage (instead of sessionStorage) so the session survives F5,
-// browser restarts and PWA re-opens in standalone mode.
-// The JWT token itself is short-lived (validated server-side on every request).
-// No PHI/medical data is ever stored in localStorage — only the auth token and
-// a minimal session object (id, name, role). The full profile is always re-hydrated
-// from the server (via Zustand persist + network re-fetch when cache expires).
+// We use localStorage so the session object survives F5/re-opens.
+// ✅ SECURITY FIX: The JWT access token is now strictly in-memory (tokenStore).
+// No PHI/medical data or access tokens are ever stored in localStorage directly.
 const storage = localStorage;
+
+// Module-level in-memory store (survives navigation, not page reload)
+let _accessToken: string | null = null;
+
+export const tokenStore = {
+  setAccessToken: (t: string) => { _accessToken = t; },
+  getAccessToken: () => _accessToken,
+  clearAccessToken: () => { _accessToken = null; },
+};
 
 /**
  * Servicio de Autenticación para la PWA Rejuvenate.
@@ -28,13 +34,16 @@ export const authService = {
    * Seguro para llamar ANTES del login — no dispara redirecciones ni logs de audit.
    */
   clearSession: () => {
+    tokenStore.clearAccessToken();
     storage.removeItem(SESSION_KEY);
-    storage.removeItem('auth_token');
     storage.removeItem('refresh_token');
-    // Also clean up any legacy sessionStorage entries from previous versions
+
+    // Also clean up any legacy entries from previous versions
+    storage.removeItem('auth_token');
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem('auth_token');
     sessionStorage.removeItem('refresh_token');
+
     useProfileStore.getState().clearProfileData();
   },
 
@@ -51,13 +60,14 @@ export const authService = {
         throw new Error('Respuesta del servidor incompleta: faltan token o datos de paciente.');
       }
 
-      // Guardar tokens en localStorage para persistir entre recargas y reinicios de PWA
-      storage.setItem('auth_token', token);
+      // Guardar access token EN MEMORIA (Seguridad)
+      tokenStore.setAccessToken(token);
+
+      // Guardar refresh token en disco (puede persistir sin riesgo directo)
       if (refreshToken) {
         storage.setItem('refresh_token', refreshToken);
       }
 
-      // ✅ FIX CRÍTICO: Obtener el perfil COMPLETO desde mobile-profile-v1
       try {
         const fullProfile = await ProtocolService.getMyProfile();
         if (fullProfile) {
@@ -90,7 +100,6 @@ export const authService = {
 
       const session: UserSession = {
         id: patient.id,
-        token: token,
         name: patient.name || `${patient.firstName} ${patient.lastName}`,
         email: patient.email,
         role: 'PATIENT',
@@ -116,15 +125,15 @@ export const authService = {
   },
 
   /**
-   * Finaliza la sesión y limpia el almacenamiento local.
+   * Finaliza la sesión y limpia el almacenamiento local y la memoria.
    */
   logout: () => {
-    // Limpiar localStorage (tokens actuales)
+    tokenStore.clearAccessToken();
     storage.removeItem(SESSION_KEY);
-    storage.removeItem('auth_token');
     storage.removeItem('refresh_token');
 
-    // Limpiar también sessionStorage por compatibilidad con versiones previas
+    // Clean legacy stuff just in case
+    storage.removeItem('auth_token');
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem('auth_token');
     sessionStorage.removeItem('refresh_token');
@@ -141,20 +150,16 @@ export const authService = {
 
   /**
    * Recupera la sesión actual desde el almacenamiento persistente.
-   * Intenta localStorage primero, luego sessionStorage como fallback (compatibilidad).
+   * NO depende de auth_token (ahora vive en memoria).
    */
   getCurrentUser: (): UserSession | null => {
-    // Intenta leer desde localStorage (versión actual)
     let session = storage.getItem(SESSION_KEY);
 
     // Fallback: migrar desde sessionStorage si existe (versión anterior)
     if (!session) {
       const legacySession = sessionStorage.getItem(SESSION_KEY);
       if (legacySession) {
-        // Migrar al nuevo storage
         storage.setItem(SESSION_KEY, legacySession);
-        const legacyToken = sessionStorage.getItem('auth_token');
-        if (legacyToken) storage.setItem('auth_token', legacyToken);
         const legacyRefresh = sessionStorage.getItem('refresh_token');
         if (legacyRefresh) storage.setItem('refresh_token', legacyRefresh);
         // Clean up old entries
@@ -176,7 +181,7 @@ export const authService = {
   },
 
   /**
-   * Verifica si hay una sesión activa.
+   * Verifica si hay una sesión activa basada en SESSION_KEY.
    */
   isAuthenticated: (): boolean => {
     return storage.getItem(SESSION_KEY) !== null ||
