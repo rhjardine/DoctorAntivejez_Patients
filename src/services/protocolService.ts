@@ -1,6 +1,7 @@
 import { PatientProtocol, NutrigenomicPlan } from '../types';
-import { authService } from './authService';
+import { authService, tokenStore } from './authService';
 import apiClient from './apiClient';
+import { offlineQueue } from './offlineQueue';
 
 // ✅ SECURITY: Cache de protocolo en sessionStorage (se limpia al cerrar tab)
 // Los datos clínicos NO deben persistir entre sesiones distintas
@@ -154,7 +155,21 @@ export const ProtocolService = {
       const response = await apiClient.patch(`/protocols/${itemId}/status`, { status });
       return response.status === 200 || response.status === 204;
     } catch {
-      // El caché local ya está actualizado — aceptable para piloto
+      // El caché local ya está actualizado — encolar en background sync
+      console.warn("[ProtocolService] Network failed, enqueueing protocol status update offline");
+      const baseUrl = apiClient.defaults.baseURL || '';
+      const fullUrl = baseUrl.endsWith('/') ? `${baseUrl}protocols/${itemId}/status` : `${baseUrl}/protocols/${itemId}/status`;
+
+      await offlineQueue.enqueue({
+        url: fullUrl,
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenStore.getAccessToken() || ''}`,
+        },
+      });
+
       return true;
     }
   },

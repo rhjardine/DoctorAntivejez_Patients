@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { COLORS } from '../types';
 import { Book, Smile, Brain, Users, Star, ChevronRight, X, Loader2, CheckCircle, Save } from 'lucide-react';
+import apiClient from '../services/apiClient';
+import { offlineQueue } from '../services/offlineQueue';
+import { tokenStore } from '../services/authService';
 
 const AttitudeView: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -59,48 +62,68 @@ const AttitudeView: React.FC = () => {
 
     setIsSubmitting(true);
 
-    // Simulate network delay for the save action
-    await new Promise(resolve => setTimeout(resolve, 1200));
+    const payload = {
+      type: 'journal',
+      points: 30,
+      notes: journalText,
+      metadata: { source: 'mobile_manual', attitude_type: 'journal' }
+    };
 
-    // Simulated Save
-    console.log("Saving journal entry:", journalText);
-    
-    setIsSubmitting(false);
+    // Optimistic UI updates
     setIsJournalModalOpen(false);
+    setSuccessMessage(navigator.onLine ? 'Entrada guardada con éxito' : 'Guardado offline (esperando red)');
     setJournalText('');
 
-    // Show Success Feedback
-    setSuccessMessage('Entrada guardada con éxito');
     setTimeout(() => {
       setSuccessMessage(null);
     }, 3000);
+
+    try {
+      await apiClient.post('/mobile-adherence-v1', payload);
+    } catch (error) {
+      console.warn("Journal saved offline, enqueueing", error);
+      const baseUrl = apiClient.defaults.baseURL || '';
+      const fullUrl = baseUrl.endsWith('/') ? `${baseUrl}mobile-adherence-v1` : `${baseUrl}/mobile-adherence-v1`;
+
+      await offlineQueue.enqueue({
+        url: fullUrl,
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenStore.getAccessToken() || ''}`,
+        },
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="flex flex-col pb-24 px-4 pt-4 space-y-3 relative">
-      
+
       {/* Success Toast Notification */}
       {successMessage && (
         <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
-           <div className="bg-green-600 text-white px-6 py-2.5 rounded-full shadow-lg flex items-center gap-2">
-              <CheckCircle size={16} />
-              <span className="text-xs font-bold">{successMessage}</span>
-           </div>
+          <div className="bg-green-600 text-white px-6 py-2.5 rounded-full shadow-lg flex items-center gap-2">
+            <CheckCircle size={16} />
+            <span className="text-xs font-bold">{successMessage}</span>
+          </div>
         </div>
       )}
 
       {/* Header Context */}
       <div className="bg-gradient-to-r from-pink-50 to-white dark:from-slate-800 dark:to-slate-900 p-4 rounded-xl border border-pink-100 dark:border-slate-700 mb-1 transition-colors duration-300">
-         <h2 className="text-darkBlue dark:text-white font-bold text-lg">Mente y Actitud</h2>
-         <p className="text-xs text-textMedium dark:text-slate-400 leading-relaxed mt-1">
-            Una actitud positiva modula la expresión génica y reduce el cortisol celular.
-         </p>
+        <h2 className="text-darkBlue dark:text-white font-bold text-lg">Mente y Actitud</h2>
+        <p className="text-xs text-textMedium dark:text-slate-400 leading-relaxed mt-1">
+          Una actitud positiva modula la expresión génica y reduce el cortisol celular.
+        </p>
       </div>
 
       {/* Tools List */}
       {tools.map((tool) => (
-        <div 
-          key={tool.id} 
+        <div
+          key={tool.id}
           onClick={() => handleToolClick(tool.id)}
           className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-all border border-transparent dark:border-slate-700 hover:border-gray-100 active:scale-[0.98]"
         >
@@ -128,8 +151,8 @@ const AttitudeView: React.FC = () => {
                 </div>
                 <h3 className="font-bold text-xl text-darkBlue dark:text-white">Diario de Gratitud</h3>
               </div>
-              <button 
-                onClick={() => !isSubmitting && setIsJournalModalOpen(false)} 
+              <button
+                onClick={() => !isSubmitting && setIsJournalModalOpen(false)}
                 className="p-1 bg-gray-100 dark:bg-slate-700 rounded-full hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
               >
                 <X size={20} className="text-gray-500 dark:text-slate-400" />
@@ -154,7 +177,7 @@ const AttitudeView: React.FC = () => {
                 </p>
               </div>
 
-              <button 
+              <button
                 type="submit"
                 disabled={!journalText.trim() || isSubmitting}
                 className="w-full bg-pink-500 text-white py-4 rounded-xl font-bold shadow-md hover:bg-pink-600 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2"

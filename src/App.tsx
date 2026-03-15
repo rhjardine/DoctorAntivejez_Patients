@@ -41,6 +41,8 @@ import OnboardingModal, { ONBOARDING_KEY } from './components/OnboardingModal';
 import { useReminders } from './hooks/useReminders';
 
 import { useDarkMode } from './hooks/useDarkMode';
+import { useSyncQueue } from './hooks/useSyncQueue';
+import { offlineQueue } from './services/offlineQueue';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { session } = useAuthStore();
@@ -57,6 +59,8 @@ const App: React.FC = () => {
 
   // ✅ ENHANCEMENT: Activate Dark Mode management
   useDarkMode();
+  // ✅ ENHANCEMENT: Background Sync Queue Hook
+  useSyncQueue();
 
   const {
     isDrawerOpen, toggleDrawer,
@@ -68,6 +72,31 @@ const App: React.FC = () => {
   const [isOnline, setIsOnline] = React.useState(navigator.onLine);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
   const [showOnboarding, setShowOnboarding] = React.useState(false);
+
+  // SW & Offline Queue tracking
+  const [pendingCount, setPendingCount] = React.useState(0);
+  const [showUpdateBanner, setShowUpdateBanner] = React.useState(false);
+
+  useEffect(() => {
+    if (!isOnline) {
+      // Refresh count periodically while offline
+      offlineQueue.count().then(setPendingCount);
+      const interval = setInterval(() => {
+        offlineQueue.count().then(setPendingCount);
+      }, 2000);
+      return () => clearInterval(interval);
+    } else {
+      setPendingCount(0);
+    }
+  }, [isOnline]);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        setShowUpdateBanner(true);
+      });
+    }
+  }, []);
 
   // Initialize session check
   useEffect(() => {
@@ -219,9 +248,28 @@ const App: React.FC = () => {
         <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
           <div className="bg-amber-500/90 backdrop-blur-sm text-white px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg border border-amber-400/50 animate-in fade-in slide-in-from-bottom-4">
             <WifiOff size={14} />
-            <span className="text-[10px] font-black uppercase tracking-widest">
-              Modo Offline - Datos de {profileData?.fetchedAt ? new Date(profileData.fetchedAt).toLocaleDateString() : 'hoy'}
+            <span className="text-[10px] font-black uppercase tracking-widest text-center">
+              {pendingCount > 0
+                ? `Modo Offline · ${pendingCount} registro(s) pendiente(s)`
+                : `Modo Offline · Datos de ${profileData?.fetchedAt ? new Date(profileData.fetchedAt).toLocaleDateString() : 'hoy'}`
+              }
             </span>
+          </div>
+        </div>
+      )}
+
+      {showUpdateBanner && (
+        <div className="fixed bottom-32 left-1/2 -translate-x-1/2 z-[60]">
+          <div className="bg-darkBlue text-white px-4 py-2 rounded-full flex items-center gap-3 shadow-2xl border border-blue-500/30 animate-in fade-in slide-in-from-bottom-4">
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              Nueva versión disponible
+            </span>
+            <button
+              onClick={() => window.location.reload()}
+              className="text-primary text-[10px] font-black uppercase underline hover:text-white transition-colors"
+            >
+              Actualizar
+            </button>
           </div>
         </div>
       )}

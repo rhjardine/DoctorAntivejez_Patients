@@ -1,0 +1,69 @@
+import { useEffect } from 'react';
+import { offlineQueue } from '../services/offlineQueue';
+import { tokenStore } from '../services/authService';
+
+export const useSyncQueue = () => {
+    useEffect(() => {
+        const drain = async () => {
+            try {
+                const pending = await offlineQueue.dequeueAll();
+                if (pending.length === 0) return;
+
+                console.log(`[SyncQueue] Drain triggered. Found ${pending.length} pending items.`);
+
+                // Force access token into headers just in case memory was flushed but localStorage syncs logic fires
+                const currentToken = tokenStore.getAccessToken();
+
+                for (const item of pending) {
+                    try {
+                        // Apply fresh token to avoid sending expired tokens stored offline
+                        const headers = { ...item.headers };
+                        if (currentToken) {
+                            headers['Authorization'] = `Bearer ${currentToken}`;
+                        }
+
+                        // Attempt to replay the write
+                        const response = await fetch(item.url, {
+                            method: item.method,
+                            headers: headers,
+                            body: item.body,
+                        });
+
+                        if (response.ok || response.status === 409) {
+                            // 409 Conflict = already applied = safe to remove
+                            await offlineQueue.remove(item.id!);
+                        } else {
+                            // If it fails with an explicit code (e.g. 400 Bad Request, 401 Unauthorized), we increment the retry count
+                            if (item.retryCount >= 3) {
+                                // Give up after 3 attempts — remove and log
+                                await offlineQueue.remove(item.id!);
+                                console.warn('[SyncQueue] Abandoned after 3 retries:', item.url);
+                            } else {
+                                await offlineQueue.updateRetryCount(item.id!, item.retryCount + 1);
+                            }
+                        }
+                    } catch (error) {
+                        // Network failed again while draining — leave in queue and break loop to avoid pounding offline loop
+                        console.warn('[SyncQueue] Network fail while draining, will retry later.');
+                        break;
+                    }
+                }
+
+                // Prune stale entries (> 7 days old)
+                await offlineQueue.pruneExpired();
+            } catch (err) {
+                console.error('[SyncQueue] Drain execution error:', err);
+            }
+        };
+
+        // Drain on mount if online
+        if (navigator.onLine) {
+            // slight delay to let the app finish booting and fetching critical tokens
+            setTimeout(() => drain(), 2000);
+        }
+
+        // Drain when coming back online
+        window.addEventListener('online', drain);
+        return () => window.removeEventListener('online', drain);
+    }, []);
+};

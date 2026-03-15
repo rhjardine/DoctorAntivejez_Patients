@@ -44,9 +44,9 @@ export default defineConfig(({ mode }) => {
           ]
         },
         workbox: {
-          // ✅ CRITICAL: Fuerza actualización inmediata del Service Worker
-          // para que los usuarios con la PWA instalada obtengan el fix de caché
-          skipWaiting: true,
+          // ✅ UPDATE: Esperar activación del Service Worker
+          // Evita recargar sesiones activas abruptamente
+          skipWaiting: false,
           clientsClaim: true,
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
           runtimeCaching: [

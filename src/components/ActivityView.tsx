@@ -1,6 +1,8 @@
 import React from 'react';
 import { Activity, Dumbbell, HeartPulse, Gauge, Move, ChevronRight, Check, CheckCircle2 } from 'lucide-react';
 import apiClient from '../services/apiClient';
+import { offlineQueue } from '../services/offlineQueue';
+import { tokenStore } from '../services/authService';
 
 const ActivityView: React.FC = () => {
   const [completedActivities, setCompletedActivities] = React.useState<Record<string, boolean>>({});
@@ -10,21 +12,34 @@ const ActivityView: React.FC = () => {
     // Prevent double submission
     if (completedActivities[activityType]) return;
 
-    setLoading(activityType);
-    try {
-      const response = await apiClient.post('/mobile-adherence-v1', {
-        type: activityType,
-        points: 20, // Default points per activity
-        notes: `Completed: ${title}`,
-        metadata: { source: 'mobile_manual' }
-      });
+    // 1. Optimistic UI update FIRST (never roll back on network failure)
+    setCompletedActivities(prev => ({ ...prev, [activityType]: true }));
 
-      if (response.data.success) {
-        setCompletedActivities(prev => ({ ...prev, [activityType]: true }));
-        // Ideally show a toast here
-      }
+    setLoading(activityType);
+    const payload = {
+      type: activityType,
+      points: 20, // Default points per activity
+      notes: `Completed: ${title}`,
+      metadata: { source: 'mobile_manual' }
+    };
+
+    try {
+      await apiClient.post('/mobile-adherence-v1', payload);
     } catch (error) {
-      console.error("Check-in failed", error);
+      console.warn("Check-in network failed, enqueueing for sync", error);
+
+      const baseUrl = apiClient.defaults.baseURL || '';
+      const fullUrl = baseUrl.endsWith('/') ? `${baseUrl}mobile-adherence-v1` : `${baseUrl}/mobile-adherence-v1`;
+
+      await offlineQueue.enqueue({
+        url: fullUrl,
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenStore.getAccessToken() || ''}`,
+        },
+      });
     } finally {
       setLoading(null);
     }

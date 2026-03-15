@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { Plus, Activity, Heart, Scale, Droplet, X, TrendingUp, TrendingDown, Calendar, Clock, CheckCircle, Trash2, AlertCircle, Loader2 } from 'lucide-react';
 import { BiometricData, BiometricType, COLORS } from '../types';
+import apiClient from '../services/apiClient';
+import { offlineQueue } from '../services/offlineQueue';
+import { tokenStore } from '../services/authService';
 
 interface BiometricsViewProps {
   entries: BiometricData[];
@@ -201,6 +204,31 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
       timestamp: isNaN(timestamp.getTime()) ? new Date() : timestamp,
     });
 
+    const adherencePayload = {
+      type: 'biometric_checkin',
+      points: 10,
+      notes: `Medición: ${newType} - ${newValue}${unit}`,
+      metadata: { source: 'mobile_manual', biometricType: newType, value: newValue }
+    };
+
+    try {
+      await apiClient.post('/mobile-adherence-v1', adherencePayload);
+    } catch (error) {
+      console.warn("Biometrics check-in offline, enqueueing", error);
+      const baseUrl = apiClient.defaults.baseURL || '';
+      const fullUrl = baseUrl.endsWith('/') ? `${baseUrl}mobile-adherence-v1` : `${baseUrl}/mobile-adherence-v1`;
+
+      await offlineQueue.enqueue({
+        url: fullUrl,
+        method: 'POST',
+        body: JSON.stringify(adherencePayload),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenStore.getAccessToken() || ''}`,
+        },
+      });
+    }
+
     // Reset Form
     setNewValue('');
     setRecordDate(new Date().toISOString().split('T')[0]);
@@ -209,7 +237,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
     setIsModalOpen(false);
 
     // Show Success Message
-    setSuccessMessage('Registro guardado con éxito');
+    setSuccessMessage(navigator.onLine ? 'Registro guardado con éxito' : 'Guardado offline (esperando red)');
     setTimeout(() => {
       setSuccessMessage(null);
     }, 3000);
@@ -326,8 +354,8 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
                       key={opt.id}
                       onClick={() => !isSubmitting && handleTypeChange(opt.id as BiometricType)}
                       className={`p-3 rounded-xl border text-center text-sm font-medium cursor-pointer transition-all flex flex-col items-center justify-center gap-1 ${newType === opt.id
-                          ? 'bg-blue-50 dark:bg-blue-900/30 border-primary text-primary shadow-sm'
-                          : 'border-gray-200 dark:border-slate-600 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
+                        ? 'bg-blue-50 dark:bg-blue-900/30 border-primary text-primary shadow-sm'
+                        : 'border-gray-200 dark:border-slate-600 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
                         } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       {opt.icon}
