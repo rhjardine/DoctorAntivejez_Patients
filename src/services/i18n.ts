@@ -31,6 +31,7 @@ const translations: Record<Locale, Record<string, string>> = {
         'nav.guide': 'Mi Guía Antivejez',
         'nav.keys5a': 'Claves 5A',
         'nav.therapies4r': 'Terapias 4R',
+        'nav.settings': 'Configuración',
 
         // Settings
         'settings.title': 'Personalización',
@@ -80,6 +81,7 @@ const translations: Record<Locale, Record<string, string>> = {
         'nav.guide': 'My Anti-Aging Guide',
         'nav.keys5a': 'Keys 5A',
         'nav.therapies4r': 'Therapies 4R',
+        'nav.settings': 'Settings',
 
         // Settings
         'settings.title': 'Customization',

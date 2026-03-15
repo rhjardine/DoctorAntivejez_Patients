@@ -126,7 +126,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#F8FAFC] overflow-hidden font-sans">
+    <div className="flex flex-col h-screen w-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden font-sans">
       {showOnboarding && session && (
         <OnboardingModal onComplete={() => setShowOnboarding(false)} />
       )}
@@ -139,7 +139,7 @@ const App: React.FC = () => {
       <PrivacyConsentModal isOpen={isPrivacyConsentOpen} onAccept={(() => { togglePrivacyConsent(false); }) as any} />
 
       {showHeaderFooter && (
-        <header className="bg-darkBlue text-white pt-safe-top z-30 shadow-sm shrink-0">
+        <header className="bg-[var(--dark-navy)] text-white pt-safe-top z-30 shadow-sm shrink-0">
           <div className="flex items-center justify-between px-6 py-3.5">
             {isDetailView ? (
               <button onClick={() => navigate(-1)} className="p-1"><ChevronLeft size={28} /></button>
@@ -169,7 +169,7 @@ const App: React.FC = () => {
           </div>
 
           {isHome && (
-            <div className="flex bg-white border-b border-gray-200 shadow-sm">
+            <div className="flex bg-[var(--surface)] border-b border-[var(--border)] shadow-sm">
               <button onClick={() => setMainTab(MainTab.CHALLENGE)} className={`flex-1 py-3 px-2 text-[11px] uppercase tracking-wide flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.CHALLENGE ? 'font-black text-[#1a3a5c] border-[#1a3a5c] bg-blue-50/50' : 'font-semibold text-[#334155] border-transparent hover:text-[#1a3a5c] hover:bg-slate-50'}`}>
                 <Trophy size={13} strokeWidth={currentMainTab === MainTab.CHALLENGE ? 3 : 2} /> Mi Guía
               </button>
@@ -184,7 +184,7 @@ const App: React.FC = () => {
         </header>
       )}
 
-      <main className="flex-1 overflow-y-auto no-scrollbar relative bg-[#F8FAFC]" style={{ paddingBottom: 'max(80px, env(safe-area-inset-bottom, 0px) + 64px)' }}>
+      <main className="flex-1 overflow-y-auto no-scrollbar relative bg-[var(--background)]" style={{ paddingBottom: 'max(80px, env(safe-area-inset-bottom, 0px) + 64px)' }}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
 
@@ -227,7 +227,7 @@ const App: React.FC = () => {
       )}
 
       {showHeaderFooter && (
-        <footer className="fixed bottom-0 left-0 right-0 z-40 bg-darkBlue border-t border-white/5 pb-safe-bottom shrink-0">
+        <footer className="fixed bottom-0 left-0 right-0 z-40 bg-[var(--dark-navy)] border-t border-white/5 pb-safe-bottom shrink-0">
           <div className="flex justify-around items-center py-3.5 px-4">
             <button
               onClick={() => {

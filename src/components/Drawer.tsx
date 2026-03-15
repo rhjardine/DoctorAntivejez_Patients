@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Info, LogOut, User, AlertCircle, Activity, Bell, Zap, FileClock, QrCode } from 'lucide-react';
+import { X, Info, LogOut, User, AlertCircle, Activity, Bell, Zap, FileClock, QrCode, Settings } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useUIStore } from '../store/useUIStore';
+import { useLocale } from '../hooks/useLocale';
 
 interface DrawerProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
   const { logout, session } = useAuthStore();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const { notificationsEnabled, enableNotifications, disableNotifications } = notificationControls;
+  const { t } = useLocale();
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -127,6 +129,11 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
               </div>
             </div>
           </div>
+
+          <button onClick={() => handleNavigation('/settings')} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group">
+            <Settings size={22} className="text-textMedium group-hover:text-primary" />
+            <span className="font-black text-[13px] uppercase tracking-widest">{t('nav.settings') || 'Configuración'}</span>
+          </button>
 
           <div className="h-px bg-gray-100 mx-6 my-3"></div>
 
