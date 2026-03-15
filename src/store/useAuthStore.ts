@@ -67,15 +67,15 @@ export const useAuthStore = create<AuthState>((set) => {
         const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
         if (refreshToken) {
           try {
-            // Llamada directa al API de refresh (obviando apiClient setup inicial)
-            const baseUrl = import.meta.env.DEV ? '/api-render/api' : `${import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com'}/api`;
-            const { data } = await apiClient.post(`${baseUrl}/auth/refresh`, { refreshToken });
+            const { data } = await apiClient.post('/auth/refresh',
+              { refreshToken }
+            );
             tokenStore.setAccessToken(data.accessToken);
             if (data.refreshToken) {
               localStorage.setItem('refresh_token', data.refreshToken);
             }
           } catch (error) {
-            console.warn('[F5 Recovery] Refresh falló silenciosamente, forzando relogin.');
+            console.warn('[F5 Recovery] Refresh failed, forcing relogin.');
             authService.logout();
             set({ session: null });
             return;

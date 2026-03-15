@@ -5,7 +5,7 @@ import {
   Zap, Activity, Dumbbell, Trophy, Bike,
   Smile, Brain, Heart, Sparkles, Star,
   Sprout, Leaf, Home, CloudSun, Wind,
-  Bed, Clock, Bell, Check
+  Bed, Clock, Bell, Check, Globe, Sun, Moon, Monitor
 } from 'lucide-react';
 import { UserPreferences, COLORS } from '../types';
 import { PrivacySettings } from './Settings/PrivacySettings';
@@ -55,8 +55,6 @@ const ICON_OPTIONS = {
 
 import { useDarkMode } from '../hooks/useDarkMode';
 import { useLocale } from '../hooks/useLocale';
-import { Globe, Sun, Moon, Monitor } from 'lucide-react';
-
 const SettingsView: React.FC<SettingsViewProps> = ({ preferences, onUpdatePreferences }) => {
   const { colorScheme, setColorScheme } = useDarkMode();
   const { t, locale, setLocale } = useLocale();

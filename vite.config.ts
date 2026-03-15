@@ -48,6 +48,7 @@ export default defineConfig(({ mode }) => {
           // Evita recargar sesiones activas abruptamente
           skipWaiting: false,
           clientsClaim: true,
+          importScripts: ['sw-messages.js'],
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
           runtimeCaching: [
             {

@@ -218,8 +218,8 @@ const HomePage: React.FC = () => {
                                         <div className="flex items-center gap-4">
                                             <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><Dna size={28} /></div>
                                             <div>
-                                                <h3 className="font-black text-darkBlue text-lg">Alimentación</h3>
-                                                <p className="text-[10px] font-bold text-textMedium uppercase">Nutrigenómica</p>
+                                                <h3 className="font-black text-darkBlue text-lg leading-tight">Alimentación Sana</h3>
+                                                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#23bcef' }}>Antienvejecimiento</p>
                                             </div>
                                         </div>
                                         <div className="text-primary pr-2">

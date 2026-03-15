@@ -110,11 +110,19 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                     >
                         <ChevronLeft size={24} className="text-white" />
                     </button>
-                    <div className="text-center">
-                        <h2 className="text-lg font-black text-white tracking-widest uppercase leading-none">Mi Guía</h2>
-                        <span className="text-[10px] font-black text-[#23BCEF] uppercase tracking-[0.2em] mt-1.5 block opacity-80">
-                            Dr. Antivejez • 2024
-                        </span>
+                    <div className="text-center flex-1 px-4">
+                        <div className="flex items-center justify-center gap-2 mb-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#23BCEF] animate-pulse" />
+                            <span className="text-[9px] font-black text-[#23BCEF] uppercase tracking-[0.2em] opacity-90">
+                                Dr. Antivejez · 2024
+                            </span>
+                        </div>
+                        <h2 className="text-lg font-black text-white tracking-tight leading-none uppercase">
+                            Guía de Alimentación
+                        </h2>
+                        <h2 className="text-lg font-black text-[#23BCEF] tracking-tight leading-none uppercase mt-0.5">
+                            Personalizada
+                        </h2>
                     </div>
                     <div className="w-12 h-12 flex items-center justify-center bg-[#23BCEF]/20 rounded-2xl border border-[#23BCEF]/30 shadow-[0_0_15px_rgba(35,188,239,0.2)]">
                         <Dna size={22} className="text-[#23BCEF] animate-pulse" />
@@ -131,8 +139,8 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                             key={id}
                             onClick={() => setActiveSection(id)}
                             className={`flex flex-1 items-center justify-center gap-2 py-3 px-3 rounded-2xl transition-all duration-300 ${isActive
-                                    ? 'bg-[#293b64] text-white shadow-lg scale-105'
-                                    : 'bg-transparent text-slate-400 font-bold'
+                                ? 'bg-[#293b64] text-white shadow-lg scale-105'
+                                : 'bg-transparent text-slate-400 font-bold'
                                 }`}
                         >
                             <Icon size={16} />
@@ -155,8 +163,8 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                                     key={id}
                                     onClick={() => setActiveMeal(id)}
                                     className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black transition-all border-2 whitespace-nowrap ${activeMeal === id
-                                            ? 'bg-[#23BCEF] border-[#23BCEF] text-white shadow-md'
-                                            : 'bg-white border-slate-100 text-slate-500'
+                                        ? 'bg-[#23BCEF] border-[#23BCEF] text-white shadow-md'
+                                        : 'bg-white border-slate-100 text-slate-500'
                                         }`}
                                 >
                                     <Icon size={14} />

@@ -44,8 +44,8 @@ apiClient.interceptors.response.use(
                     { refreshToken }
                 );
 
-                // Actualizar tokens en localStorage
-                localStorage.setItem('auth_token', data.accessToken);
+                // Actualizar tokens en memoria y localStorage
+                tokenStore.setAccessToken(data.accessToken);
                 if (data.refreshToken) {
                     localStorage.setItem('refresh_token', data.refreshToken);
                 }

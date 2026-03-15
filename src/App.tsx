@@ -91,11 +91,32 @@ const App: React.FC = () => {
   }, [isOnline]);
 
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!('serviceWorker' in navigator)) return;
+
+    navigator.serviceWorker.ready.then(registration => {
+      // Case A: SW already waiting when app loads
+      if (registration.waiting) {
         setShowUpdateBanner(true);
+      }
+      // Case B: new SW found after app was open
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed'
+            && registration.waiting) {
+            setShowUpdateBanner(true);
+          }
+        });
       });
-    }
+    });
+
+    // Case C: SW took control (after user clicked Actualizar)
+    navigator.serviceWorker.addEventListener(
+      'controllerchange', () => {
+        setShowUpdateBanner(false);
+      }
+    );
   }, []);
 
   // Initialize session check
@@ -265,7 +286,12 @@ const App: React.FC = () => {
               Nueva versión disponible
             </span>
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => {
+                navigator.serviceWorker.ready.then(reg => {
+                  reg.waiting?.postMessage({ type: 'SKIP_WAITING' });
+                });
+                setTimeout(() => window.location.reload(), 300);
+              }}
               className="text-primary text-[10px] font-black uppercase underline hover:text-white transition-colors"
             >
               Actualizar
