@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Info, LogOut, User, AlertCircle, Activity, Bell, Zap, FileClock, QrCode, Settings } from 'lucide-react';
+import { X, Info, LogOut, User, AlertCircle, Activity, Bell, Zap, FileClock, QrCode, Settings, MessageSquare } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useUIStore } from '../store/useUIStore';
 import { useLocale } from '../hooks/useLocale';
@@ -138,9 +138,21 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
           <div className="h-px bg-gray-100 mx-6 my-3"></div>
 
           <button onClick={() => handleNavigation('/about')} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group">
-            <Info size={22} className="text-textMedium group-hover:text-primary" />
-            <span className="font-black text-[13px] uppercase tracking-widest">Sobre la App</span>
+            <span className="flex items-center gap-4">
+              <Info size={22} className="text-textMedium group-hover:text-primary" />
+              <span className="font-black text-[13px] uppercase tracking-widest">Sobre la App</span>
+            </span>
           </button>
+
+          <a
+            href={`mailto:soporte@doctorantivejez.com?subject=Reporte%20de%20Error%20PWA&body=Paciente%3A%20${encodeURIComponent(session?.name || '')}%0AFecha%3A%20${encodeURIComponent(new Date().toLocaleString('es-VE'))}%0A%0ADescripci%C3%B3n%20del%20problema%3A%0A`}
+            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-amber-50 transition-all text-amber-600 group"
+          >
+            <MessageSquare size={22} className="text-amber-400 group-hover:text-amber-600" />
+            <span className="font-black text-[13px] uppercase tracking-widest">
+              Reportar Problema
+            </span>
+          </a>
 
           <button onClick={() => setShowLogoutConfirm(true)} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-red-50 transition-all text-accentRed group">
             <LogOut size={22} className="group-hover:text-red-600" />
