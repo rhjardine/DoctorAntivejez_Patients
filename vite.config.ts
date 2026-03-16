@@ -49,7 +49,7 @@ export default defineConfig(({ mode }) => {
           skipWaiting: false,
           clientsClaim: true,
           importScripts: ['sw-messages.js'],
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,jpeg,jpg}'],
           runtimeCaching: [
             {
               // Auth y Profile: NUNCA cachear endpoints médicos/sensibles
