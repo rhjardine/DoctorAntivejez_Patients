@@ -1,103 +1,18 @@
-
 import React from 'react';
-import {
-  Apple, Utensils, Coffee, Salad, Grape,
-  Zap, Activity, Dumbbell, Trophy, Bike,
-  Smile, Brain, Heart, Sparkles, Star,
-  Sprout, Leaf, Home, CloudSun, Wind,
-  Bed, Clock, Bell, Check, Globe, Sun, Moon, Monitor
-} from 'lucide-react';
 import { UserPreferences, COLORS } from '../types';
 import { PrivacySettings } from './Settings/PrivacySettings';
+import { useDarkMode } from '../hooks/useDarkMode';
+import { useLocale } from '../hooks/useLocale';
+import { Globe, Sun, Moon, Monitor } from 'lucide-react';
 
 interface SettingsViewProps {
   preferences: UserPreferences;
   onUpdatePreferences: (prefs: UserPreferences) => void;
 }
 
-const ICON_OPTIONS = {
-  NUTRITION: [
-    { id: 'Apple', icon: Apple },
-    { id: 'Utensils', icon: Utensils },
-    { id: 'Coffee', icon: Coffee },
-    { id: 'Salad', icon: Salad },
-    { id: 'Grape', icon: Grape }
-  ],
-  ACTIVITY: [
-    { id: 'Zap', icon: Zap },
-    { id: 'Activity', icon: Activity },
-    { id: 'Dumbbell', icon: Dumbbell },
-    { id: 'Trophy', icon: Trophy },
-    { id: 'Bike', icon: Bike }
-  ],
-  ATTITUDE: [
-    { id: 'Smile', icon: Smile },
-    { id: 'Brain', icon: Brain },
-    { id: 'Heart', icon: Heart },
-    { id: 'Sparkles', icon: Sparkles },
-    { id: 'Star', icon: Star }
-  ],
-  ENVIRONMENT: [
-    { id: 'Sprout', icon: Sprout },
-    { id: 'Leaf', icon: Leaf },
-    { id: 'Home', icon: Home },
-    { id: 'CloudSun', icon: CloudSun },
-    { id: 'Wind', icon: Wind }
-  ],
-  REST: [
-    { id: 'Bed', icon: Bed },
-    { id: 'Moon', icon: Moon },
-    { id: 'Clock', icon: Clock },
-    { id: 'Bell', icon: Bell },
-    { id: 'Check', icon: Check }
-  ]
-};
-
-import { useDarkMode } from '../hooks/useDarkMode';
-import { useLocale } from '../hooks/useLocale';
 const SettingsView: React.FC<SettingsViewProps> = ({ preferences, onUpdatePreferences }) => {
   const { colorScheme, setColorScheme } = useDarkMode();
   const { t, locale, setLocale } = useLocale();
-
-  const handleIconSelect = (category: keyof UserPreferences['icons'], iconId: string) => {
-    const newPrefs = {
-      ...preferences,
-      icons: {
-        ...preferences.icons,
-        [category]: iconId
-      }
-    };
-    onUpdatePreferences(newPrefs);
-  };
-
-  const renderCategorySelection = (category: keyof UserPreferences['icons'], label: string) => {
-    const options = ICON_OPTIONS[category];
-    const currentIconId = preferences.icons[category];
-
-    return (
-      <div className="space-y-3">
-        <h4 className="text-[11px] font-black text-[var(--dark-navy)] dark:text-[var(--text-primary)] uppercase tracking-widest pl-1">{label}</h4>
-        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-          {options.map((opt) => {
-            const Icon = opt.icon;
-            const isSelected = currentIconId === opt.id;
-            return (
-              <button
-                key={opt.id}
-                onClick={() => handleIconSelect(category, opt.id)}
-                className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center transition-all border-2 ${isSelected
-                  ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105'
-                  : 'bg-[var(--surface)] border-[var(--border)] text-slate-300'
-                  }`}
-              >
-                <Icon size={24} />
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="flex flex-col p-6 pb-32 animate-in fade-in slide-in-from-right duration-500 overflow-y-auto no-scrollbar h-full bg-[var(--background)]">
@@ -165,14 +80,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ preferences, onUpdatePrefer
           </div>
         </div>
 
-        {/* Icons Section */}
-        <div className="bg-[var(--surface)] rounded-[2.5rem] p-6 shadow-sm border border-[var(--border)] space-y-8">
-          {renderCategorySelection('NUTRITION', t('settings.icons.nutrition'))}
-          {renderCategorySelection('ACTIVITY', t('settings.icons.activity'))}
-          {renderCategorySelection('ATTITUDE', t('settings.icons.attitude'))}
-          {renderCategorySelection('ENVIRONMENT', t('settings.icons.environment'))}
-          {renderCategorySelection('REST', t('settings.icons.rest'))}
-        </div>
+
       </div>
 
       <div className="mt-8">
