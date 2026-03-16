@@ -2,10 +2,18 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { logger } from '../utils/logger';
 
 // Load seed from env
-const ENCRYPTION_SEED = import.meta.env.VITE_ENCRYPTION_SEED;
+const ENCRYPTION_SEED =
+    import.meta.env.VITE_ENCRYPTION_SEED ||
+    (import.meta.env.DEV
+        ? 'dev-only-insecure-seed-do-not-use-in-prod'
+        : null);
 
-if (!ENCRYPTION_SEED) {
-    logger.error('CRITICAL: VITE_ENCRYPTION_SEED is missing. Encryption will be weak.');
+if (!import.meta.env.VITE_ENCRYPTION_SEED) {
+    if (import.meta.env.DEV) {
+        logger.warn('VITE_ENCRYPTION_SEED not set — using dev fallback. Safe for local only.');
+    } else {
+        logger.error('CRITICAL: VITE_ENCRYPTION_SEED missing in production. Configure in Render env.');
+    }
 }
 
 /**

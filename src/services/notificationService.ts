@@ -13,7 +13,7 @@ export const notificationService = {
   // Request permission from user
   requestPermission: async (): Promise<boolean> => {
     if (!('Notification' in window)) return false;
-    
+
     try {
       const permission = await Notification.requestPermission();
       return permission === 'granted';
@@ -33,17 +33,16 @@ export const notificationService = {
         navigator.serviceWorker.ready.then((registration) => {
           registration.showNotification(title, {
             body,
-            icon: '/icon-192x192.png', // Assuming pwa icon exists, or browser default
+            icon: '/icon-192.png', // Assuming pwa icon exists, or browser default
             tag, // Tag prevents duplicate notifications
-            vibrate: [200, 100, 200],
-            badge: '/badge-72x72.png'
+            vibrate: [200, 100, 200]
           } as any);
         });
       } else {
         // Standard Desktop/Simple implementation
         new Notification(title, {
           body,
-          icon: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png', // Generic pill icon
+          icon: '/icon-192.png', // Generic pill icon
           tag,
         });
       }
