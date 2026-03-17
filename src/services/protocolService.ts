@@ -2,6 +2,7 @@ import { PatientProtocol, NutrigenomicPlan } from '../types';
 import { authService, tokenStore } from './authService';
 import apiClient from './apiClient';
 import { offlineQueue } from './offlineQueue';
+import { useProfileStore } from '../store/useProfileStore';
 
 // ✅ SECURITY: Cache de protocolo en sessionStorage (se limpia al cerrar tab)
 // Los datos clínicos NO deben persistir entre sesiones distintas
@@ -182,6 +183,11 @@ export const ProtocolService = {
    */
   getMyProfile: async (): Promise<any> => {
     try {
+      // Check if profile store has fresh data — avoid redundant API call
+      const { profileData, isCacheValid } = useProfileStore.getState();
+      if (profileData && isCacheValid()) {
+        return profileData;
+      }
       const response = await apiClient.get('/mobile-profile-v1');
       return response.data;
     } catch (error) {
