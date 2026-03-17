@@ -118,14 +118,17 @@ class CryptoService {
      * Desencripta un string en formato iv:ciphertext.
      */
     async decrypt(cipherString: string): Promise<any> {
-        await this.ensureInitialized();
-        if (!this.key) throw new Error('Crypto not ready');
-
-        // Allow graceful fallback if the string is clearly not an encrypted token
-        if (!cipherString.includes(':')) {
-            console.warn('[CryptoService] cipherString missing colon delimiter, ignoring decryption attempt.');
+        // Guard: if not a valid encrypted string, return null
+        if (!cipherString ||
+            typeof cipherString !== 'string' ||
+            !cipherString.includes(':') ||
+            cipherString.length < 20) {
+            console.warn('[CryptoService] Invalid cipher format, clearing stale cache');
             return null;
         }
+
+        await this.ensureInitialized();
+        if (!this.key) throw new Error('Crypto not ready');
 
         try {
             const [ivBase64, contentBase64] = cipherString.split(':');

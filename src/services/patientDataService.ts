@@ -81,14 +81,21 @@ export const fetchConsultationHistory = async (): Promise<ConsultationRecord[]> 
   const user = authService.getCurrentUser();
   return [
     {
-      consultationId: "HIST-001",
-      patientId: user?.id || "5963578",
-      date: "15/11/2023",
-      doctorName: "Dr. Alexander Miller",
-      doctorNotes: "Consulta inicial. Protocolo 4R activado.",
-      adherenceRate: 75,
-      biologicalAgeAtTime: 42,
-      chronologicalAgeAtTime: 49,
+      consultationId: "BETA-001",
+      patientId: user?.id || "",
+      date: new Date().toLocaleDateString('es-VE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }),
+      doctorName: "Dr. Juan Carlos Méndez",
+      doctorNotes: "Consulta Beta v1.0. Protocolo 4R activado. " +
+        "Se inicia seguimiento de biomarcadores y adherencia " +
+        "al plan nutrigenómico personalizado. Próxima evaluación " +
+        "en 30 días para ajuste de guía clínica.",
+      adherenceRate: 0,
+      biologicalAgeAtTime: 0,
+      chronologicalAgeAtTime: 0,
       treatmentSnapshot: []
     }
   ];

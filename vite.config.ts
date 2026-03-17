@@ -52,8 +52,12 @@ export default defineConfig(({ mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,jpeg,jpg}'],
           runtimeCaching: [
             {
-              // Auth y Profile: NUNCA cachear endpoints médicos/sensibles
-              urlPattern: ({ url }) => url.pathname.includes('mobile-auth-v1') || url.pathname.includes('mobile-profile-v1'),
+              urlPattern: ({ url }) =>
+                url.pathname.includes('mobile-auth-v1') ||
+                url.pathname.includes('mobile-profile-v1') ||
+                url.pathname.includes('mobile-adherence-v1') ||
+                url.pathname.includes('auth/refresh') ||
+                url.pathname.includes('/api/'),
               handler: 'NetworkOnly',
             }
           ]

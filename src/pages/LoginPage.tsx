@@ -33,65 +33,118 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col h-full w-full bg-[#23BCEF] px-8 pt-safe-top pb-safe-bottom items-center justify-center animate-in fade-in duration-700 min-h-screen">
-
-            {/* Branding */}
-            <div className="flex flex-col items-center mb-12">
+        <div
+            className="flex flex-col h-full w-full px-8
+                 pt-safe-top pb-safe-bottom items-center
+                 justify-center animate-in fade-in
+                 duration-700 min-h-screen"
+            style={{ backgroundColor: 'rgb(41, 59, 100)' }}
+        >
+            {/* Logo */}
+            <div className="flex flex-col items-center mb-10">
                 <img
-                    src="/Logo_app.jpeg"
+                    src="/Logo_azul_oscuro.png"
                     alt="Doctor Antivejez"
-                    className="w-64 h-auto object-contain animate-in zoom-in duration-700 drop-shadow-sm"
+                    className="w-56 h-auto object-contain
+                     drop-shadow-sm"
+                    onError={(e) => {
+                        // Fallback to header-style branding
+                        e.currentTarget.style.display = 'none';
+                    }}
                 />
             </div>
 
             {/* Form */}
-            <form onSubmit={handleLogin} className="w-full max-w-sm space-y-6">
+            <form onSubmit={handleLogin}
+                className="w-full max-w-sm space-y-5">
                 <div className="space-y-4">
+
+                    {/* Document ID field */}
                     <div className="space-y-2">
-                        <label className="text-xs font-black text-[#293b64] uppercase tracking-widest ml-1">{t('login.documentId')}</label>
+                        <label className="text-xs font-black
+                              text-white/70 uppercase
+                              tracking-widest ml-1">
+                            {t('login.documentId')}
+                        </label>
                         <input
                             type="text"
                             value={documentId}
                             onChange={(e) => setDocumentId(e.target.value)}
                             placeholder={t('login.placeholder.documentId')}
                             autoComplete="username"
-                            className={`w-full bg-white border-2 rounded-3xl p-4 text-lg font-black text-black placeholder:text-slate-300 focus:outline-none transition-all ${error ? 'border-red-500 focus:border-red-600' : 'border-[#293b64] focus:border-[#293b64]/50'
-                                } shadow-md`}
+                            className="w-full bg-white border-2
+                         border-white rounded-3xl p-4
+                         text-lg font-bold text-black
+                         placeholder:text-slate-400
+                         focus:outline-none
+                         focus:border-white/80
+                         shadow-md transition-all"
                             required
                             autoFocus
                         />
                     </div>
 
+                    {/* Password field */}
                     <div className="space-y-2">
-                        <label className="text-xs font-black text-[#293b64] uppercase tracking-widest ml-1">{t('login.password')}</label>
+                        <label className="text-xs font-black
+                              text-white/70 uppercase
+                              tracking-widest ml-1">
+                            {t('login.password')}
+                        </label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder={t('login.placeholder.password')}
                             autoComplete="current-password"
-                            className={`w-full bg-white border-2 rounded-3xl p-4 text-lg font-black text-black placeholder:text-slate-300 focus:outline-none transition-all ${error ? 'border-red-500 focus:border-red-600' : 'border-[#293b64] focus:border-[#293b64]/50'
-                                } shadow-md`}
+                            className="w-full bg-white border-2
+                         border-white rounded-3xl p-4
+                         text-lg font-bold text-black
+                         placeholder:text-slate-400
+                         focus:outline-none
+                         focus:border-white/80
+                         shadow-md transition-all"
                             required
                         />
                     </div>
 
+                    {/* Error message */}
                     {error && (
-                        <div className="flex items-center gap-2 mt-2 px-2 text-red-600 animate-in slide-in-from-top-2">
+                        <div className="flex items-center gap-2
+                            mt-2 px-2 text-red-300
+                            animate-in slide-in-from-top-2">
                             <AlertCircle size={14} />
-                            <span className="text-[10px] font-bold uppercase">{error}</span>
+                            <span className="text-[11px] font-bold
+                               uppercase">
+                                {error}
+                            </span>
                         </div>
                     )}
                 </div>
 
+                {/* Submit button — disabled until both fields filled */}
                 <button
                     type="submit"
                     disabled={!documentId || !password || isLoading}
-                    className="w-full bg-[#293b64] text-white py-5 rounded-[2rem] font-black text-base uppercase tracking-widest shadow-xl shadow-blue-900/30 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:grayscale"
+                    className="w-full text-white py-5 rounded-[2rem]
+                     font-black text-base uppercase
+                     tracking-widest shadow-xl
+                     active:scale-95 transition-all
+                     flex items-center justify-center
+                     gap-3 disabled:opacity-40
+                     disabled:cursor-not-allowed
+                     disabled:scale-100"
+                    style={{
+                        backgroundColor: (!documentId || !password
+                            || isLoading)
+                            ? 'rgba(255,255,255,0.2)'
+                            : 'rgba(35, 188, 239, 1)'
+                    }}
                 >
                     {isLoading ? (
                         <>
-                            <Loader2 size={24} className="animate-spin text-white" />
+                            <Loader2 size={24}
+                                className="animate-spin text-white" />
                             <span>{t('login.connecting')}</span>
                         </>
                     ) : (
@@ -103,11 +156,13 @@ const LoginPage: React.FC = () => {
                 </button>
             </form>
 
-
-            <div className="mt-20 text-center">
-                <p className="text-[11px] font-black text-[#293b64] uppercase tracking-[0.2em]">{t('login.secureAccess')}</p>
+            <div className="mt-16 text-center">
+                <p className="text-[11px] font-black
+                      text-white/40 uppercase
+                      tracking-[0.2em]">
+                    {t('login.secureAccess')}
+                </p>
             </div>
-
         </div>
     );
 };

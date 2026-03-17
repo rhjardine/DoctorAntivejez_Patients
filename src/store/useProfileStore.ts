@@ -32,14 +32,20 @@ const encryptedStorage: StateStorage = {
     getItem: async (name: string) => {
         const raw = localStorage.getItem(name);
         if (!raw) return null;
+
+        // If raw doesn't look encrypted, clear and return null
+        if (!raw.includes(':') || raw.startsWith('{')) {
+            console.warn('[Storage] Clearing unencrypted cache');
+            localStorage.removeItem(name);
+            return null;
+        }
+
         try {
             const decrypted = await cryptoService.decrypt(raw);
-            if (decrypted) {
-                return JSON.stringify(decrypted);
-            }
+            if (decrypted) return JSON.stringify(decrypted);
+            localStorage.removeItem(name);
             return null;
         } catch {
-            console.error('[encryptedStorage] Decrypt failed, discarding corrupted persist cache');
             localStorage.removeItem(name);
             return null;
         }

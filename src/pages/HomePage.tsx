@@ -48,11 +48,10 @@ const HomePage: React.FC = () => {
     }, [currentMainTab]);
 
     useEffect(() => {
-        // Si el perfil ya existe Y tiene alimentacion, no re-fetch (datos completos en caché)
-        // Si existe pero le falta alimentacion, forzar re-fetch para obtenerlo
         if (isLoadingMetrics) return;
-        const needsFullRefetch = profileData && profileData.alimentacion === undefined;
-        if (profileData && !needsFullRefetch) return;
+        // If cache is valid and has alimentacion, skip fetch
+        if (profileData && isCacheValid() &&
+            profileData.alimentacion !== undefined) return;
 
         const loadMetrics = async () => {
             if (!session || isLoadingMetrics) return;
