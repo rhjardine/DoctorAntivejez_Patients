@@ -56,8 +56,8 @@ const VCoachChat: React.FC = () => {
         + 'todas tus preguntas sobre tu plan de salud, '
         + 'nutrición y longevidad. 🌱\n\n'
         + 'Por ahora, cualquier duda puedes consultarla '
-        + 'directamente con tu médico a través del '
-        + 'Bio-Pase en tu próxima consulta.',
+        + 'directamente con tu Coach Antivejez o Médico Tratante '
+        + 'a través del WhatsApp o coordenada de contacto.',
       timestamp: new Date().toISOString()
     };
 
