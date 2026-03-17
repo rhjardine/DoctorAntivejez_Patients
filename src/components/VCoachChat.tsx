@@ -2,19 +2,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { COLORS, ChatMessage } from '../types';
 import { Send, Bot, User, Sparkles } from 'lucide-react';
-import { sendMessageToVCoach, startChatSession } from '../services/geminiService';
-import { useAuthStore } from '../store/useAuthStore';
-import { useProfileStore } from '../store/useProfileStore';
 
 const VCoachChat: React.FC = () => {
-  const { session } = useAuthStore();
-  const { profileData } = useProfileStore();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       role: 'model',
-      text: '¡Hola! Soy tu VCoach de Doctor Antivejez. ¿En qué puedo ayudarte hoy para optimizar tu longevidad y salud celular?',
+      text: '¡Hola! Soy tu VCoach de Doctor Antivejez. '
+        + 'Estoy en fase de activación y pronto estaré '
+        + 'completamente operativo para apoyar tu salud '
+        + 'y longevidad. 🚀\n\n'
+        + 'Mientras tanto, revisa tu Guía del Paciente '
+        + 'y tu Plan de Alimentación para comenzar tu '
+        + 'protocolo antienvejecimiento.',
       timestamp: new Date().toISOString()
     }
   ]);
@@ -43,32 +44,25 @@ const VCoachChat: React.FC = () => {
     setInput('');
     setIsLoading(true);
 
-    try {
-      if (messages.length === 1) { // First message or session start
-        const context = {
-          name: session?.name,
-          chronologicalAge: profileData?.chronologicalAge || 0,
-          biologicalAge: profileData?.biologicalAge || 0,
-          bloodType: profileData?.bloodType || ''
-        };
-        await startChatSession(context);
-      }
+    // Short delay for natural feel
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-      const responseText = await sendMessageToVCoach(userMessage.text);
+    const betaResponse: ChatMessage = {
+      id: (Date.now() + 1).toString(),
+      role: 'model',
+      text: '¡Hola! Estoy en fase de activación para '
+        + 'acompañarte mejor. Muy pronto estaré '
+        + 'completamente operativo para responder '
+        + 'todas tus preguntas sobre tu plan de salud, '
+        + 'nutrición y longevidad. 🌱\n\n'
+        + 'Por ahora, cualquier duda puedes consultarla '
+        + 'directamente con tu médico a través del '
+        + 'Bio-Pase en tu próxima consulta.',
+      timestamp: new Date().toISOString()
+    };
 
-      const botMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'model',
-        text: responseText,
-        timestamp: new Date().toISOString()
-      };
-
-      setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
-      console.error("Chat error", error);
-    } finally {
-      setIsLoading(false);
-    }
+    setMessages(prev => [...prev, betaResponse]);
+    setIsLoading(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -89,8 +83,8 @@ const VCoachChat: React.FC = () => {
           >
             <div
               className={`max-w-[85%] p-4 rounded-3xl shadow-sm flex gap-3 ${msg.role === 'user'
-                  ? 'bg-primary text-white rounded-tr-none'
-                  : 'bg-white text-textDark rounded-tl-none border border-gray-100'
+                ? 'bg-primary text-white rounded-tr-none'
+                : 'bg-white text-textDark rounded-tl-none border border-gray-100'
                 }`}
             >
               {msg.role === 'model' && (
