@@ -13,7 +13,7 @@ const MedicalTeamView: React.FC = () => {
         "Especialista en Medicina Antienvejecimiento egresado de A4M, UNAM y Univ. de Sevilla.",
         "Director y fundador del Centro Médico y Académico Latinoamericano de Medicina Antienvejecimiento (CMA / ALMA)."
       ],
-      image: "/equipo_med/Dr_Juan_Mendez.jpeg",
+      image: "/equipo_med/Dr_Juan_Mendez.png",
       accent: "border-primary",
       social: {
         instagram: "@doctorantivejez",
@@ -29,7 +29,7 @@ const MedicalTeamView: React.FC = () => {
         "Docente adjunto del Postgrado de Anestesiología (UCV).",
         "Miembro referente internacional SISDET Colombia."
       ],
-      image: "/equipo_med/Dra_ZuraidaR.jpeg",
+      image: "/equipo_med/Dra_ZuraidaR.png",
       accent: "border-orange-500"
     },
     {
@@ -41,7 +41,7 @@ const MedicalTeamView: React.FC = () => {
         "Diplomados en Medicina Integrativa y Salud Ocupacional.",
         "Liderazgo en atención primaria y medicina integrativa."
       ],
-      image: "/equipo_med/Dra_SaraiMedina.jpeg",
+      image: "/equipo_med/Dra_SaraiMedina.png",
       accent: "border-primary"
     }
   ];
