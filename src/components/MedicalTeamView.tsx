@@ -56,11 +56,11 @@ const MedicalTeamView: React.FC = () => {
       {doctors.map((doc, index) => (
         <div key={index} className="bg-white rounded-[2rem] shadow-xl border border-gray-50 overflow-hidden flex flex-col">
           {/* Image Area with Branding Background for Primary Doctor */}
-          <div className={`w-full h-72 relative border-b-8 ${doc.accent} ${index === 0 ? 'bg-[#293B64]' : ''}`}>
+          <div className={`w-full h-72 relative border-b-8 ${doc.accent}`}>
             <img
               src={doc.image}
               alt={doc.name}
-              className={`w-full h-full object-cover ${index === 0 ? 'opacity-90 mix-blend-luminosity hover:mix-blend-normal transition-all' : ''}`}
+              className="w-full h-full object-cover object-top"
             />
             <div className="absolute top-4 left-4">
               <div className="bg-white/90 backdrop-blur-md p-2 rounded-xl shadow-sm">
