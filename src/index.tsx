@@ -40,6 +40,28 @@ async function main() {
     return;
   }
 
+  // ✅ EMERGENCY RESET — ?clear=1 parameter clears all corrupted local state
+  // Usage: send patient the URL https://doctorantivejez-patients.onrender.com/?clear=1
+  const url = new URL(window.location.href);
+  if (url.searchParams.get('clear') === '1') {
+    console.log('[Boot] Emergency reset triggered via ?clear=1');
+    // Remove all localStorage keys
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) keysToRemove.push(key);
+    }
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+    sessionStorage.clear();
+    // Clear Service Worker caches too
+    if ('caches' in window) {
+      caches.keys().then(names => names.forEach(n => caches.delete(n)));
+    }
+    // Redirect cleanly without the ?clear=1 parameter
+    window.location.replace('/');
+    return; // Stop boot here — redirect will re-run main()
+  }
+
   // Warm up crypto before React hydrates
   // This guarantees the key is ready before any Zustand persist read is attempted
   await cryptoService.init().catch(() => {

@@ -30,24 +30,47 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 const encryptedStorage: StateStorage = {
     getItem: async (name: string) => {
-        const raw = localStorage.getItem(name);
-        if (!raw) return null;
-
-        // If raw doesn't look encrypted, clear and return null
-        if (!raw.includes(':') || raw.startsWith('{')) {
-            console.warn('[Storage] Clearing unencrypted cache');
-            localStorage.removeItem(name);
-            return null;
-        }
-
         try {
+            const raw = localStorage.getItem(name);
+
+            // Guard 1: empty / missing value
+            if (!raw || raw.trim() === '') return null;
+
+            // Guard 2: legacy unencrypted JSON (versions before encryption was added)
+            if (raw.startsWith('{') || raw.startsWith('[')) {
+                console.warn('[encryptedStorage] Legacy unencrypted data detected, clearing:', name);
+                localStorage.removeItem(name);
+                return null;
+            }
+
+            // Guard 3: invalid AES-GCM format (must be base64:base64)
+            const parts = raw.split(':');
+            if (parts.length < 2) {
+                console.warn('[encryptedStorage] Invalid format (no colon delimiter), clearing:', name);
+                localStorage.removeItem(name);
+                return null;
+            }
+            try {
+                atob(parts[0]); // Verify first part is valid base64
+            } catch {
+                console.warn('[encryptedStorage] Invalid base64 format, clearing:', name);
+                localStorage.removeItem(name);
+                return null;
+            }
+
             const decrypted = await cryptoService.decrypt(raw);
-            if (decrypted) return JSON.stringify(decrypted);
+            if (decrypted == null) {
+                // decrypt() returned null — corrupted or wrong key (e.g. different device)
+                localStorage.removeItem(name);
+                return null;
+            }
+            return JSON.stringify(decrypted);
+
+        } catch (e) {
+            // AES-GCM can fail in degraded security contexts (some Android browsers)
+            console.warn('[encryptedStorage] Decryption failed for key:', name, '— clearing');
             localStorage.removeItem(name);
-            return null;
-        } catch {
-            localStorage.removeItem(name);
-            return null;
+            return null; // Always return null, never throw, never return undefined
         }
     },
     setItem: async (name: string, value: string) => {
