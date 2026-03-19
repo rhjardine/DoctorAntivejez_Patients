@@ -51,77 +51,108 @@ export const authService = {
    * Intenta iniciar sesión con el ID de documento del paciente.
    */
   login: async (identification: string, password?: string): Promise<UserSession> => {
-    try {
-      const baseUrl = import.meta.env.DEV ? '/api-render' : API_URL;
-      const response = await axios.post(`${baseUrl}/mobile-auth-v1`, { identification, password });
-      const { token, refreshToken, patient } = response.data;
+    const baseUrl = import.meta.env.DEV ? '/api-render' : API_URL;
+    const MAX_RETRIES = 2;
+    const TIMEOUT_MS = 45_000; // 45s — Render free tier cold start can take 30s+
 
-      if (!token || !patient) {
-        throw new Error('Respuesta del servidor incompleta: faltan token o datos de paciente.');
-      }
+    let lastError: unknown;
 
-      // Guardar access token EN MEMORIA (Seguridad)
-      tokenStore.setAccessToken(token);
-
-      // Guardar refresh token en disco (puede persistir sin riesgo directo)
-      if (refreshToken) {
-        storage.setItem('refresh_token', refreshToken);
-      }
-
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const fullProfile = await ProtocolService.getMyProfile();
-        if (fullProfile) {
+        const response = await axios.post(
+          `${baseUrl}/mobile-auth-v1`,
+          { identification, password },
+          { timeout: TIMEOUT_MS }
+        );
+        const { token, refreshToken, patient } = response.data;
+
+        if (!token || !patient) {
+          throw new Error('Respuesta del servidor incompleta: faltan token o datos de paciente.');
+        }
+
+        // Guardar access token EN MEMORIA (Seguridad)
+        tokenStore.setAccessToken(token);
+
+        // Guardar refresh token en disco (puede persistir sin riesgo directo)
+        if (refreshToken) {
+          storage.setItem('refresh_token', refreshToken);
+        }
+
+        try {
+          const fullProfile = await ProtocolService.getMyProfile();
+          if (fullProfile) {
+            useProfileStore.getState().setProfileData({
+              biologicalAge: fullProfile.biophysics?.biologicalAge ?? fullProfile.biologicalAge ?? null,
+              chronologicalAge: fullProfile.chronologicalAge ?? null,
+              guides: fullProfile.guides || [],
+              foodPlans: fullProfile.foodPlans || [],
+              bloodType: fullProfile.bloodType || patient.bloodType || null,
+              latestNlr: fullProfile.latestNlr || null,
+              firstName: fullProfile.firstName || patient.firstName,
+              alimentacion: fullProfile.alimentacion ?? null,
+              fetchedAt: Date.now()
+            });
+          }
+        } catch (profileError) {
+          logger.error('Profile fetch after login failed', { message: (profileError as Error).message });
           useProfileStore.getState().setProfileData({
-            biologicalAge: fullProfile.biophysics?.biologicalAge ?? fullProfile.biologicalAge ?? null,
-            chronologicalAge: fullProfile.chronologicalAge ?? null,
-            guides: fullProfile.guides || [],
-            foodPlans: fullProfile.foodPlans || [],
-            bloodType: fullProfile.bloodType || patient.bloodType || null,
-            latestNlr: fullProfile.latestNlr || null,
-            firstName: fullProfile.firstName || patient.firstName,
-            alimentacion: fullProfile.alimentacion ?? null,
+            biologicalAge: null,
+            chronologicalAge: patient.chronologicalAge,
+            guides: patient.guides || [],
+            foodPlans: patient.foodPlans || [],
+            bloodType: patient.bloodType,
+            latestNlr: null,
+            firstName: patient.firstName,
+            alimentacion: null,
             fetchedAt: Date.now()
           });
         }
-      } catch (profileError) {
-        logger.error('Profile fetch after login failed', { message: (profileError as Error).message });
-        useProfileStore.getState().setProfileData({
-          biologicalAge: null,
-          chronologicalAge: patient.chronologicalAge,
-          guides: patient.guides || [],
-          foodPlans: patient.foodPlans || [],
-          bloodType: patient.bloodType,
-          latestNlr: null,
-          firstName: patient.firstName,
-          alimentacion: null,
-          fetchedAt: Date.now()
-        });
-      }
 
-      const session: UserSession = {
-        id: patient.id,
-        name: patient.name || `${patient.firstName} ${patient.lastName}`,
-        email: patient.email,
-        role: 'PATIENT',
-        lastLoginAt: new Date().toISOString()
-      };
+        const session: UserSession = {
+          id: patient.id,
+          name: patient.name || `${patient.firstName} ${patient.lastName}`,
+          email: patient.email,
+          role: 'PATIENT',
+          lastLoginAt: new Date().toISOString()
+        };
 
-      storage.setItem(SESSION_KEY, JSON.stringify(session));
+        storage.setItem(SESSION_KEY, JSON.stringify(session));
 
-      logger.audit('login_success', { patientId: patient.id });
-      return session;
+        logger.audit('login_success', { patientId: patient.id });
+        return session;
 
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        const status = error.response?.status;
-        const serverMessage = error.response?.data?.error;
-        logger.error('Login failed (network/server)', { status: status ?? 0 });
-        throw new Error(serverMessage || 'Error al conectar con el servidor. Intente de nuevo.');
-      } else {
-        logger.error('Login failed (unexpected)', { message: (error as Error).message });
-        throw new Error('Error inesperado al procesar la respuesta. Contacte soporte.');
+      } catch (error: unknown) {
+        lastError = error;
+
+        if (axios.isAxiosError(error)) {
+          const status = error.response?.status;
+          const serverMessage = error.response?.data?.error;
+
+          // Auth errors (401, 403) → throw immediately, no retry
+          if (status && status >= 400 && status < 500) {
+            logger.error('Login failed (auth)', { status });
+            throw new Error(serverMessage || 'Credenciales inválidas.');
+          }
+
+          // Network/timeout errors → retry if attempts remain
+          if (attempt < MAX_RETRIES) {
+            logger.warn(`Login attempt ${attempt} failed (network), retrying...`);
+            continue; // next iteration of for-loop
+          }
+
+          logger.error('Login failed after retries (network/server)', { status: status ?? 0 });
+          throw new Error(
+            'El servidor está iniciando. Por favor espere 30 segundos e intente de nuevo.'
+          );
+        } else {
+          logger.error('Login failed (unexpected)', { message: (error as Error).message });
+          throw new Error('Error inesperado al procesar la respuesta. Contacte soporte.');
+        }
       }
     }
+
+    // Fallback (should not reach here)
+    throw lastError instanceof Error ? lastError : new Error('Error de conexión.');
   },
 
   /**

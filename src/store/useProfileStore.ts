@@ -101,10 +101,16 @@ export const useProfileStore = create<ProfileState>()(
             partialize: (state) => ({
                 profileData: state.profileData,
             } as unknown as ProfileState),
-            // onRehydrateStorage is called during Zustand hydration
-            onRehydrateStorage: () => (state) => {
+            onRehydrateStorage: () => (state, error) => {
+                if (error) {
+                    console.warn('[ProfileStore] Rehydration failed, clearing cache:', error);
+                    localStorage.removeItem('rejuvenate_profile_v1');
+                    return;
+                }
                 // Ensure state is marked ready when initialization finishes
-                state?.setReady(true);
+                if (state && typeof state.setReady === 'function') {
+                    state.setReady(true);
+                }
             },
         }
     )
