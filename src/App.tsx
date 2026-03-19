@@ -10,6 +10,7 @@ import { useUIStore } from './store/useUIStore';
 import { useProfileStore } from './store/useProfileStore';
 
 // Pages
+import WelcomePage from './pages/WelcomePage';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import PatientGuidePage from './pages/PatientGuidePage';
@@ -47,7 +48,7 @@ import { offlineQueue } from './services/offlineQueue';
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { session } = useAuthStore();
   if (!session) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/welcome" replace />;
   }
   return <>{children}</>;
 };
@@ -158,7 +159,7 @@ const App: React.FC = () => {
   // This needs to be moved to a proper global manager in Phase 5
   const notificationControls = useReminders([]);
 
-  const isLoginPage = location.pathname === '/login';
+  const isLoginPage = location.pathname === '/login' || location.pathname === '/welcome';
   const showHeaderFooter = session && !isLoginPage;
   const isHome = location.pathname === '/';
   const isDetailView = !isHome && !['/chat', '/achievements', '/store'].includes(location.pathname);
@@ -236,6 +237,7 @@ const App: React.FC = () => {
 
       <main className="flex-1 overflow-y-auto no-scrollbar relative bg-[var(--background)]" style={{ paddingBottom: 'max(80px, env(safe-area-inset-bottom, 0px) + 64px)' }}>
         <Routes>
+          <Route path="/welcome" element={<WelcomePage />} />
           <Route path="/login" element={<LoginPage />} />
 
           <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
