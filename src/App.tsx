@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   Shield, Trophy, RefreshCw, Menu, ChevronLeft, LayoutDashboard,
@@ -8,6 +8,13 @@ import { MainTab } from './types';
 import { useAuthStore } from './store/useAuthStore';
 import { useUIStore } from './store/useUIStore';
 import { useProfileStore } from './store/useProfileStore';
+
+// Lazy-loaded public pages (growth engine — no auth required)
+const LandingPublica = React.lazy(() => import('./pages/public/LandingPublicaPage'));
+const TestAntivejez = React.lazy(() => import('./pages/public/TestAntivejezPage'));
+const AgeBotFacial = React.lazy(() => import('./pages/public/AgeBotFacialPage'));
+const ResultadoScore = React.lazy(() => import('./pages/public/ResultadoScorePage'));
+const ConsultaExploratoria = React.lazy(() => import('./pages/public/ConsultaExploratoriaPage'));
 
 // Pages
 import WelcomePage from './pages/WelcomePage';
@@ -160,7 +167,9 @@ const App: React.FC = () => {
   const notificationControls = useReminders([]);
 
   const isLoginPage = location.pathname === '/login' || location.pathname === '/welcome';
-  const showHeaderFooter = session && !isLoginPage;
+  const PUBLIC_ROUTES = ['/longevidad', '/test', '/agebot', '/resultado', '/consulta'];
+  const isPublicRoute = PUBLIC_ROUTES.some(r => location.pathname.startsWith(r));
+  const showHeaderFooter = session && !isLoginPage && !isPublicRoute;
   const isHome = location.pathname === '/';
   const isDetailView = !isHome && !['/chat', '/achievements', '/store'].includes(location.pathname);
 
@@ -235,36 +244,45 @@ const App: React.FC = () => {
         </header>
       )}
 
-      <main className="flex-1 overflow-y-auto no-scrollbar relative bg-[var(--background)]" style={{ paddingBottom: 'max(80px, env(safe-area-inset-bottom, 0px) + 64px)' }}>
-        <Routes>
-          <Route path="/welcome" element={<WelcomePage />} />
-          <Route path="/login" element={<LoginPage />} />
+      <main className={`flex-1 overflow-y-auto no-scrollbar relative ${isPublicRoute ? '' : 'bg-[var(--background)]'}`} style={{ paddingBottom: isPublicRoute ? '0' : 'max(80px, env(safe-area-inset-bottom, 0px) + 64px)' }}>
+        <Suspense fallback={<div className="flex items-center justify-center h-screen" style={{ background: '#293B64' }}><div className="w-8 h-8 border-2 border-[#23BCEF] border-t-transparent rounded-full animate-spin" /></div>}>
+          <Routes>
+            <Route path="/welcome" element={<WelcomePage />} />
+            <Route path="/login" element={<LoginPage />} />
 
-          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-          <Route path="/guide" element={<ProtectedRoute><PatientGuidePage /></ProtectedRoute>} />
-          <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-          <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
-          <Route path="/store" element={<ProtectedRoute><StorePage /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-          <Route path="/biomics" element={<ProtectedRoute><BiomicsPage /></ProtectedRoute>} />
+            <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+            <Route path="/guide" element={<ProtectedRoute><PatientGuidePage /></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+            <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
+            <Route path="/store" element={<ProtectedRoute><StorePage /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+            <Route path="/biomics" element={<ProtectedRoute><BiomicsPage /></ProtectedRoute>} />
 
-          {/* Detail Views */}
-          <Route path="/nutrition" element={<ProtectedRoute><NutritionView /></ProtectedRoute>} />
-          <Route path="/mi-guia/alimentacion" element={<ProtectedRoute><DoctorNutritionPlanView onBack={() => navigate(-1)} /></ProtectedRoute>} />
-          <Route path="/attitude" element={<ProtectedRoute><AttitudeView /></ProtectedRoute>} />
-          <Route path="/activity" element={<ProtectedRoute><ActivityView /></ProtectedRoute>} />
-          <Route path="/environment" element={<ProtectedRoute><EnvironmentView /></ProtectedRoute>} />
-          <Route path="/rest" element={<ProtectedRoute><RestView /></ProtectedRoute>} />
-          <Route path="/restoration" element={<ProtectedRoute><RestorationView onBack={() => navigate(-1)} /></ProtectedRoute>} />
-          <Route path="/about" element={<ProtectedRoute><AboutView onNavigateToTeam={() => navigate('/team')} onNavigateToGuide={() => navigate('/usage-guide')} /></ProtectedRoute>} />
-          <Route path="/team" element={<ProtectedRoute><MedicalTeamView /></ProtectedRoute>} />
-          <Route path="/usage-guide" element={<ProtectedRoute><UsageGuideView /></ProtectedRoute>} />
-          <Route path="/biometrics" element={<ProtectedRoute><BiometricsPage /></ProtectedRoute>} />
-          <Route path="/history" element={<ProtectedRoute><ConsultationHistoryView onBack={() => navigate(-1)} onInfoPress={() => toggleClinicalInfo(true)} /></ProtectedRoute>} />
-          <Route path="/biopase" element={<ProtectedRoute><BioPaseView patientId={session?.id || ''} onRefresh={async () => { }} onBack={() => navigate(-1)} /></ProtectedRoute>} />
+            {/* Detail Views */}
+            <Route path="/nutrition" element={<ProtectedRoute><NutritionView /></ProtectedRoute>} />
+            <Route path="/mi-guia/alimentacion" element={<ProtectedRoute><DoctorNutritionPlanView onBack={() => navigate(-1)} /></ProtectedRoute>} />
+            <Route path="/attitude" element={<ProtectedRoute><AttitudeView /></ProtectedRoute>} />
+            <Route path="/activity" element={<ProtectedRoute><ActivityView /></ProtectedRoute>} />
+            <Route path="/environment" element={<ProtectedRoute><EnvironmentView /></ProtectedRoute>} />
+            <Route path="/rest" element={<ProtectedRoute><RestView /></ProtectedRoute>} />
+            <Route path="/restoration" element={<ProtectedRoute><RestorationView onBack={() => navigate(-1)} /></ProtectedRoute>} />
+            <Route path="/about" element={<ProtectedRoute><AboutView onNavigateToTeam={() => navigate('/team')} onNavigateToGuide={() => navigate('/usage-guide')} /></ProtectedRoute>} />
+            <Route path="/team" element={<ProtectedRoute><MedicalTeamView /></ProtectedRoute>} />
+            <Route path="/usage-guide" element={<ProtectedRoute><UsageGuideView /></ProtectedRoute>} />
+            <Route path="/biometrics" element={<ProtectedRoute><BiometricsPage /></ProtectedRoute>} />
+            <Route path="/history" element={<ProtectedRoute><ConsultationHistoryView onBack={() => navigate(-1)} onInfoPress={() => toggleClinicalInfo(true)} /></ProtectedRoute>} />
+            <Route path="/biopase" element={<ProtectedRoute><BioPaseView patientId={session?.id || ''} onRefresh={async () => { }} onBack={() => navigate(-1)} /></ProtectedRoute>} />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            {/* Public growth engine routes — no auth required */}
+            <Route path="/longevidad" element={<LandingPublica />} />
+            <Route path="/test" element={<TestAntivejez />} />
+            <Route path="/agebot" element={<AgeBotFacial />} />
+            <Route path="/resultado" element={<ResultadoScore />} />
+            <Route path="/consulta" element={<ConsultaExploratoria />} />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </main>
 
       {showHeaderFooter && !isOnline && (
