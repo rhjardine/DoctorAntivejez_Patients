@@ -313,6 +313,14 @@ const App: React.FC = () => {
                 navigator.serviceWorker.ready.then(reg => {
                   reg.waiting?.postMessage({ type: 'SKIP_WAITING' });
                 });
+                // Clear manifest + workbox caches to force fresh icon on reinstall
+                if ('caches' in window) {
+                  caches.keys().then(keys =>
+                    keys.forEach(k => {
+                      if (k.includes('manifest') || k.includes('workbox')) caches.delete(k);
+                    })
+                  );
+                }
                 setTimeout(() => window.location.reload(), 300);
               }}
               className="text-primary text-[10px] font-black uppercase underline hover:text-white transition-colors"

@@ -23,25 +23,21 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'prompt',
         manifest: {
+          name: 'Doctor Antivejez',
           short_name: 'Antivejez',
-          name: 'Doctor Antivejez - Medicina Personalizada',
-          theme_color: '#293b64',
-          background_color: '#F8FAFC',
+          description: 'Plataforma de medicina preventiva y longevidad',
+          theme_color: '#293B64',
+          background_color: '#293B64',
           display: 'standalone',
+          orientation: 'portrait',
+          start_url: '/',
+          scope: '/',
           icons: [
-            {
-              src: '/icon-192.png',
-              sizes: '192x192',
-              type: 'image/png',
-              purpose: 'any maskable'
-            },
-            {
-              src: '/icon-512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'any maskable'
-            }
-          ]
+            { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+            { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          ],
         },
         workbox: {
           // ✅ UPDATE: Esperar activación del Service Worker
