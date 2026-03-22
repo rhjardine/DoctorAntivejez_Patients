@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       VitePWA({
-        registerType: 'autoUpdate',
+        registerType: 'prompt',
         manifest: {
           short_name: 'Antivejez',
           name: 'Doctor Antivejez - Medicina Personalizada',

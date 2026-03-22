@@ -12,6 +12,9 @@ import { useProfileStore } from '../store/useProfileStore';
 import { ProtocolService } from '../services/protocolService';
 import CircularProgress from '../components/CircularProgress';
 import BiologicalAgeGauge from '../components/BiologicalAgeGauge';
+import BioStreakWidget from '../components/public/BioStreakWidget';
+import PulsoMatinoCard from '../components/public/PulsoMatinoCard';
+import { BioStreakService } from '../services/BioStreakService';
 import BioAgeAlert from '../components/BioAgeAlert';
 import RemovalView from '../components/Therapies/RemovalView';
 import { Apple, Utensils, Coffee, Salad, Grape, Zap, Dumbbell, Trophy, Bike, Smile, Brain, Heart, Sparkles, Star, Sprout, Leaf, Home, CloudSun, Wind, Bed, Moon, Clock, Bell, Check, Dna } from 'lucide-react';
@@ -198,9 +201,20 @@ const HomePage: React.FC = () => {
                         <div className="w-full">
                             {currentMainTab === MainTab.CHALLENGE ? (
                                 <div className="flex flex-col items-center w-full px-6 py-4">
-                                    <div className="w-full bg-white/70 backdrop-blur-sm rounded-3xl p-4 mb-6 border border-white/50 text-center shadow-sm">
+                                    <div className="w-full bg-white/70 backdrop-blur-sm rounded-3xl p-4 mb-3 border border-white/50 text-center shadow-sm">
                                         <p className="text-[11px] font-bold text-darkBlue italic">"La consistencia es la clave de la regeneración celular."</p>
                                     </div>
+
+                                    {/* Componentes Anti-Churn */}
+                                    {!BioStreakService.isPulseRegisteredToday() && (
+                                        <div className="w-full mb-3">
+                                            <PulsoMatinoCard />
+                                        </div>
+                                    )}
+                                    <div className="w-full mb-4">
+                                        <BioStreakWidget compact={false} />
+                                    </div>
+
                                     <div onClick={() => navigate('/guide')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-4 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
                                         <div className="flex items-center gap-4">
                                             <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><ClipboardCheck size={28} /></div>

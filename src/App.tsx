@@ -46,6 +46,7 @@ import ClinicalInfoModal from './components/ClinicalInfoModal';
 import PrivacyConsentModal from './components/PrivacyConsentModal';
 import Drawer from './components/Drawer';
 import OnboardingModal, { ONBOARDING_KEY } from './components/OnboardingModal';
+import OnboardingSlim from './components/OnboardingSlim';
 import { useReminders } from './hooks/useReminders';
 
 import { useDarkMode } from './hooks/useDarkMode';
@@ -132,7 +133,7 @@ const App: React.FC = () => {
     checkSession();
 
     // Show onboarding after first login
-    if (session && !localStorage.getItem(ONBOARDING_KEY)) {
+    if (session && !localStorage.getItem(ONBOARDING_KEY) && !localStorage.getItem('da_onboarding_slim_v1')) {
       setShowOnboarding(true);
     }
 
@@ -143,7 +144,7 @@ const App: React.FC = () => {
 
   // Show onboarding when session becomes available for the first time
   React.useEffect(() => {
-    if (session && !localStorage.getItem(ONBOARDING_KEY)) {
+    if (session && !localStorage.getItem(ONBOARDING_KEY) && !localStorage.getItem('da_onboarding_slim_v1')) {
       setShowOnboarding(true);
     }
   }, [session?.id]);
@@ -188,7 +189,9 @@ const App: React.FC = () => {
   return (
     <div className="flex flex-col h-screen w-screen bg-[var(--background)] text-[var(--text-primary)] overflow-hidden font-sans">
       {showOnboarding && session && (
-        <OnboardingModal onComplete={() => setShowOnboarding(false)} />
+        localStorage.getItem('da_funnel_conversion')
+          ? <OnboardingSlim onComplete={() => setShowOnboarding(false)} />
+          : <OnboardingModal onComplete={() => setShowOnboarding(false)} />
       )}
       <Drawer
         isOpen={isDrawerOpen}
