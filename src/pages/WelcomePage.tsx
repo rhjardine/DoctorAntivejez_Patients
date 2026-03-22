@@ -38,10 +38,7 @@ const WelcomePage: React.FC = () => {
                 <div className="w-full max-w-sm space-y-4 z-10 px-2 mt-auto pb-12">
                     {/* Invitee / Demo Flow */}
                     <button
-                        onClick={() => {
-                            // Currently inactive / coming soon behavior as per requirements
-                            alert("Acceso para invitados próximamente.");
-                        }}
+                        onClick={() => navigate('/longevidad')}
                         className="w-full bg-[rgba(35,188,239,1)] text-white py-4 rounded-3xl
                             font-bold text-base shadow-lg
                             active:scale-95 transition-all
@@ -58,7 +55,7 @@ const WelcomePage: React.FC = () => {
                             active:scale-95 transition-all
                             flex items-center justify-center"
                     >
-                        Ya soy paciente del Dr. Méndez
+                        Ya soy paciente
                     </button>
                 </div>
             </div>
