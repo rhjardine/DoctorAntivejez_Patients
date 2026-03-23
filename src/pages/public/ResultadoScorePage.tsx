@@ -107,21 +107,38 @@ const ResultadoScorePage: React.FC = () => {
     const cat = CAT[result.category];
     const score = result.score;
 
-    /* ── Emotional hook text ── */
-    const hookConfig = score < 60
+    /* ── Hook text: dato → contexto → oportunidad ── */
+    const hookConfig = score < 40
         ? {
-            color: AMBER, icon: <AlertTriangle size={20} />,
-            text: `Tu biología muestra señales de envejecimiento acelerado. Hay una brecha estimada de ${result.yearsBiological ? result.yearsBiological - 45 : 15} años entre tu edad cronológica y tu vitalidad actual.`,
+            color: CORAL, icon: <AlertTriangle size={20} />,
+            title: 'Tu score indica áreas de atención prioritaria',
+            rangeBadge: 'Rango de optimización activa',
+            context: 'Tu biología está respondiendo a patrones de hábito que aceleran el envejecimiento celular. El 70% de estos factores son modificables con el protocolo correcto.',
+            opportunity: 'Una evaluación clínica puede identificar exactamente cuáles son tus 2–3 prioridades de mayor impacto.',
         }
-        : score < 80
+        : score < 60
             ? {
-                color: CYAN, icon: <TrendingUp size={20} />,
-                text: 'Tu vitalidad está en rango aceptable, pero existe margen significativo de optimización. Con el protocolo correcto, puedes recuperar entre 5 y 10 años de vitalidad biológica.',
+                color: AMBER, icon: <AlertTriangle size={20} />,
+                title: 'Tu score muestra margen significativo de mejora',
+                rangeBadge: 'Rango de progresión activa',
+                context: 'Tu biología tiene bases sólidas pero hay factores que están frenando tu potencial de vitalidad. Son abordables.',
+                opportunity: 'Con un protocolo ajustado a tu perfil, es posible ganar entre 5 y 10 años de vitalidad en 6 meses documentados.',
             }
-            : {
-                color: GREEN, icon: <ShieldCheck size={20} />,
-                text: 'Tu biología responde bien a tus hábitos actuales. Con un protocolo de optimización personalizado, puedes consolidar y extender este estado de vitalidad.',
-            };
+            : score < 80
+                ? {
+                    color: CYAN, icon: <TrendingUp size={20} />,
+                    title: 'Tu score refleja hábitos con espacio de optimización',
+                    rangeBadge: 'Rango de consolidación',
+                    context: 'Tienes una base bien establecida. La diferencia entre "bien" y "óptimo" suele ser un ajuste en 2–3 variables clave.',
+                    opportunity: 'El protocolo personalizado puede llevarte al rango óptimo y sostenerlo a largo plazo con seguimiento médico.',
+                }
+                : {
+                    color: GREEN, icon: <ShieldCheck size={20} />,
+                    title: 'Tu score está en el rango de alto rendimiento biológico',
+                    rangeBadge: 'Rango óptimo',
+                    context: 'Tus hábitos actuales están funcionando. El trabajo ahora es sostener y extender este estado con precisión clínica.',
+                    opportunity: 'Un protocolo de mantenimiento avanzado puede preservar este estado 15–20 años más allá del promedio.',
+                };
 
     /* ── Handle lead submission ── */
     const handleLead = async (e: React.FormEvent) => {
@@ -194,23 +211,35 @@ const ResultadoScorePage: React.FC = () => {
                     </motion.div>
                 </motion.div>
 
-                {/* ── BLOQUE 2: Emotional Hook ── */}
+                {/* ── BLOQUE 2: Hook — dato → contexto → oportunidad ── */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
                     className="rounded-[20px] p-5 mb-5"
                     style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)' }}
                 >
-                    <div className="flex items-start gap-3 mb-4">
-                        <div className="mt-0.5" style={{ color: hookConfig.color }}>{hookConfig.icon}</div>
-                        <p className="text-sm leading-relaxed text-white">{hookConfig.text}</p>
+                    <div className="flex items-start gap-3 mb-3">
+                        <div className="mt-0.5 shrink-0" style={{ color: hookConfig.color }}>{hookConfig.icon}</div>
+                        <div>
+                            <p className="text-sm font-bold text-white leading-snug mb-1">{hookConfig.title}</p>
+                            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block"
+                                style={{ background: `${hookConfig.color}20`, color: hookConfig.color }}>
+                                Score {score}/100 — {hookConfig.rangeBadge}
+                            </span>
+                        </div>
                     </div>
-                    {/* Disclaimer — always visible */}
-                    <div className="border-t pt-3" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+                    <p className="text-[13px] leading-relaxed mb-2" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                        {hookConfig.context}
+                    </p>
+                    <p className="text-[13px] leading-relaxed font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                        {hookConfig.opportunity}
+                    </p>
+                    {/* Disclaimer */}
+                    <div className="border-t mt-4 pt-3" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
                         <p className="text-[10px] leading-relaxed italic"
                             style={{ color: 'rgba(255,255,255,0.45)' }}>
-                            Esta evaluación es orientativa. Los valores aquí presentados son estimaciones basadas en sus respuestas
-                            y no constituyen un diagnóstico médico. Para determinar su edad biológica real (biofísica, bioquímica
-                            y genética) se requiere evaluación clínica presencial o virtual con el Dr. Juan Carlos Méndez.
+                            Nota: Este análisis es una estimación basada en sus respuestas de hábitos y no constituye un diagnóstico médico.
+                            La edad biológica real se determina mediante evaluación biofísica, bioquímica y genética en consulta con el
+                            Dr. Juan Carlos Méndez o los especialistas de su red.
                         </p>
                     </div>
                 </motion.div>
@@ -326,55 +355,73 @@ const ResultadoScorePage: React.FC = () => {
                     </AnimatePresence>
                 </motion.div>
 
-                {/* ── CTA: Consulta options ── */}
+                {/* ── CTA: Siguiente paso en el protocolo ── */}
                 {(alreadyCaptured || leadStatus === 'idle') && (
                     <motion.div
                         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
                         className="flex flex-col gap-3"
                     >
                         <p className="text-[16px] font-black text-white mb-1" style={{ fontFamily: 'Poppins' }}>
-                            Avanza a Consulta Exploratoria
+                            Elige tu siguiente paso
                         </p>
 
-                        {/* Opción A — Gratis */}
+                        {/* Opción A — Programa de Optimización */}
                         <button
                             onClick={() => navigate('/consulta?tipo=basica')}
                             className="w-full text-left rounded-2xl p-4 transition-all active:scale-95"
                             style={{ border: `1.5px solid rgba(255,255,255,0.2)`, background: 'transparent' }}
                         >
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full"
                                     style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}>
-                                    USD 0 · Gratis
+                                    Sin costo · 20 min
                                 </span>
                             </div>
-                            <p className="text-white font-bold text-[14px]">Consulta Virtual Básica (20 min)</p>
-                            <p className="text-[12px] mt-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                                Análisis inicial con profesional de salud
+                            <p className="text-white font-bold text-[14px]">Programa de Optimización</p>
+                            <p className="text-[12px] mt-1 leading-snug" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                                Revisión de tu score con un profesional y definición de tus 2 prioridades de vitalidad
                             </p>
+                            <div className="mt-2.5 flex flex-col gap-1">
+                                {['Análisis de tus 5 dimensiones de vitalidad', 'Identificación de áreas críticas', 'Recomendaciones iniciales del equipo Dr. Méndez'].map(b => (
+                                    <p key={b} className="text-[11px] flex items-start gap-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                                        <span style={{ color: 'rgba(255,255,255,0.3)' }}>•</span> {b}
+                                    </p>
+                                ))}
+                            </div>
                         </button>
 
-                        {/* Opción B — Paga */}
+                        {/* Opción B — Acompañamiento Médico */}
                         <button
                             onClick={() => navigate('/consulta?tipo=profunda')}
                             className="w-full text-left rounded-2xl p-4 relative transition-all active:scale-95"
                             style={{ border: `1.5px solid ${CYAN}`, background: `${CYAN}18` }}
                         >
-                            {/* Recomendado badge */}
                             <span className="absolute top-3 right-3 text-[9px] font-black uppercase px-2 py-0.5 rounded-full"
                                 style={{ background: CYAN, color: NAVY }}>
                                 Recomendado
                             </span>
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full"
                                     style={{ background: `${CYAN}30`, color: CYAN }}>
-                                    USD 49
+                                    USD 49 · 45 min
                                 </span>
                             </div>
-                            <p className="text-white font-bold text-[14px]">Consulta Profunda + Reporte Ómico (45 min)</p>
-                            <p className="text-[12px] mt-0.5" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                                Análisis completo de biofísica + laboratorio
+                            <p className="text-white font-bold text-[14px]">Acompañamiento Médico</p>
+                            <p className="text-[12px] mt-1 leading-snug" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                                Evaluación biofísica completa con especialista + reporte de optimización personalizado
                             </p>
+                            <div className="mt-2.5 flex flex-col gap-1">
+                                {[
+                                    'Evaluación biofísica con médico especialista',
+                                    'Reporte de Edad Biológica estimada (4 dimensiones)',
+                                    'Plan de optimización de 30 días',
+                                    'Acceso a la app durante 30 días sin costo',
+                                ].map(b => (
+                                    <p key={b} className="text-[11px] flex items-start gap-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                                        <span style={{ color: CYAN }}>•</span> {b}
+                                    </p>
+                                ))}
+                            </div>
                         </button>
 
                         {/* Quick action repeat test */}

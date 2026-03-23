@@ -20,17 +20,17 @@ type SubmitState = 'idle' | 'sending' | 'confirmed' | 'error';
 /* ─── Benefits per type ─────────────────────────────────────────────── */
 const BENEFITS: Record<ConsultaType, { emoji: string; text: string }[]> = {
     basica: [
-        { emoji: '🎯', text: 'Revisión de tu Score de Vitalidad con profesional' },
+        { emoji: '🎯', text: 'Revisión de tu Score de Vitalidad con especialista del equipo' },
         { emoji: '📊', text: 'Identificación de tus 2 dimensiones más críticas' },
-        { emoji: '💡', text: 'Recomendaciones iniciales del equipo Dr. Méndez' },
-        { emoji: '⏱️', text: '20 minutos · Virtual · Gratis' },
+        { emoji: '💡', text: 'Orientación inicial del equipo Dr. Méndez' },
+        { emoji: '⏱️', text: '20 minutos · Virtual · Sin costo' },
     ],
     profunda: [
-        { emoji: '🧬', text: 'Análisis completo de biofísica y bioquímica' },
-        { emoji: '📋', text: 'Reporte Ómico personalizado (epigenética)' },
-        { emoji: '🧪', text: 'Guía de laboratorio con parámetros clave' },
-        { emoji: '💊', text: 'Protocolo inicial de suplementación y estilo de vida' },
-        { emoji: '⏱️', text: '45 minutos · Virtual con Dr. Méndez · USD 49' },
+        { emoji: '🧬', text: 'Evaluación biofísica completa con médico especialista' },
+        { emoji: '📋', text: 'Reporte de Edad Biológica estimada (4 dimensiones)' },
+        { emoji: '📊', text: 'Plan de acción personalizado 30 días' },
+        { emoji: '📱', text: 'Acceso a la app Doctor Antivejez — 30 días sin costo' },
+        { emoji: '💬', text: 'Seguimiento por WhatsApp con el equipo' },
     ],
 };
 
@@ -72,16 +72,25 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
                 <CheckCircle size={40} style={{ color: GREEN }} />
             </div>
             <h2 className="text-2xl font-black text-white mb-3" style={{ fontFamily: 'Poppins' }}>
-                ¡Solicitud Registrada!
+                ¡Solicitud registrada!
             </h2>
             {tipo === 'basica' ? (
                 <p className="text-sm leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                    Tu solicitud fue registrada. Te contactaremos en <strong className="text-white">menos de 24 horas</strong> para coordinar tu consulta exploratoria gratuita.
+                    Nuestro equipo te contactará en <strong className="text-white">menos de 24 horas</strong> para coordinar
+                    tu <strong className="text-white">Programa de Optimización</strong>.
+                    Revisa tu WhatsApp y email — usaremos el canal que prefieras.
                 </p>
             ) : (
-                <p className="text-sm leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                    Tu consulta profunda está siendo procesada. Recibirás un correo de confirmación con los próximos pasos.
-                </p>
+                <>
+                    <p className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                        Tu reserva fue registrada. Un especialista del equipo te contactará en
+                        <strong className="text-white"> menos de 24 horas</strong> para confirmar fecha y hora de tu
+                        <strong className="text-white"> evaluación biofísica completa</strong>.
+                    </p>
+                    <p className="text-[11px] italic mb-8 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                        El pago de USD 49 se coordina en la confirmación de cita. Aceptamos transferencia, Zelle y tarjeta internacional.
+                    </p>
+                </>
             )}
             <a
                 href={waLink} target="_blank" rel="noopener noreferrer"
@@ -182,15 +191,31 @@ const ConsultaExploratoriaPage: React.FC = () => {
 
                 {/* Header */}
                 <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6 text-center">
-                    <p className="text-[10px] uppercase tracking-widest font-semibold mb-2" style={{ color: CYAN }}>
-                        Consulta Exploratoria
-                    </p>
-                    <h1 className="text-2xl font-black text-white leading-tight mb-2" style={{ fontFamily: 'Poppins' }}>
-                        {tipo === 'basica' ? 'Consulta Virtual Gratuita' : 'Consulta Profunda + Reporte Ómico'}
-                    </h1>
-                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                        {tipo === 'basica' ? '20 minutos · Sin costo' : '45 minutos · USD 49'}
-                    </p>
+                    {tipo === 'basica' ? (
+                        <>
+                            <p className="text-[10px] uppercase tracking-widest font-semibold mb-2" style={{ color: CYAN }}>
+                                Programa de Optimización
+                            </p>
+                            <h1 className="text-2xl font-black text-white leading-tight mb-2" style={{ fontFamily: 'Poppins' }}>
+                                Consulta Virtual Gratuita
+                            </h1>
+                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                                20 minutos · Sin costo
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <p className="text-[10px] uppercase tracking-widest font-semibold mb-2" style={{ color: AMBER }}>
+                                Acompañamiento Médico
+                            </p>
+                            <h1 className="text-2xl font-black text-white leading-tight mb-2" style={{ fontFamily: 'Poppins' }}>
+                                Evaluación Biofísica Completa
+                            </h1>
+                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                                45 minutos · USD 49
+                            </p>
+                        </>
+                    )}
                 </motion.div>
 
                 {/* ── SECCIÓN 1: Benefits ── */}
@@ -204,7 +229,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                             ? <Video size={18} style={{ color: CYAN }} />
                             : <ClipboardList size={18} style={{ color: CYAN }} />}
                         <p className="text-[13px] font-bold text-white">
-                            {tipo === 'basica' ? 'Qué incluye tu consulta gratuita' : 'Qué incluye tu consulta profunda'}
+                            {tipo === 'basica' ? 'Qué incluye tu Programa de Optimización' : 'Qué incluye tu Acompañamiento Médico'}
                         </p>
                     </div>
                     <div className="space-y-2.5">
@@ -215,6 +240,11 @@ const ConsultaExploratoriaPage: React.FC = () => {
                             </div>
                         ))}
                     </div>
+                    {tipo === 'basica' && (
+                        <p className="mt-4 text-[12px] italic leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                            Esta consulta es el primer paso. Si decides continuar, te orientaremos sobre el programa que más se adapta a tu perfil.
+                        </p>
+                    )}
                 </motion.div>
 
                 {/* ── SECCIÓN 2: Booking Form ── */}
