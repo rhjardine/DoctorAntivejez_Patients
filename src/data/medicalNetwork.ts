@@ -37,6 +37,7 @@ export const MEDICAL_NETWORK: NetworkDoctor[] = [
         accentColor: '#23BCEF',
         certifications: ['A4M', 'UNAM', 'Universidad de Sevilla', 'FISMAL']
     },
+
     {
         id: 'rojas-z',
         name: 'Dra. Zuraida Rojas',
@@ -92,7 +93,7 @@ export const MEDICAL_NETWORK: NetworkDoctor[] = [
         modality: ['presencial', 'virtual'],
         languages: ['Español'],
         availableForBooking: false,  // false hasta confirmar incorporación
-        imageUrl: '/equipo_med/placeholder_doctor.png',
+        imageUrl: '/equipo_med/placeholder_doctor.svg',
         accentColor: '#4CAF50',
         certifications: ['ALMA']
     },
@@ -112,7 +113,7 @@ export const MEDICAL_NETWORK: NetworkDoctor[] = [
         modality: ['presencial', 'virtual'],
         languages: ['Español', 'Inglés'],
         availableForBooking: false,  // false hasta confirmar incorporación
-        imageUrl: '/equipo_med/placeholder_doctora.png',
+        imageUrl: '/equipo_med/placeholder_doctora.svg',
         accentColor: '#4CAF50',
         certifications: ['ALMA']
     },
