@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
+import PublicHeader from '../../components/public/PublicHeader';
 
 const NAVY = '#293B64';
 const CYAN = '#23BCEF';
@@ -171,21 +172,11 @@ const AgeBotFacialPage: React.FC = () => {
 
     return (
         <div className="min-h-screen flex flex-col" style={{ background: '#0b0f1a' }}>
-            {/* Header */}
-            <div className="px-5 pt-12 pb-4 flex items-center justify-between"
-                style={{ background: 'rgba(0,0,0,0.4)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <div>
-                    <p className="text-[10px] uppercase tracking-widest font-semibold mb-0.5" style={{ color: CYAN }}>
-                        AgeBot Facial
-                    </p>
-                    <p className="text-white text-sm font-bold">Análisis de Edad Biológica Facial</p>
-                </div>
-                <button onClick={() => navigate(-1)}
-                    className="text-xs px-3 py-1.5 rounded-full border font-medium transition-all"
-                    style={{ borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.6)' }}>
-                    Volver
-                </button>
-            </div>
+            <PublicHeader
+                title={capturedImage ? "Análisis Facial" : "AgeBot Facial"}
+                showBack={true}
+                onBack={() => navigate('/longevidad')}
+            />
 
             {/* Hidden canvas for capture */}
             <canvas ref={canvasRef} className="hidden" />

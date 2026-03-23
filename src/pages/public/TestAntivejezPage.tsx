@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
+import PublicHeader from '../../components/public/PublicHeader';
+import { useExitConfirmation } from '../../hooks/useExitConfirmation';
+import ExitConfirmModal from '../../components/public/ExitConfirmModal';
 
 const NAVY = '#293B64';
 const CYAN = '#23BCEF';
@@ -136,10 +139,17 @@ const TestAntivejezPage: React.FC = () => {
     const [answers, setAnswers] = useState<Record<string, boolean>>({});
     const [currentGroup, setCurrentGroup] = useState<1 | 2 | 3 | 4 | 5>(1);
 
+    const totalAnswered = Object.keys(answers).length;
+    const hasProgress = totalAnswered > 0;
+    const { handleBack, showConfirm, confirmExit, cancelExit } = useExitConfirmation({
+        hasProgress,
+        exitTo: '/longevidad',
+        message: `Has respondido ${totalAnswered} de 45 preguntas. ¿Seguro que quieres salir?`
+    });
+
     const groupQuestions = QUESTIONS.filter(q => q.group === currentGroup);
     const allAnswered = groupQuestions.every(q => q.id in answers);
-    const totalAnswered = Object.keys(answers).length;
-    const progress = (currentGroup - 1) / 5;
+    // const progress = (currentGroup - 1) / 5; // This is no longer needed as PublicHeader handles progress
 
     const answer = (id: string, val: boolean) => {
         setAnswers(prev => ({ ...prev, [id]: val }));
@@ -160,30 +170,20 @@ const TestAntivejezPage: React.FC = () => {
     const questionOffset = QUESTIONS.filter(q => q.group < currentGroup).length;
 
     return (
-        <div className="min-h-screen flex flex-col" style={{ background: `linear-gradient(160deg, ${NAVY} 0%, #1a2d52 100%)` }}>
-            {/* Fixed header */}
-            <div className="sticky top-0 z-20 pt-safe-top px-5 py-4"
-                style={{ background: NAVY, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                <div className="flex items-center justify-between mb-3">
-                    <img src="/Logo_azul_oscuro.png" alt="Doctor Antivejez"
-                        className="h-7 w-auto opacity-90" style={{ filter: 'brightness(1.6)' }} />
-                    <span className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                        Grupo {currentGroup} de 5 · ~4 minutos
-                    </span>
-                </div>
-                {/* Progress bar */}
-                <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
-                    <motion.div
-                        className="h-full rounded-full"
-                        style={{ background: CYAN }}
-                        animate={{ width: `${progress * 100}%` }}
-                        transition={{ duration: 0.4 }}
-                    />
-                </div>
-                <p className="mt-2 text-sm font-bold text-white">
-                    {GROUP_NAMES[currentGroup]}
-                </p>
-            </div>
+        <div className="min-h-screen flex flex-col relative" style={{ background: `linear-gradient(160deg, ${NAVY} 0%, #1a2d52 100%)` }}>
+            <ExitConfirmModal
+                isOpen={showConfirm}
+                onConfirm={confirmExit}
+                onCancel={cancelExit}
+                message={`Has respondido ${Object.keys(answers).length} de 45 preguntas. ¿Seguro que quieres salir?`}
+            />
+
+            <PublicHeader
+                showBack={true}
+                onBack={handleBack}
+                progress={Math.round((Object.keys(answers).length / 45) * 100)}
+                progressLabel={`${Object.keys(answers).length}/45 respondidas · Grupo ${currentGroup} de 5`}
+            />
 
             {/* Questions */}
             <div className="flex-1 overflow-y-auto px-5 py-4 pb-36">
