@@ -157,9 +157,12 @@ const LoginPage: React.FC = () => {
                 </form>
 
                 {/* Footer */}
-                <div className="mt-12 mb-6 text-center z-10 opacity-70">
+                <div className="mt-12 mb-6 text-center z-10 opacity-70 flex flex-col items-center gap-4">
                     <p className="text-[11px] font-medium text-cyan-200">
                         Protegido con cifrado AES-256 · Dr. Juan Carlos Méndez
+                    </p>
+                    <p className="text-[9px] font-black text-cyan-400 uppercase tracking-[0.3em] opacity-50">
+                        Vytalix.io
                     </p>
                 </div>
             </div>

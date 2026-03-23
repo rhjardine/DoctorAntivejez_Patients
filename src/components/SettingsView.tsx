@@ -92,6 +92,12 @@ const SettingsView: React.FC<SettingsViewProps> = ({ preferences, onUpdatePrefer
           "{t('settings.quote')}"
         </p>
       </div>
+
+      <div className="mt-12 pb-8 text-center opacity-30">
+        <p className="text-[9px] font-black text-[var(--dark-navy)] dark:text-white uppercase tracking-[0.3em]">
+          Vytalix.io
+        </p>
+      </div>
     </div>
   );
 };

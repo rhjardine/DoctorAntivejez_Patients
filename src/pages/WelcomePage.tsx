@@ -35,7 +35,7 @@ const WelcomePage: React.FC = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="w-full max-w-sm space-y-4 z-10 px-2 mt-auto pb-12">
+                <div className="w-full max-w-sm space-y-4 z-10 px-2 mt-auto pb-8">
                     {/* Invitee / Demo Flow */}
                     <button
                         onClick={() => navigate('/longevidad')}
@@ -57,6 +57,13 @@ const WelcomePage: React.FC = () => {
                     >
                         Ya soy paciente
                     </button>
+                </div>
+
+                {/* Vytalix.io footer credit */}
+                <div className="pb-8 opacity-40">
+                    <p className="text-[10px] text-white font-black uppercase tracking-[0.2em]">
+                        Vytalix.io
+                    </p>
                 </div>
             </div>
         </div>

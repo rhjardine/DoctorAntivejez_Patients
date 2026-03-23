@@ -26,13 +26,14 @@ const LandingPublicaPage: React.FC = () => {
             <div className="w-full max-w-sm px-6 pt-14 pb-6 flex flex-col items-center text-center">
 
                 {/* Badge */}
-                <motion.p
+                <motion.div
                     custom={0} variants={fadeUp} initial="hidden" animate="visible"
-                    style={{ color: CYAN, fontSize: 10, letterSpacing: 3, textTransform: 'uppercase', fontFamily: 'Poppins, sans-serif' }}
-                    className="mb-5 font-semibold"
+                    style={{ color: CYAN, fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', fontFamily: 'Poppins, sans-serif' }}
+                    className="mb-8 font-semibold flex flex-col items-center gap-1.5"
                 >
-                    Centro de Longevidad · Dr. Juan Carlos Méndez
-                </motion.p>
+                    <span className="opacity-80">Plataforma Digital de Longevidad</span>
+                    <span className="font-black text-[12px] tracking-[0.2em]">Dr. Juan Carlos Méndez</span>
+                </motion.div>
 
                 {/* Logo with glow */}
                 <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible" className="relative mb-8">
@@ -49,7 +50,7 @@ const LandingPublicaPage: React.FC = () => {
                     style={{ fontFamily: 'Poppins, sans-serif', fontSize: 32, fontWeight: 900, color: 'white', lineHeight: 1.2 }}
                     className="mb-3"
                 >
-                    Descubre tu Edad Biológica Real
+                    Descubre tu Edad Biológica
                 </motion.h1>
 
                 {/* Sub */}
