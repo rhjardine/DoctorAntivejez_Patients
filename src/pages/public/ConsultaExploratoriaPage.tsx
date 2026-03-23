@@ -101,11 +101,23 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
     );
 };
 
+import { MEDICAL_NETWORK } from '../../data/medicalNetwork';
+
+/* ─── Confirmation Screen ───────────────────────────────────────────── */
+// ...
+
 /* ─── Main Component ────────────────────────────────────────────────── */
 const ConsultaExploratoriaPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const tipo: ConsultaType = (new URLSearchParams(location.search).get('tipo') as ConsultaType) || 'basica';
+    const [queryParams] = useState(() => new URLSearchParams(location.search));
+    const tipo = (queryParams.get('tipo') as ConsultaType) || 'basica';
+    const preselectedDoctorId = queryParams.get('doctorId');
+
+    // Mapeamos los médicos disponibles
+    const availableDoctors = MEDICAL_NETWORK.filter(d => d.availableForBooking);
+    const preselectedDoc = preselectedDoctorId ? MEDICAL_NETWORK.find(d => d.id === preselectedDoctorId) : null;
+    const [showSelector, setShowSelector] = useState(!preselectedDoc);
 
     const [form, setForm] = useState({
         name: sessionStorage.getItem('da_lead_name') || '',
@@ -113,6 +125,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
         phone: '',
         country: 'Venezuela',
         horario: 'Flexible',
+        doctorId: preselectedDoctorId || '',
     });
     const [card, setCard] = useState({ number: '', expiry: '', cvc: '', holder: '' });
     const [submitState, setSubmitState] = useState<SubmitState>('idle');
@@ -127,7 +140,13 @@ const ConsultaExploratoriaPage: React.FC = () => {
         if (!form.name || !form.email || !form.phone) return;
         setSubmitState('sending');
 
-        const bookingData = { ...form, card: tipo === 'profunda' ? card : undefined, tipo, ts: Date.now() };
+        const bookingData = {
+            ...form,
+            doctorId: form.doctorId || null,
+            card: tipo === 'profunda' ? card : undefined,
+            tipo,
+            ts: Date.now()
+        };
         sessionStorage.setItem('da_booking_data', JSON.stringify(bookingData));
 
         try {
@@ -221,8 +240,48 @@ const ConsultaExploratoriaPage: React.FC = () => {
                         )}
                     </select>
 
+                    <div className="flex flex-col gap-1.5 mt-1">
+                        <label className="text-[10px] text-[#23BCEF] font-bold uppercase tracking-wider ml-1">Médico de preferencia</label>
+                        {!showSelector && preselectedDoc ? (
+                            <div className="flex items-center justify-between p-3 rounded-xl border"
+                                style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(35,188,239,0.3)' }}>
+                                <div className="flex items-center gap-3">
+                                    <img src={preselectedDoc.imageUrl} alt={preselectedDoc.name}
+                                        className="w-10 h-10 rounded-full object-cover"
+                                        style={{ border: `1px solid ${preselectedDoc.accentColor}80` }}
+                                        onError={(e) => {
+                                            const target = e.target as HTMLImageElement;
+                                            target.onerror = null;
+                                            target.style.display = 'none';
+                                            target.parentElement!.innerHTML += `<div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs" style="background:${preselectedDoc.accentColor}20; color:${preselectedDoc.accentColor}; box-shadow: inset 0 0 0 1px ${preselectedDoc.accentColor}40">${preselectedDoc.name.substring(0, 2)}</div>`;
+                                        }}
+                                    />
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-white leading-tight">{preselectedDoc.name}</span>
+                                        <span className="text-[10px] text-white/50">{preselectedDoc.location}</span>
+                                    </div>
+                                </div>
+                                <button type="button" onClick={() => { setShowSelector(true); setForm(f => ({ ...f, doctorId: '' })); }}
+                                    className="text-xs font-semibold underline underline-offset-2 px-2 py-1"
+                                    style={{ color: CYAN }}>
+                                    Cambiar
+                                </button>
+                            </div>
+                        ) : (
+                            <select name="doctorId" value={form.doctorId} onChange={handleFormChange}
+                                style={{ ...INPUT_STYLE, appearance: 'none' }}>
+                                <option value="" style={{ background: NAVY }}>Sin preferencia (primer disponible)</option>
+                                {availableDoctors.map(doc => (
+                                    <option key={doc.id} value={doc.id} style={{ background: NAVY }}>
+                                        {doc.name} — {doc.location.split(',')[0]}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+
                     <select name="horario" value={form.horario} onChange={handleFormChange}
-                        style={{ ...INPUT_STYLE, appearance: 'none' }}>
+                        style={{ ...INPUT_STYLE, appearance: 'none', marginTop: '0.25rem' }}>
                         {['Mañana', 'Tarde', 'Flexible'].map(h =>
                             <option key={h} value={h} style={{ background: NAVY }}>{h}</option>
                         )}

@@ -15,6 +15,7 @@ const TestAntivejez = React.lazy(() => import('./pages/public/TestAntivejezPage'
 const AgeBotFacial = React.lazy(() => import('./pages/public/AgeBotFacialPage'));
 const ResultadoScore = React.lazy(() => import('./pages/public/ResultadoScorePage'));
 const ConsultaExploratoria = React.lazy(() => import('./pages/public/ConsultaExploratoriaPage'));
+const MedicalNetwork = React.lazy(() => import('./pages/public/MedicalNetworkPage'));
 
 // Pages
 import WelcomePage from './pages/WelcomePage';
@@ -282,6 +283,7 @@ const App: React.FC = () => {
             <Route path="/agebot" element={<AgeBotFacial />} />
             <Route path="/resultado" element={<ResultadoScore />} />
             <Route path="/consulta" element={<ConsultaExploratoria />} />
+            <Route path="/medicos" element={<MedicalNetwork />} />
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

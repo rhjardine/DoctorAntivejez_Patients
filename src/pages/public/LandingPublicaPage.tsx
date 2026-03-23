@@ -133,8 +133,13 @@ const LandingPublicaPage: React.FC = () => {
             </div>
 
             {/* Footer note */}
-            <motion.div custom={6} variants={fadeUp} initial="hidden" animate="visible" className="mt-8 px-8 text-center">
-                <p className="text-[11px] mb-4" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
+            <motion.div custom={6} variants={fadeUp} initial="hidden" animate="visible" className="mt-8 px-8 text-center flex flex-col items-center gap-4">
+                <button onClick={() => navigate('/medicos')}
+                    className="text-xs transition-opacity hover:opacity-80 pb-1"
+                    style={{ color: CYAN, borderBottom: `1px solid ${CYAN}50` }}>
+                    Conoce nuestra red de médicos especialistas →
+                </button>
+                <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
                     Ambos tests son gratuitos y te conectan con una consulta exploratoria con nuestra red médica.
                 </p>
                 <button
@@ -146,6 +151,7 @@ const LandingPublicaPage: React.FC = () => {
                 </button>
             </motion.div>
         </div>
+
     );
 };
 
