@@ -5,9 +5,8 @@ import { ChevronRight } from 'lucide-react';
 import PublicHeader from '../../components/public/PublicHeader';
 import { useExitConfirmation } from '../../hooks/useExitConfirmation';
 import ExitConfirmModal from '../../components/public/ExitConfirmModal';
-
-const NAVY = '#293B64';
-const CYAN = '#23BCEF';
+import { WELLNESS } from '../../styles/wellnessPalette';
+import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 
 /* ─── Question definitions ─────────────────────────────────────────────── */
 type Question = {
@@ -160,8 +159,9 @@ const TestAntivejezPage: React.FC = () => {
             setCurrentGroup(prev => (prev + 1) as 1 | 2 | 3 | 4 | 5);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
+            // Guarda y avanza al resultado (Stage 2)
             const resultado = calcularScore(answers);
-            sessionStorage.setItem('da_test_result', JSON.stringify(resultado));
+            sessionStorage.setItem('vx_test_result', JSON.stringify(resultado));
             navigate('/resultado');
         }
     };
@@ -170,7 +170,7 @@ const TestAntivejezPage: React.FC = () => {
     const questionOffset = QUESTIONS.filter(q => q.group < currentGroup).length;
 
     return (
-        <div className="min-h-screen flex flex-col relative" style={{ background: `linear-gradient(160deg, ${NAVY} 0%, #1a2d52 100%)` }}>
+        <div className="min-h-screen flex flex-col relative" style={{ background: WELLNESS.bg }}>
             <ExitConfirmModal
                 isOpen={showConfirm}
                 onConfirm={confirmExit}
@@ -179,6 +179,7 @@ const TestAntivejezPage: React.FC = () => {
             />
 
             <PublicHeader
+                theme="wellness"
                 showBack={true}
                 onBack={handleBack}
                 progress={Math.round((Object.keys(answers).length / 45) * 100)}
@@ -200,23 +201,29 @@ const TestAntivejezPage: React.FC = () => {
                             const qNumber = questionOffset + idx + 1;
                             const val = answers[q.id];
                             return (
-                                <div key={q.id} className="rounded-2xl p-4"
-                                    style={{ background: 'white', boxShadow: '0 2px 12px rgba(0,0,0,0.1)' }}>
-                                    <p className="text-[10px] font-black uppercase mb-1.5" style={{ color: CYAN }}>
-                                        Pregunta {qNumber}
+                                <div key={q.id} className="p-5"
+                                    style={{
+                                        background: WELLNESS.bgCard,
+                                        border: `1px solid ${WELLNESS.earth}26`, // 0.15 alpha
+                                        borderRadius: 16,
+                                        boxShadow: '0 4px 14px rgba(0,0,0,0.03)'
+                                    }}>
+                                    <p className="text-[10px] font-black uppercase mb-1.5" style={{ color: WELLNESS.sage }}>
+                                        PREGUNTA {qNumber}
                                     </p>
-                                    <p className="text-[15px] font-medium mb-4 leading-snug" style={{ color: NAVY }}>
+                                    <p className="text-[15px] font-medium mb-5 leading-snug" style={{ color: WELLNESS.earthDark }}>
                                         {q.text}
                                     </p>
                                     <div className="flex gap-2.5">
                                         {/* SÍ */}
                                         <button
                                             onClick={() => answer(q.id, true)}
-                                            className="flex-1 py-3 rounded-2xl font-bold text-sm transition-all duration-150 active:scale-95"
+                                            className="flex-1 py-3 rounded-2xl text-sm transition-all duration-150 active:scale-95"
                                             style={{
-                                                background: val === true ? CYAN : 'transparent',
-                                                color: val === true ? NAVY : '#94a3b8',
-                                                border: `2px solid ${val === true ? CYAN : '#e2e8f0'}`,
+                                                background: val === true ? WELLNESS.sage : 'transparent',
+                                                color: val === true ? 'white' : WELLNESS.textHint,
+                                                fontWeight: val === true ? 700 : 500,
+                                                border: `1px solid ${val === true ? WELLNESS.sage : `${WELLNESS.earth}33`}`,
                                             }}
                                         >
                                             SÍ
@@ -224,11 +231,12 @@ const TestAntivejezPage: React.FC = () => {
                                         {/* NO */}
                                         <button
                                             onClick={() => answer(q.id, false)}
-                                            className="flex-1 py-3 rounded-2xl font-bold text-sm transition-all duration-150 active:scale-95"
+                                            className="flex-1 py-3 rounded-2xl text-sm transition-all duration-150 active:scale-95"
                                             style={{
-                                                background: val === false ? NAVY : 'transparent',
-                                                color: val === false ? 'white' : '#94a3b8',
-                                                border: `2px solid ${val === false ? NAVY : '#e2e8f0'}`,
+                                                background: val === false ? `${WELLNESS.earth}1A` : 'transparent',
+                                                color: val === false ? WELLNESS.earth : WELLNESS.textHint,
+                                                fontWeight: val === false ? 700 : 500,
+                                                border: `1px solid ${val === false ? `${WELLNESS.earth}4D` : `${WELLNESS.earth}33`}`,
                                             }}
                                         >
                                             NO
@@ -242,20 +250,22 @@ const TestAntivejezPage: React.FC = () => {
             </div>
 
             {/* Sticky footer */}
-            <div className="fixed bottom-0 left-0 right-0 px-5 py-4 pb-safe-bottom"
-                style={{ background: NAVY, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="fixed bottom-0 left-0 right-0 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+                style={{ background: WELLNESS.bgDeep, borderTop: `1px solid ${WELLNESS.earth}26` }}>
                 {/* Disclaimer */}
-                <p className="text-center text-[9px] mb-3 leading-relaxed px-2"
-                    style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    Esta evaluación es una estimación orientativa. La determinación precisa requiere evaluación clínica completa con el Dr. Méndez.
+                <p className="text-center text-[10px] mb-3 leading-relaxed px-2 italic"
+                    style={{ color: WELLNESS.textHint }}>
+                    Esta evaluación es orientativa. No constituye diagnóstico médico.
                 </p>
                 <button
                     onClick={next}
                     disabled={!allAnswered}
-                    className="w-full font-bold text-base flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-35"
+                    className="w-full font-bold text-[15px] flex items-center justify-center gap-2 transition-all"
                     style={{
-                        background: CYAN, color: NAVY, borderRadius: 28,
-                        padding: '15px 0', fontFamily: 'Poppins'
+                        background: WELLNESS.terracotta, color: WELLNESS.bgCard, borderRadius: 28,
+                        padding: '15px 0', fontFamily: 'Poppins, sans-serif',
+                        opacity: allAnswered ? 1 : 0.4,
+                        transform: allAnswered ? 'scale(1)' : 'scale(0.98)'
                     }}
                 >
                     {currentGroup < 5 ? (
@@ -264,7 +274,7 @@ const TestAntivejezPage: React.FC = () => {
                         <>Ver mis Resultados <ChevronRight size={18} /></>
                     )}
                 </button>
-                <p className="text-center text-[10px] mt-2" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <p className="text-center text-[10px] mt-2 font-medium" style={{ color: WELLNESS.textSecond }}>
                     {totalAnswered}/45 respondidas
                 </p>
             </div>

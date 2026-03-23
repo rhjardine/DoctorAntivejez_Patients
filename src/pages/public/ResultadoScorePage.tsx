@@ -2,15 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, TrendingUp, ShieldCheck, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { WELLNESS } from '../../styles/wellnessPalette';
+import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 
 /* ─── Design tokens ────────────────────────────────────────────────── */
-const NAVY = '#293B64';
-const CYAN = '#23BCEF';
-const GREEN = '#4CAF50';
-const AMBER = '#FFA726';
-const CORAL = '#E53935';
-
-const BG = 'linear-gradient(160deg, #293B64 0%, #0f1d38 100%)';
+const BG = `linear-gradient(160deg, ${WELLNESS.earthDark} 0%, #3D2B1F 100%)`;
 
 type Category = 'EXCELENTE' | 'BUENO' | 'REGULAR' | 'CRITICO';
 
@@ -25,10 +21,10 @@ interface TestResult {
 
 /* ─── Category metadata ────────────────────────────────────────────── */
 const CAT: Record<Category, { color: string; bg: string; border: string; label: string }> = {
-    EXCELENTE: { color: GREEN, bg: `${GREEN}22`, border: `${GREEN}55`, label: 'Excelente Vitalidad' },
-    BUENO: { color: CYAN, bg: `${CYAN}22`, border: `${CYAN}55`, label: 'Buena Condición' },
-    REGULAR: { color: AMBER, bg: `${AMBER}22`, border: `${AMBER}55`, label: 'Área de Oportunidad' },
-    CRITICO: { color: CORAL, bg: `${CORAL}22`, border: `${CORAL}55`, label: 'Atención Prioritaria' },
+    EXCELENTE: { color: WELLNESS.good, bg: `${WELLNESS.good}22`, border: `${WELLNESS.good}55`, label: 'Excelente Vitalidad' },
+    BUENO: { color: WELLNESS.sage, bg: `${WELLNESS.sage}22`, border: `${WELLNESS.sage}55`, label: 'Buena Condición' },
+    REGULAR: { color: WELLNESS.warn, bg: `${WELLNESS.warn}22`, border: `${WELLNESS.warn}55`, label: 'Área de Oportunidad' },
+    CRITICO: { color: WELLNESS.alert, bg: `${WELLNESS.alert}22`, border: `${WELLNESS.alert}55`, label: 'Atención Prioritaria' },
 };
 
 const DIMENSIONS: { key: string; label: string }[] = [
@@ -76,10 +72,10 @@ const SemiGauge: React.FC<{ score: number; color: string }> = ({ score, color })
 
 /* ─── Dimension bar color ───────────────────────────────────────────── */
 function barColor(v: number) {
-    if (v >= 75) return GREEN;
-    if (v >= 50) return CYAN;
-    if (v >= 30) return AMBER;
-    return CORAL;
+    if (v >= 75) return WELLNESS.good;
+    if (v >= 50) return WELLNESS.sage;
+    if (v >= 30) return WELLNESS.warn;
+    return WELLNESS.alert;
 }
 
 /* ─── Main Component ────────────────────────────────────────────────── */
@@ -91,10 +87,10 @@ const ResultadoScorePage: React.FC = () => {
     const [leadName, setLeadName] = useState('');
     const [leadEmail, setLeadEmail] = useState('');
     const [leadStatus, setLeadStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
-    const alreadyCaptured = !!sessionStorage.getItem('da_lead_email');
+    const alreadyCaptured = !!sessionStorage.getItem('vx_lead_email');
 
     useEffect(() => {
-        const raw = sessionStorage.getItem('da_test_result');
+        const raw = sessionStorage.getItem('vx_test_result');
         if (raw) {
             try { setResult(JSON.parse(raw)); } catch { navigate('/longevidad'); }
         } else {
@@ -110,7 +106,7 @@ const ResultadoScorePage: React.FC = () => {
     /* ── Hook text: dato → contexto → oportunidad ── */
     const hookConfig = score < 40
         ? {
-            color: CORAL, icon: <AlertTriangle size={20} />,
+            color: WELLNESS.alert, icon: <AlertTriangle size={20} />,
             title: 'Tu score indica áreas de atención prioritaria',
             rangeBadge: 'Rango de optimización activa',
             context: 'Tu biología está respondiendo a patrones de hábito que aceleran el envejecimiento celular. El 70% de estos factores son modificables con el protocolo correcto.',
@@ -118,7 +114,7 @@ const ResultadoScorePage: React.FC = () => {
         }
         : score < 60
             ? {
-                color: AMBER, icon: <AlertTriangle size={20} />,
+                color: WELLNESS.warn, icon: <AlertTriangle size={20} />,
                 title: 'Tu score muestra margen significativo de mejora',
                 rangeBadge: 'Rango de progresión activa',
                 context: 'Tu biología tiene bases sólidas pero hay factores que están frenando tu potencial de vitalidad. Son abordables.',
@@ -126,14 +122,14 @@ const ResultadoScorePage: React.FC = () => {
             }
             : score < 80
                 ? {
-                    color: CYAN, icon: <TrendingUp size={20} />,
+                    color: WELLNESS.sage, icon: <TrendingUp size={20} />,
                     title: 'Tu score refleja hábitos con espacio de optimización',
                     rangeBadge: 'Rango de consolidación',
                     context: 'Tienes una base bien establecida. La diferencia entre "bien" y "óptimo" suele ser un ajuste en 2–3 variables clave.',
                     opportunity: 'El protocolo personalizado puede llevarte al rango óptimo y sostenerlo a largo plazo con seguimiento médico.',
                 }
                 : {
-                    color: GREEN, icon: <ShieldCheck size={20} />,
+                    color: WELLNESS.good, icon: <ShieldCheck size={20} />,
                     title: 'Tu score está en el rango de alto rendimiento biológico',
                     rangeBadge: 'Rango óptimo',
                     context: 'Tus hábitos actuales están funcionando. El trabajo ahora es sostener y extender este estado con precisión clínica.',
@@ -145,8 +141,8 @@ const ResultadoScorePage: React.FC = () => {
         e.preventDefault();
         if (!leadName || !leadEmail) return;
         setLeadStatus('sending');
-        sessionStorage.setItem('da_lead_name', leadName);
-        sessionStorage.setItem('da_lead_email', leadEmail);
+        sessionStorage.setItem('vx_lead_name', leadName);
+        sessionStorage.setItem('vx_lead_email', leadEmail);
 
         try {
             const res = await fetch('/api-render/api/leads', {
@@ -183,19 +179,19 @@ const ResultadoScorePage: React.FC = () => {
                 >
                     {/* Semicircular gauge */}
                     <div className="relative flex flex-col items-center">
-                        <SemiGauge score={score} color={cat.color} />
+                        <SemiGauge score={score} color={WELLNESS.tealMicro} />
                         {/* Number over the gauge center */}
                         <div className="absolute bottom-0 flex flex-col items-center" style={{ bottom: 4 }}>
                             <motion.span
                                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
-                                className="font-black text-white"
-                                style={{ fontSize: 48, fontFamily: 'Poppins, sans-serif', lineHeight: 1 }}
+                                className="font-black"
+                                style={{ fontSize: 48, fontFamily: 'Poppins, sans-serif', lineHeight: 1, color: WELLNESS.bgCard }}
                             >
                                 {score}
                             </motion.span>
                             <span className="text-[11px] uppercase tracking-widest font-semibold mt-1"
-                                style={{ color: 'rgba(255,255,255,0.5)' }}>
-                                Score de Vitalidad
+                                style={{ color: `${WELLNESS.bgCard}B3` }}>
+                                {VITALITY_LABELS.age_front}
                             </span>
                         </div>
                     </div>
@@ -220,26 +216,26 @@ const ResultadoScorePage: React.FC = () => {
                     <div className="flex items-start gap-3 mb-3">
                         <div className="mt-0.5 shrink-0" style={{ color: hookConfig.color }}>{hookConfig.icon}</div>
                         <div>
-                            <p className="text-sm font-bold text-white leading-snug mb-1">{hookConfig.title}</p>
+                            <p className="text-sm font-bold leading-snug mb-1" style={{ color: WELLNESS.bgCard }}>{hookConfig.title}</p>
                             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block"
                                 style={{ background: `${hookConfig.color}20`, color: hookConfig.color }}>
                                 Score {score}/100 — {hookConfig.rangeBadge}
                             </span>
                         </div>
                     </div>
-                    <p className="text-[13px] leading-relaxed mb-2" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                    <p className="text-[13px] leading-relaxed mb-2" style={{ color: `${WELLNESS.bgCard}BF` }}>
                         {hookConfig.context}
                     </p>
-                    <p className="text-[13px] leading-relaxed font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                    <p className="text-[13px] leading-relaxed font-medium" style={{ color: `${WELLNESS.bgCard}E6` }}>
                         {hookConfig.opportunity}
                     </p>
                     {/* Disclaimer */}
                     <div className="border-t mt-4 pt-3" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
                         <p className="text-[10px] leading-relaxed italic"
-                            style={{ color: 'rgba(255,255,255,0.45)' }}>
+                            style={{ color: `${WELLNESS.bgCard}73` }}>
                             Nota: Este análisis es una estimación basada en sus respuestas de hábitos y no constituye un diagnóstico médico.
                             La edad biológica real se determina mediante evaluación biofísica, bioquímica y genética en consulta con el
-                            Dr. Juan Carlos Méndez o los especialistas de su red.
+                            equipo médico especialista.
                         </p>
                     </div>
                 </motion.div>
@@ -250,7 +246,7 @@ const ResultadoScorePage: React.FC = () => {
                     className="rounded-[20px] p-5 mb-5"
                     style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)' }}
                 >
-                    <p className="text-[13px] uppercase tracking-widest font-semibold mb-4" style={{ color: CYAN }}>
+                    <p className="text-[13px] uppercase tracking-widest font-semibold mb-4" style={{ color: WELLNESS.tealMicro }}>
                         Tu Mapa de Vitalidad
                     </p>
                     <div className="space-y-4">
@@ -260,7 +256,7 @@ const ResultadoScorePage: React.FC = () => {
                             return (
                                 <div key={d.key}>
                                     <div className="flex justify-between items-center mb-1.5">
-                                        <span className="text-[12px] font-medium text-white">{d.label}</span>
+                                        <span className="text-[12px] font-medium" style={{ color: WELLNESS.bgCard }}>{d.label}</span>
                                         <span className="text-[12px] font-bold" style={{ color: col }}>{val}%</span>
                                     </div>
                                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.10)' }}>
@@ -285,7 +281,7 @@ const ResultadoScorePage: React.FC = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
                     className="rounded-[20px] p-5 mb-4"
-                    style={{ background: `${CYAN}14`, border: `1px solid ${CYAN}40` }}
+                    style={{ background: `${WELLNESS.tealMicro}1A`, border: `1px solid ${WELLNESS.tealMicro}40` }}
                 >
                     <AnimatePresence mode="wait">
                         {/* Lead form — shown if email not yet captured */}
@@ -295,11 +291,11 @@ const ResultadoScorePage: React.FC = () => {
                                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                                 onSubmit={handleLead}
                             >
-                                <p className="text-[14px] font-semibold text-white mb-2">
-                                    Guarda tu resultado y recibe el análisis completo
+                                <p className="text-[14px] font-semibold mb-2" style={{ color: WELLNESS.bgCard }}>
+                                    Recibe tu análisis completo de un especialista en longevidad
                                 </p>
-                                <p className="text-[12px] mb-5 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
-                                    Te enviamos el desglose detallado de tus 5 dimensiones de vitalidad y las recomendaciones iniciales del equipo.
+                                <p className="text-[12px] mb-5 leading-relaxed" style={{ color: `${WELLNESS.bgCard}A6` }}>
+                                    Te enviamos el desglose detallado de tus 5 dimensiones de vitalidad y las recomendaciones iniciales del equipo médico.
                                 </p>
                                 <div className="flex flex-col gap-3 mb-4">
                                     <input
@@ -325,13 +321,13 @@ const ResultadoScorePage: React.FC = () => {
                                     type="submit"
                                     disabled={leadStatus === 'sending'}
                                     className="w-full font-bold text-[14px] flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-60"
-                                    style={{ background: CYAN, color: NAVY, borderRadius: 28, padding: '13px 0', fontFamily: 'Poppins' }}
+                                    style={{ background: WELLNESS.tealMicro, color: WELLNESS.earthDark, borderRadius: 28, padding: '13px 0', fontFamily: 'Poppins' }}
                                 >
                                     {leadStatus === 'sending'
                                         ? <Loader2 size={20} className="animate-spin" />
                                         : 'Guardar mi resultado →'}
                                 </button>
-                                <p className="text-center text-[10px] mt-3" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                                <p className="text-center text-[10px] mt-3" style={{ color: `${WELLNESS.bgCard}66` }}>
                                     Sin spam. Solo información relevante sobre tu salud.
                                 </p>
                             </motion.form>
@@ -345,9 +341,9 @@ const ResultadoScorePage: React.FC = () => {
                                 className="flex flex-col items-center text-center py-4"
                                 onAnimationComplete={() => setTimeout(() => setLeadStatus('idle'), 2000)}
                             >
-                                <CheckCircle size={40} style={{ color: GREEN }} className="mb-3" />
-                                <p className="text-white font-bold text-base mb-1">¡Listo!</p>
-                                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                                <CheckCircle size={40} style={{ color: WELLNESS.tealMicro }} className="mb-3" />
+                                <p className="font-bold text-base mb-1" style={{ color: WELLNESS.bgCard }}>¡Listo!</p>
+                                <p className="text-sm" style={{ color: `${WELLNESS.bgCard}A6` }}>
                                     Recibirás tu análisis detallado en breve.
                                 </p>
                             </motion.div>
@@ -361,7 +357,7 @@ const ResultadoScorePage: React.FC = () => {
                         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
                         className="flex flex-col gap-3"
                     >
-                        <p className="text-[16px] font-black text-white mb-1" style={{ fontFamily: 'Poppins' }}>
+                        <p className="text-[16px] font-black mb-1" style={{ fontFamily: 'Poppins', color: WELLNESS.bgCard }}>
                             Elige tu siguiente paso
                         </p>
 
@@ -377,13 +373,13 @@ const ResultadoScorePage: React.FC = () => {
                                     Sin costo · 20 min
                                 </span>
                             </div>
-                            <p className="text-white font-bold text-[14px]">Programa de Optimización</p>
-                            <p className="text-[12px] mt-1 leading-snug" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                                Revisión de tu score con un profesional y definición de tus 2 prioridades de vitalidad
+                            <p className="font-bold text-[14px]" style={{ color: WELLNESS.bgCard }}>Programa de Optimización</p>
+                            <p className="text-[12px] mt-1 leading-snug" style={{ color: `${WELLNESS.bgCard}8C` }}>
+                                Revisión de tu score con un profesional médico y definición de tus 2 prioridades
                             </p>
                             <div className="mt-2.5 flex flex-col gap-1">
-                                {['Análisis de tus 5 dimensiones de vitalidad', 'Identificación de áreas críticas', 'Recomendaciones iniciales del equipo Dr. Méndez'].map(b => (
-                                    <p key={b} className="text-[11px] flex items-start gap-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                                {['Análisis de tus 5 dimensiones', 'Identificación de áreas críticas', 'Recomendaciones iniciales del equipo médico'].map(b => (
+                                    <p key={b} className="text-[11px] flex items-start gap-1.5" style={{ color: `${WELLNESS.bgCard}80` }}>
                                         <span style={{ color: 'rgba(255,255,255,0.3)' }}>•</span> {b}
                                     </p>
                                 ))}
@@ -394,31 +390,31 @@ const ResultadoScorePage: React.FC = () => {
                         <button
                             onClick={() => navigate('/consulta?tipo=profunda')}
                             className="w-full text-left rounded-2xl p-4 relative transition-all active:scale-95"
-                            style={{ border: `1.5px solid ${CYAN}`, background: `${CYAN}18` }}
+                            style={{ border: `1.5px solid ${WELLNESS.tealMicro}`, background: `${WELLNESS.tealMicro}18` }}
                         >
                             <span className="absolute top-3 right-3 text-[9px] font-black uppercase px-2 py-0.5 rounded-full"
-                                style={{ background: CYAN, color: NAVY }}>
+                                style={{ background: WELLNESS.tealMicro, color: WELLNESS.earthDark }}>
                                 Recomendado
                             </span>
                             <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full"
-                                    style={{ background: `${CYAN}30`, color: CYAN }}>
+                                    style={{ background: `${WELLNESS.tealMicro}30`, color: WELLNESS.tealMicro }}>
                                     USD 49 · 45 min
                                 </span>
                             </div>
-                            <p className="text-white font-bold text-[14px]">Acompañamiento Médico</p>
-                            <p className="text-[12px] mt-1 leading-snug" style={{ color: 'rgba(255,255,255,0.55)' }}>
-                                Evaluación biofísica completa con especialista + reporte de optimización personalizado
+                            <p className="font-bold text-[14px]" style={{ color: WELLNESS.bgCard }}>Acompañamiento Médico</p>
+                            <p className="text-[12px] mt-1 leading-snug" style={{ color: `${WELLNESS.bgCard}8C` }}>
+                                Evaluación biofísica completa con especialista + reporte de optimización
                             </p>
                             <div className="mt-2.5 flex flex-col gap-1">
                                 {[
-                                    'Evaluación biofísica con médico especialista',
-                                    'Reporte de Edad Biológica estimada (4 dimensiones)',
+                                    'Evaluación biofísica con especialista',
+                                    'Reporte de Edad Celular completa',
                                     'Plan de optimización de 30 días',
-                                    'Acceso a la app durante 30 días sin costo',
+                                    'Acceso al ecosistema Longevidad'
                                 ].map(b => (
-                                    <p key={b} className="text-[11px] flex items-start gap-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                                        <span style={{ color: CYAN }}>•</span> {b}
+                                    <p key={b} className="text-[11px] flex items-start gap-1.5" style={{ color: `${WELLNESS.bgCard}99` }}>
+                                        <span style={{ color: WELLNESS.tealMicro }}>•</span> {b}
                                     </p>
                                 ))}
                             </div>
@@ -427,8 +423,8 @@ const ResultadoScorePage: React.FC = () => {
                         {/* Quick action repeat test */}
                         <button onClick={() => navigate('/test')}
                             className="w-full text-center py-3 text-[12px] transition-all"
-                            style={{ color: 'rgba(255,255,255,0.35)' }}>
-                            Repetir el test →
+                            style={{ color: `${WELLNESS.bgCard}59` }}>
+                            Repetir evaluación →
                         </button>
                     </motion.div>
                 )}

@@ -1,67 +1,77 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { WELLNESS } from '../styles/wellnessPalette';
 
 const WelcomePage: React.FC = () => {
     const navigate = useNavigate();
 
     return (
         <div
-            className="flex flex-col h-screen w-full px-8
-                 pt-safe-top pb-safe-bottom items-center
-                 justify-between animate-in fade-in
-                 duration-700 bg-[rgb(41,59,100)]"
+            className="flex flex-col h-screen w-full px-8 pt-safe-top pb-safe-bottom items-center justify-between animate-in fade-in duration-700"
+            style={{ background: WELLNESS.bg }}
         >
-            <div className="flex-1 flex flex-col justify-center items-center w-full">
-                {/* Logo with Cyan Glow */}
-                <div className="relative flex flex-col items-center mb-16">
-                    {/* Glow effect positioned behind the logo */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-cyan-400 opacity-30 rounded-full blur-3xl pointer-events-none" />
-                    <img
-                        src="/Logo_azul_oscuro.png"
-                        alt="Doctor Antivejez"
-                        className="w-56 h-auto object-contain z-10 drop-shadow-lg"
-                        style={{ filter: 'brightness(1.5)' }} // Adjust brightness as needed if logo is too dark
-                    />
+            <div className="flex-1 flex flex-col justify-center items-center w-full mt-10">
+                {/* Stage 1 Neutral Branding */}
+                <div className="mb-14 mt-16 text-center">
+                    <span
+                        className="font-black tracking-[0.2em] text-[20px]"
+                        style={{ color: WELLNESS.earthDark, fontFamily: 'Poppins, sans-serif' }}
+                    >
+                        VYTALIX
+                    </span>
+                    <p className="text-[10px] tracking-widest mt-1" style={{ color: WELLNESS.sage }}>
+                        PLATAFORMA DIGITAL DE LONGEVIDAD
+                    </p>
                 </div>
 
                 {/* Typography */}
-                <div className="text-center mb-12 space-y-3 z-10 w-full">
-                    <h1 className="text-white text-3xl font-black leading-tight tracking-tight px-4">
+                <div className="text-center mb-16 space-y-3 z-10 w-full">
+                    <h1 className="text-3xl font-black leading-tight tracking-tight px-4" style={{ color: WELLNESS.earthDark }}>
                         Tu vitalidad,<br />en tus manos
                     </h1>
-                    <p className="text-white/80 text-base font-medium leading-snug px-6">
+                    <p className="text-base font-medium leading-snug px-6" style={{ color: WELLNESS.textHint }}>
                         Descubre cómo se siente<br />tener<br />más energía cada día
                     </p>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="w-full max-w-sm space-y-4 z-10 px-2 mt-auto pb-8">
-                    {/* Invitee / Demo Flow */}
+                <div className="w-full max-w-sm space-y-4 z-10 px-2 mt-auto mb-4">
+                    {/* Discovery Flow */}
                     <button
                         onClick={() => navigate('/longevidad')}
-                        className="w-full bg-[rgba(35,188,239,1)] text-white py-4 rounded-3xl
-                            font-bold text-base shadow-lg
-                            active:scale-95 transition-all
-                            flex items-center justify-center"
+                        style={{
+                            background: '#C4714A',
+                            color: '#FDFAF4',
+                            borderRadius: '32px',
+                            padding: '16px 0',
+                            width: '100%',
+                            fontFamily: 'Poppins, sans-serif',
+                            fontWeight: 700,
+                            fontSize: '16px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            letterSpacing: '0.5px',
+                            transition: 'background 0.2s ease',
+                        }}
                     >
                         Comenzar ahora
                     </button>
-
-                    {/* Patient Login Flow */}
-                    <button
-                        onClick={() => navigate('/login')}
-                        className="w-full bg-transparent border-[1.5px] border-white text-white py-4 rounded-3xl
-                            font-bold text-base
-                            active:scale-95 transition-all
-                            flex items-center justify-center"
-                    >
-                        Ya soy paciente
-                    </button>
                 </div>
 
-                {/* Vytalix.io footer credit */}
-                <div className="pb-8 opacity-40">
-                    <p className="text-[10px] text-white font-black uppercase tracking-[0.2em]">
+                {/* Footer with Login link */}
+                <div className="pb-8 text-center flex flex-col gap-4 mt-8">
+                    <div style={{ textAlign: 'center', opacity: 0.5 }}>
+                        <span style={{ fontSize: '11px', color: '#8B7355' }}>
+                            ¿Ya eres parte del programa?{' '}
+                            <span
+                                onClick={() => navigate('/login')}
+                                style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                            >
+                                Ingresar →
+                            </span>
+                        </span>
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40" style={{ color: WELLNESS.textHint }}>
                         Vytalix.io
                     </p>
                 </div>

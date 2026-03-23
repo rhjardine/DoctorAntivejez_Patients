@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronLeft } from 'lucide-react';
+import { WELLNESS } from '../../styles/wellnessPalette';
 
 interface PublicHeaderProps {
     title?: string;
@@ -8,6 +9,7 @@ interface PublicHeaderProps {
     showBack?: boolean;
     progress?: number; // 0-100
     progressLabel?: string; // e.g., "Grupo 2 de 5"
+    theme?: 'clinical' | 'wellness';
 }
 
 export const PublicHeader: React.FC<PublicHeaderProps> = ({
@@ -15,10 +17,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     onBack,
     showBack,
     progress,
-    progressLabel
+    progressLabel,
+    theme = 'clinical'
 }) => {
+    const isWellness = theme === 'wellness';
+    const bgColor = isWellness ? WELLNESS.earthDark : '#293B64';
+    const accentColor = isWellness ? WELLNESS.sage : '#23BCEF';
+    const textColor = isWellness ? 'rgba(253, 250, 244, 0.9)' : 'white';
+
     return (
-        <div className="w-full h-[56px] bg-[#293B64] flex flex-col relative shrink-0">
+        <div className="w-full h-[56px] flex flex-col relative shrink-0" style={{ background: bgColor }}>
             <div className="flex items-center h-full px-4">
                 {/* Left Section */}
                 <div className="w-9">
@@ -28,7 +36,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                             className="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/15 rounded-full transition-colors"
                             aria-label="Volver"
                         >
-                            <ChevronLeft size={20} className="text-white/80" />
+                            <ChevronLeft size={20} style={{ color: isWellness ? 'rgba(253, 250, 244, 0.8)' : 'rgba(255,255,255,0.8)' }} />
                         </button>
                     )}
                 </div>
@@ -36,8 +44,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                 {/* Center Section */}
                 <div className="flex-1 flex justify-center text-center overflow-hidden">
                     {title ? (
-                        <span className="text-[13px] font-semibold text-white/90 truncate px-2">
+                        <span className="text-[13px] font-semibold truncate px-2" style={{ color: textColor }}>
                             {title}
+                        </span>
+                    ) : isWellness ? (
+                        <span style={{ color: WELLNESS.bgCard, fontSize: 13, letterSpacing: 3, fontFamily: 'Poppins, sans-serif' }} className="font-black">
+                            VYTALIX
                         </span>
                     ) : (
                         <img src="/Logo_azul_oscuro.png" alt="Doctor Antivejez" className="h-7 w-auto" />
@@ -50,10 +62,10 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
             {/* Progress Bar */}
             {progress !== undefined && (
-                <div className="w-full h-[3px] bg-white/10 relative overflow-hidden">
+                <div className="w-full h-[3px] relative overflow-hidden" style={{ background: isWellness ? `${WELLNESS.earth}33` : 'rgba(255,255,255,0.1)' }}>
                     <div
-                        className="h-full bg-[#23BCEF] transition-all duration-500 ease-out"
-                        style={{ width: `${progress}%` }}
+                        className="h-full transition-all duration-500 ease-out"
+                        style={{ width: `${progress}%`, background: accentColor }}
                     />
                 </div>
             )}
@@ -61,12 +73,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             {/* Progress Label */}
             {progressLabel && progress !== undefined && (
                 <div className="absolute top-[59px] left-0 right-0 flex justify-center pointer-events-none">
-                    <span className="text-[10px] text-[#23BCEF] font-medium tracking-tight bg-[#293B64]/80 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                    <span
+                        className="text-[10px] font-medium tracking-tight px-2 py-0.5 rounded-full backdrop-blur-sm"
+                        style={{ color: accentColor, background: isWellness ? 'transparent' : 'rgba(41,59,100,0.8)' }}
+                    >
                         {progressLabel}
                     </span>
                 </div>
             )}
         </div>
+
     );
 };
 

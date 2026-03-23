@@ -5,12 +5,14 @@ import {
     CheckCircle, Lock, Loader2, Info, MessageCircle,
     Video, ClipboardList, ArrowRight
 } from 'lucide-react';
+import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 
 /* ─── Design tokens ────────────────────────────────────────────────── */
 const NAVY = '#293B64';
 const CYAN = '#23BCEF';
 const AMBER = '#FFA726';
 const GREEN = '#4CAF50';
+const TEAL_DEEP = '#0f5b78';
 
 const WHATSAPP_NUMBER = '18296440000'; // TODO: set real number
 
@@ -20,17 +22,17 @@ type SubmitState = 'idle' | 'sending' | 'confirmed' | 'error';
 /* ─── Benefits per type ─────────────────────────────────────────────── */
 const BENEFITS: Record<ConsultaType, { emoji: string; text: string }[]> = {
     basica: [
-        { emoji: '🎯', text: 'Revisión de tu Score de Vitalidad con especialista del equipo' },
+        { emoji: '🎯', text: `Revisión de tu ${VITALITY_LABELS.age_front} con especialista del equipo` },
         { emoji: '📊', text: 'Identificación de tus 2 dimensiones más críticas' },
-        { emoji: '💡', text: 'Orientación inicial del equipo Dr. Méndez' },
+        { emoji: '💡', text: 'Orientación inicial del equipo especialista' },
         { emoji: '⏱️', text: '20 minutos · Virtual · Sin costo' },
     ],
     profunda: [
         { emoji: '🧬', text: 'Evaluación biofísica completa con médico especialista' },
-        { emoji: '📋', text: 'Reporte de Edad Biológica estimada (4 dimensiones)' },
+        { emoji: '📋', text: `Reporte de ${VITALITY_LABELS.age_result} (4 dimensiones)` },
         { emoji: '📊', text: 'Plan de acción personalizado 30 días' },
-        { emoji: '📱', text: 'Acceso a la app Doctor Antivejez — 30 días sin costo' },
-        { emoji: '💬', text: 'Seguimiento por WhatsApp con el equipo' },
+        { emoji: '📱', text: 'Acceso a la plataforma de Longevidad — 30 días' },
+        { emoji: '💬', text: 'Seguimiento por WhatsApp con el equipo médico' },
     ],
 };
 
@@ -57,7 +59,7 @@ const CARD_STYLE: React.CSSProperties = {
 /* ─── Confirmation Screen ───────────────────────────────────────────── */
 const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate: ReturnType<typeof useNavigate> }> = ({ tipo, name, navigate }) => {
     const message = encodeURIComponent(
-        `Hola, soy ${name}. Acabo de completar el Test Antivejez y me gustaría coordinar mi consulta ${tipo === 'basica' ? 'gratuita de 20 min' : 'profunda'}.`
+        `Hola, soy ${name}. Acabo de completar el protocolo y me gustaría coordinar mi ${tipo === 'basica' ? 'Sesión de Optimización sin costo' : 'Plan Maestro de Vitalidad'}.`
     );
     const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
 
@@ -77,7 +79,7 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
             {tipo === 'basica' ? (
                 <p className="text-sm leading-relaxed mb-8" style={{ color: 'rgba(255,255,255,0.7)' }}>
                     Nuestro equipo te contactará en <strong className="text-white">menos de 24 horas</strong> para coordinar
-                    tu <strong className="text-white">Programa de Optimización</strong>.
+                    tu <strong className="text-white">Sesión de Optimización</strong>.
                     Revisa tu WhatsApp y email — usaremos el canal que prefieras.
                 </p>
             ) : (
@@ -85,7 +87,7 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
                     <p className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.7)' }}>
                         Tu reserva fue registrada. Un especialista del equipo te contactará en
                         <strong className="text-white"> menos de 24 horas</strong> para confirmar fecha y hora de tu
-                        <strong className="text-white"> evaluación biofísica completa</strong>.
+                        <strong className="text-white"> Plan Maestro de Vitalidad</strong>.
                     </p>
                     <p className="text-[11px] italic mb-8 leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
                         El pago de USD 49 se coordina en la confirmación de cita. Aceptamos transferencia, Zelle y tarjeta internacional.
@@ -129,8 +131,8 @@ const ConsultaExploratoriaPage: React.FC = () => {
     const [showSelector, setShowSelector] = useState(!preselectedDoc);
 
     const [form, setForm] = useState({
-        name: sessionStorage.getItem('da_lead_name') || '',
-        email: sessionStorage.getItem('da_lead_email') || '',
+        name: sessionStorage.getItem('vx_lead_name') || '',
+        email: sessionStorage.getItem('vx_lead_email') || '',
         phone: '',
         country: 'Venezuela',
         horario: 'Flexible',
@@ -178,7 +180,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
 
     if (submitState === 'confirmed') {
         return (
-            <div className="min-h-screen" style={{ background: `linear-gradient(160deg, ${NAVY} 0%, #0f1d38 100%)` }}>
+            <div className="min-h-screen" style={{ background: `linear-gradient(160deg, ${TEAL_DEEP} 0%, ${NAVY} 100%)` }}>
                 <ConfirmationScreen tipo={tipo} name={form.name} navigate={navigate} />
             </div>
         );
@@ -186,33 +188,46 @@ const ConsultaExploratoriaPage: React.FC = () => {
 
     return (
         <div className="min-h-screen w-full flex flex-col items-center overflow-y-auto pb-14"
-            style={{ background: `linear-gradient(160deg, ${NAVY} 0%, #0f1d38 100%)` }}>
+            style={{ background: `linear-gradient(160deg, ${TEAL_DEEP} 0%, ${NAVY} 100%)` }}>
             <div className="w-full max-w-sm px-5 pt-12">
 
+                {/* ── Trust Reveal: Doctor Antivejez Brand ── */}
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
+                    className="flex flex-col items-center justify-center mb-8"
+                >
+                    <img src="/Logo_azul_oscuro.png" alt="Doctor Antivejez" className="h-9 w-auto object-contain mb-2 brightness-[2] drop-shadow-lg" />
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-semibold" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        Centro de Medicina Antienvejecimiento
+                    </p>
+                </motion.div>
+
                 {/* Header */}
-                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6 text-center">
+                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mb-6 text-center">
                     {tipo === 'basica' ? (
                         <>
                             <p className="text-[10px] uppercase tracking-widest font-semibold mb-2" style={{ color: CYAN }}>
-                                Programa de Optimización
+                                Tu Siguiente Paso
                             </p>
-                            <h1 className="text-2xl font-black text-white leading-tight mb-2" style={{ fontFamily: 'Poppins' }}>
-                                Consulta Virtual Gratuita
+                            <h1 className="text-[22px] font-black text-white leading-tight mb-2" style={{ fontFamily: 'Poppins' }}>
+                                Sesión de Optimización
                             </h1>
-                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                                20 minutos · Sin costo
+                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                                20 minutos · Entrevista Virtual · Sin costo
                             </p>
                         </>
                     ) : (
                         <>
                             <p className="text-[10px] uppercase tracking-widest font-semibold mb-2" style={{ color: AMBER }}>
-                                Acompañamiento Médico
+                                Diagnóstico Avanzado
                             </p>
-                            <h1 className="text-2xl font-black text-white leading-tight mb-2" style={{ fontFamily: 'Poppins' }}>
-                                Evaluación Biofísica Completa
+                            <h1 className="text-[22px] font-black text-white leading-tight mb-2" style={{ fontFamily: 'Poppins' }}>
+                                Plan Maestro de Vitalidad
                             </h1>
-                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                                45 minutos · USD 49
+                            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                                45 minutos · Presencial o Virtual · USD 49
                             </p>
                         </>
                     )}
@@ -229,7 +244,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                             ? <Video size={18} style={{ color: CYAN }} />
                             : <ClipboardList size={18} style={{ color: CYAN }} />}
                         <p className="text-[13px] font-bold text-white">
-                            {tipo === 'basica' ? 'Qué incluye tu Programa de Optimización' : 'Qué incluye tu Acompañamiento Médico'}
+                            {tipo === 'basica' ? 'Qué incluye tu Sesión de Optimización' : 'Qué incluye tu Plan Maestro'}
                         </p>
                     </div>
                     <div className="space-y-2.5">
@@ -366,7 +381,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                         ) : tipo === 'profunda' ? (
                             <><Lock size={16} /> Pagar seguro con Stripe — USD 49</>
                         ) : (
-                            <>Reservar consulta gratuita <ArrowRight size={18} /></>
+                            <>Agendar Sesión de Optimización <ArrowRight size={18} /></>
                         )}
                     </button>
 
