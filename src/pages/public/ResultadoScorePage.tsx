@@ -6,7 +6,7 @@ import { WELLNESS } from '../../styles/wellnessPalette';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 
 /* ─── Design tokens ────────────────────────────────────────────────── */
-const BG = `linear-gradient(160deg, ${WELLNESS.earthDark} 0%, #3D2B1F 100%)`;
+const BG = `linear-gradient(160deg, ${WELLNESS.earth} 0%, ${WELLNESS.earthDark} 100%)`;
 
 type Category = 'EXCELENTE' | 'BUENO' | 'REGULAR' | 'CRITICO';
 

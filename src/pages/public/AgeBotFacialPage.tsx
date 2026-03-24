@@ -110,24 +110,17 @@ const AgeBotFacialPage: React.FC = () => {
         const start = async () => {
             setIsCameraLoading(true);
             try {
-                // Constraint 1: High-Precision Selfie (HD)
-                const constraints = {
-                    video: {
-                        facingMode: 'user',
-                        width: { ideal: 1920, min: 640 },
-                        height: { ideal: 1080, min: 480 },
-                        aspectRatio: { ideal: 1 }
-                    }
-                };
-
+                // Constraint 1: Standard Selfie - highly compatible across all devices
                 let mediaStream: MediaStream;
                 try {
-                    mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-                } catch (e) {
-                    console.warn("Retrying with standard selfie video constraints", e);
-                    // Constraint 2: Standard Selfie
                     mediaStream = await navigator.mediaDevices.getUserMedia({
                         video: { facingMode: 'user' }
+                    });
+                } catch (e) {
+                    console.warn("Retrying with any available video device", e);
+                    // Constraint 2: Fallback to any video capability
+                    mediaStream = await navigator.mediaDevices.getUserMedia({
+                        video: true
                     });
                 }
 

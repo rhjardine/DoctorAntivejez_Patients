@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, Camera } from 'lucide-react';
 import { motion } from 'framer-motion';
+import PublicHeader from '../../components/public/PublicHeader';
 
 const BG = '#F5F0E8';
 const BG_CARD = '#FDFAF4';
@@ -23,13 +24,19 @@ const TestsSelectorPage: React.FC = () => {
             display: 'flex', flexDirection: 'column', alignItems: 'center',
             fontFamily: 'Poppins, sans-serif', overflowX: 'hidden'
         }}>
+            <PublicHeader
+                theme="wellness"
+                title="Evaluación Inicial"
+                showBack={true}
+                onBack={() => navigate('/longevidad')}
+            />
             <div style={{ width: '100%', maxWidth: 440, padding: '0 24px 32px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    style={{ paddingTop: 48, textAlign: 'center', marginBottom: 32 }}
+                    style={{ paddingTop: 24, textAlign: 'center', marginBottom: 32 }}
                 >
                     <p style={{
                         fontSize: 11, letterSpacing: 2, color: EARTH,

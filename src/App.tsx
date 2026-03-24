@@ -68,6 +68,11 @@ const App: React.FC = () => {
   const navigate = useNavigate();
   const { session, logout, checkSession } = useAuthStore();
 
+  // ✅ ENHANCEMENT: Reset scroll on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   // ✅ ENHANCEMENT: Activate Dark Mode management
   useDarkMode();
   // ✅ ENHANCEMENT: Background Sync Queue Hook

@@ -192,7 +192,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     className="flex flex-col items-center mb-10"
                 >
-                    <img src="/Logo_azul_oscuro.png" alt="Doctor Antivejez" className="h-7 w-auto object-contain mb-2 opacity-80" />
+                    <img src="/Logo_azul_oscuro.png" alt="Doctor Antivejez" className="h-10 w-auto object-contain mb-2 opacity-80" />
                     <p className="text-[9px] uppercase tracking-[0.25em] font-black opacity-40 text-center">
                         Centro de Medicina Antienvejecimiento<br />
                         Plataforma de Longevidad Certificada
@@ -205,7 +205,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                         Tu Siguiente Paso
                     </p>
                     <h1 className="text-[28px] font-black leading-tight mb-3" style={{ color: WELLNESS.earthDark }}>
-                        {tipo === 'basica' ? 'Programa de Optimización' : 'Evaluación de Longevidad'}
+                        {tipo === 'basica' ? 'Programa de Optimización' : 'Edad Celular y Plan Personalizado de Longevidad'}
                     </h1>
                     <p className="text-[15px] font-semibold opacity-70" style={{ color: WELLNESS.textSecond }}>
                         {tipo === 'basica' ? '20 minutos · Virtual · Sin costo' : '45 minutos · Presencial o Virtual · USD 49'}
