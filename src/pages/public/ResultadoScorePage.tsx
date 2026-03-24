@@ -428,8 +428,22 @@ const ResultadoScorePage: React.FC = () => {
                         </button>
                     </motion.div>
                 )}
+                {/* ── LINK DISCRETO PACIENTES ── */}
+                <div className="text-center opacity-60 mb-6">
+                    <span className="text-[12px]" style={{ color: WELLNESS.bgCard }}>
+                        ¿Ya eres parte del programa?{' '}
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="underline font-bold"
+                            style={{ color: WELLNESS.bgCard }}
+                        >
+                            Ingresar →
+                        </button>
+                    </span>
+                </div>
+
                 {/* Final Footer */}
-                <p className="text-center text-[10px] font-black uppercase tracking-[0.25em] opacity-30 mt-8 mb-4" style={{ color: WELLNESS.bgCard }}>
+                <p className="text-center text-[10px] font-black uppercase tracking-[0.25em] opacity-30 mt-4 mb-4" style={{ color: WELLNESS.bgCard }}>
                     Creado por Vytalix.io
                 </p>
             </div>

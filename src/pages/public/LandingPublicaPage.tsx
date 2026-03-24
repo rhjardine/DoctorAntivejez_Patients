@@ -131,18 +131,7 @@ const LandingPublicaPage: React.FC = () => {
                     </motion.p>
                 </div>
 
-                {/* ── LINK DISCRETO PACIENTES ── */}
-                <div style={{ textAlign: 'center', opacity: 0.5, marginBottom: 16 }}>
-                    <span style={{ fontSize: 12, color: EARTH_DK }}>
-                        ¿Ya eres parte del programa?{' '}
-                        <span
-                            onClick={() => navigate('/login')}
-                            style={{ textDecoration: 'underline', cursor: 'pointer' }}
-                        >
-                            Ingresar →
-                        </span>
-                    </span>
-                </div>
+                <div className="h-4" />
 
                 {/* ── FOOTER ── */}
                 <div style={{

@@ -142,7 +142,7 @@ const TestAntivejezPage: React.FC = () => {
     const hasProgress = totalAnswered > 0;
     const { handleBack, showConfirm, confirmExit, cancelExit } = useExitConfirmation({
         hasProgress,
-        exitTo: '/longevidad',
+        exitTo: '/longevidad-tests',
         message: `Has respondido ${totalAnswered} de 45 preguntas. ¿Seguro que quieres salir?`
     });
 

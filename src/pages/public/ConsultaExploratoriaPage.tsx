@@ -385,6 +385,20 @@ const ConsultaExploratoriaPage: React.FC = () => {
                     </button>
                 </div>
 
+                {/* ── LINK DISCRETO PACIENTES ── */}
+                <div className="text-center opacity-60 mb-6 mt-4">
+                    <span className="text-[12px]" style={{ color: WELLNESS.earthDark }}>
+                        ¿Ya eres parte del programa?{' '}
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="underline font-bold"
+                            style={{ color: WELLNESS.earthDark }}
+                        >
+                            Ingresar →
+                        </button>
+                    </span>
+                </div>
+
                 {/* Final Footer */}
                 <p className="text-center text-[10px] font-black uppercase tracking-[0.25em] opacity-30">
                     Creado por Vytalix.io

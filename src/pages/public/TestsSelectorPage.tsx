@@ -127,26 +127,8 @@ const TestsSelectorPage: React.FC = () => {
                     </p>
                 </motion.div>
 
-                {/* CTA principal */}
-                <motion.button
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.35 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={handleStart}
-                    style={{
-                        width: '100%', background: TERRA, color: '#FDFAF4',
-                        border: 'none', borderRadius: 32, padding: '16px 0',
-                        fontSize: 16, fontWeight: 700, fontFamily: 'Poppins, sans-serif',
-                        cursor: 'pointer', marginBottom: 12
-                    }}
-                >
-                    Comenzar ahora
-                </motion.button>
-
-                <p style={{ fontSize: 12, color: TXT_SEC, opacity: 0.7, textAlign: 'center', marginBottom: 32 }}>
-                    Ambos análisis son gratuitos y orientativos.
+                <p style={{ fontSize: 13, color: TXT_SEC, opacity: 0.8, textAlign: 'center', marginBottom: 40, lineHeight: 1.5 }}>
+                    Selecciona uno de los métodos anteriores para iniciar tu evaluación de vitalidad.
                 </p>
 
                 {/* Footer */}

@@ -110,12 +110,13 @@ const AgeBotFacialPage: React.FC = () => {
         const start = async () => {
             setIsCameraLoading(true);
             try {
-                // Constraint 1: Ideal selfie mode
+                // Constraint 1: High-Precision Selfie (HD)
                 const constraints = {
                     video: {
                         facingMode: 'user',
-                        width: { ideal: 1024 },
-                        height: { ideal: 1024 }
+                        width: { ideal: 1920, min: 640 },
+                        height: { ideal: 1080, min: 480 },
+                        aspectRatio: { ideal: 1 }
                     }
                 };
 
@@ -123,26 +124,29 @@ const AgeBotFacialPage: React.FC = () => {
                 try {
                     mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 } catch (e) {
-                    console.warn("Retrying with simple video constraints", e);
-                    // Constraint 2: Fallback to any video
-                    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    console.warn("Retrying with standard selfie video constraints", e);
+                    // Constraint 2: Standard Selfie
+                    mediaStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user' }
+                    });
                 }
 
                 activeStream = mediaStream;
                 streamRef.current = mediaStream;
                 if (videoRef.current) {
                     videoRef.current.srcObject = mediaStream;
-                    // Force play in case autoplay is blocked or fails
-                    try {
-                        await videoRef.current.play();
-                    } catch (playErr) {
-                        console.error("Video play failed:", playErr);
-                    }
+                    videoRef.current.onloadedmetadata = async () => {
+                        try {
+                            await videoRef.current?.play();
+                            setIsCameraLoading(false);
+                        } catch (pErr) {
+                            console.error("Play failed:", pErr);
+                        }
+                    };
                 }
             } catch (err) {
                 console.error("Camera access failed entirely:", err);
                 setCameraError(true);
-            } finally {
                 setIsCameraLoading(false);
             }
         };
@@ -214,7 +218,7 @@ const AgeBotFacialPage: React.FC = () => {
                 theme="wellness"
                 title={capturedImage ? "Análisis Facial" : "AgeBot Facial"}
                 showBack={true}
-                onBack={() => navigate('/longevidad')}
+                onBack={() => navigate('/longevidad-tests')}
             />
 
             {/* Hidden canvas for capture */}
@@ -243,15 +247,41 @@ const AgeBotFacialPage: React.FC = () => {
                                                 <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Iniciando cámara...</p>
                                             </div>
                                         )}
-                                        {/* Ellipse guide overlay */}
+                                        {/* Ellipse guide overlay - High Precision HUD */}
                                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                             <div className="relative">
-                                                <div className="w-52 h-64 rounded-full"
-                                                    style={{ border: `2px solid ${WELLNESS.sage}88`, boxShadow: `0 0 0 4000px rgba(0,0,0,0.5)` }} />
-                                                <p className="absolute -bottom-8 left-0 right-0 text-center text-xs font-medium"
-                                                    style={{ color: 'rgba(255,255,255,0.9)' }}>
-                                                    Centra tu rostro aquí
-                                                </p>
+                                                {/* Scanning Bar Animation */}
+                                                {!isCameraLoading && (
+                                                    <motion.div
+                                                        className="absolute left-0 right-0 h-1 bg-sage/40 z-20"
+                                                        style={{ background: `${WELLNESS.sage}88`, boxShadow: `0 0 15px ${WELLNESS.sage}` }}
+                                                        animate={{ top: ['15%', '85%', '15%'] }}
+                                                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                                    />
+                                                )}
+
+                                                <div className="w-56 h-72 rounded-[40%] border-2"
+                                                    style={{
+                                                        borderColor: isCameraLoading ? 'rgba(255,255,255,0.2)' : `${WELLNESS.sage}88`,
+                                                        boxShadow: `0 0 0 4000px rgba(0,0,0,0.6)`
+                                                    }}>
+                                                    {/* HUD Corners */}
+                                                    <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
+                                                    <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
+                                                    <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
+                                                    <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
+                                                </div>
+
+                                                <div className="absolute -bottom-12 left-0 right-0 flex flex-col items-center gap-1">
+                                                    <p className="text-[10px] font-black uppercase tracking-[0.2em]"
+                                                        style={{ color: WELLNESS.sage }}>
+                                                        {isCameraLoading ? 'Sincronizando...' : 'Calibración Óptica Activa'}
+                                                    </p>
+                                                    <p className="text-[13px] font-medium"
+                                                        style={{ color: 'rgba(255,255,255,0.9)' }}>
+                                                        Centra tu rostro para análisis vital
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </>
