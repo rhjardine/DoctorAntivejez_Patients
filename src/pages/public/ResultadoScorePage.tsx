@@ -402,7 +402,7 @@ const ResultadoScorePage: React.FC = () => {
                                     USD 49 · 45 min
                                 </span>
                             </div>
-                            <p className="font-bold text-[14px]" style={{ color: WELLNESS.bgCard }}>Acompañamiento Médico</p>
+                            <p className="font-bold text-[14px]" style={{ color: WELLNESS.bgCard }}>Evaluación de Longevidad</p>
                             <p className="text-[12px] mt-1 leading-snug" style={{ color: `${WELLNESS.bgCard}8C` }}>
                                 Evaluación biofísica completa con especialista + reporte de optimización
                             </p>
@@ -428,6 +428,10 @@ const ResultadoScorePage: React.FC = () => {
                         </button>
                     </motion.div>
                 )}
+                {/* Final Footer */}
+                <p className="text-center text-[10px] font-black uppercase tracking-[0.25em] opacity-30 mt-8 mb-4" style={{ color: WELLNESS.bgCard }}>
+                    Creado por Vytalix.io
+                </p>
             </div>
         </div>
     );

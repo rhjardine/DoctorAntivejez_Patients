@@ -208,22 +208,22 @@ const TestAntivejezPage: React.FC = () => {
                                         borderRadius: 16,
                                         boxShadow: '0 4px 14px rgba(0,0,0,0.03)'
                                     }}>
-                                    <p className="text-[10px] font-black uppercase mb-1.5" style={{ color: WELLNESS.sage }}>
+                                    <p className="text-[12px] font-black uppercase mb-2" style={{ color: WELLNESS.sage, letterSpacing: '0.1em' }}>
                                         PREGUNTA {qNumber}
                                     </p>
-                                    <p className="text-[15px] font-medium mb-5 leading-snug" style={{ color: WELLNESS.earthDark }}>
+                                    <p className="text-[18px] font-bold mb-6 leading-snug" style={{ color: WELLNESS.earthDark }}>
                                         {q.text}
                                     </p>
                                     <div className="flex gap-2.5">
                                         {/* SÍ */}
                                         <button
                                             onClick={() => answer(q.id, true)}
-                                            className="flex-1 py-3 rounded-2xl text-sm transition-all duration-150 active:scale-95"
+                                            className="flex-1 py-4 rounded-2xl text-[16px] transition-all duration-150 active:scale-95 shadow-sm"
                                             style={{
                                                 background: val === true ? WELLNESS.sage : 'transparent',
-                                                color: val === true ? 'white' : WELLNESS.textHint,
-                                                fontWeight: val === true ? 700 : 500,
-                                                border: `1px solid ${val === true ? WELLNESS.sage : `${WELLNESS.earth}33`}`,
+                                                color: val === true ? 'white' : WELLNESS.sage,
+                                                fontWeight: 800,
+                                                border: `2px solid ${val === true ? WELLNESS.sage : `${WELLNESS.sage}40`}`,
                                             }}
                                         >
                                             SÍ
@@ -231,12 +231,12 @@ const TestAntivejezPage: React.FC = () => {
                                         {/* NO */}
                                         <button
                                             onClick={() => answer(q.id, false)}
-                                            className="flex-1 py-3 rounded-2xl text-sm transition-all duration-150 active:scale-95"
+                                            className="flex-1 py-4 rounded-2xl text-[16px] transition-all duration-150 active:scale-95 shadow-sm"
                                             style={{
-                                                background: val === false ? `${WELLNESS.earth}1A` : 'transparent',
-                                                color: val === false ? WELLNESS.earth : WELLNESS.textHint,
-                                                fontWeight: val === false ? 700 : 500,
-                                                border: `1px solid ${val === false ? `${WELLNESS.earth}4D` : `${WELLNESS.earth}33`}`,
+                                                background: val === false ? WELLNESS.nut : 'transparent',
+                                                color: val === false ? 'white' : WELLNESS.nut,
+                                                fontWeight: 800,
+                                                border: `2px solid ${val === false ? WELLNESS.nut : `${WELLNESS.nut}40`}`,
                                             }}
                                         >
                                             NO
@@ -274,8 +274,8 @@ const TestAntivejezPage: React.FC = () => {
                         <>Ver mis Resultados <ChevronRight size={18} /></>
                     )}
                 </button>
-                <p className="text-center text-[10px] mt-2 font-medium" style={{ color: WELLNESS.textSecond }}>
-                    {totalAnswered}/45 respondidas
+                <p className="text-center text-[10px] mt-2 font-black uppercase tracking-[0.2em] opacity-40" style={{ color: WELLNESS.textSecond }}>
+                    Creado por Vytalix.io
                 </p>
             </div>
         </div>

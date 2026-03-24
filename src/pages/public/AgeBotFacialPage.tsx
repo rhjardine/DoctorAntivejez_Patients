@@ -99,24 +99,63 @@ const AgeBotFacialPage: React.FC = () => {
     const [result, setResult] = useState<FacialResult | null>(null);
     const [errorMsg, setErrorMsg] = useState<string>('');
     const [cameraError, setCameraError] = useState(false);
+    const [isCameraLoading, setIsCameraLoading] = useState(false);
 
-    // Start front-facing camera for selfie
+    // Start front-facing camera for selfie with resilient fallback
     useEffect(() => {
         if (phase !== 'capture' || cameraError) return;
+
+        let activeStream: MediaStream | null = null;
+
         const start = async () => {
+            setIsCameraLoading(true);
             try {
-                // Try front camera first (selfie), fallback to environment
-                const mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } }
-                });
+                // Constraint 1: Ideal selfie mode
+                const constraints = {
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 1024 },
+                        height: { ideal: 1024 }
+                    }
+                };
+
+                let mediaStream: MediaStream;
+                try {
+                    mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+                } catch (e) {
+                    console.warn("Retrying with simple video constraints", e);
+                    // Constraint 2: Fallback to any video
+                    mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                }
+
+                activeStream = mediaStream;
                 streamRef.current = mediaStream;
-                if (videoRef.current) videoRef.current.srcObject = mediaStream;
-            } catch {
+                if (videoRef.current) {
+                    videoRef.current.srcObject = mediaStream;
+                    // Force play in case autoplay is blocked or fails
+                    try {
+                        await videoRef.current.play();
+                    } catch (playErr) {
+                        console.error("Video play failed:", playErr);
+                    }
+                }
+            } catch (err) {
+                console.error("Camera access failed entirely:", err);
                 setCameraError(true);
+            } finally {
+                setIsCameraLoading(false);
             }
         };
+
         start();
-        return () => { streamRef.current?.getTracks().forEach(t => t.stop()); };
+
+        return () => {
+            activeStream?.getTracks().forEach(t => t.stop());
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(t => t.stop());
+                streamRef.current = null;
+            }
+        };
     }, [phase, cameraError]);
 
     const capturePhoto = () => {
@@ -194,8 +233,16 @@ const AgeBotFacialPage: React.FC = () => {
                                 {!cameraError ? (
                                     <>
                                         <video ref={videoRef} autoPlay playsInline muted
+                                            onLoadedData={() => setIsCameraLoading(false)}
                                             className="w-full h-full object-cover"
                                             style={{ transform: 'scaleX(-1)' }} />
+
+                                        {isCameraLoading && (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-30">
+                                                <Loader2 size={40} className="animate-spin text-white mb-3" />
+                                                <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Iniciando cámara...</p>
+                                            </div>
+                                        )}
                                         {/* Ellipse guide overlay */}
                                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                             <div className="relative">

@@ -57,7 +57,7 @@ import { offlineQueue } from './services/offlineQueue';
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { session } = useAuthStore();
   if (!session) {
-    return <Navigate to="/welcome" replace />;
+    return <Navigate to="/longevidad" replace />;
   }
   return <>{children}</>;
 };
@@ -168,7 +168,7 @@ const App: React.FC = () => {
   // This needs to be moved to a proper global manager in Phase 5
   const notificationControls = useReminders([]);
 
-  const isLoginPage = location.pathname === '/login' || location.pathname === '/welcome';
+  const isLoginPage = location.pathname === '/login';
   const PUBLIC_ROUTES = ['/longevidad', '/test', '/agebot', '/resultado', '/consulta'];
   const isPublicRoute = PUBLIC_ROUTES.some(r => location.pathname.startsWith(r));
   const showHeaderFooter = session && !isLoginPage && !isPublicRoute;
@@ -251,7 +251,6 @@ const App: React.FC = () => {
       <main className={`flex-1 overflow-y-auto no-scrollbar relative ${isPublicRoute ? '' : 'bg-[var(--background)]'}`} style={{ paddingBottom: isPublicRoute ? '0' : 'max(80px, env(safe-area-inset-bottom, 0px) + 64px)' }}>
         <Suspense fallback={<div className="flex items-center justify-center h-screen" style={{ background: '#293B64' }}><div className="w-8 h-8 border-2 border-[#23BCEF] border-t-transparent rounded-full animate-spin" /></div>}>
           <Routes>
-            <Route path="/welcome" element={<WelcomePage />} />
             <Route path="/login" element={<LoginPage />} />
 
             <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
