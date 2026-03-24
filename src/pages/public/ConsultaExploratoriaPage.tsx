@@ -11,7 +11,7 @@ import { MEDICAL_NETWORK } from '../../data/medicalNetwork';
 
 const WHATSAPP_NUMBER = '18296440000'; // TODO: set real number
 
-type ConsultaType = 'basica' | 'profunda';
+type ConsultaType = 'basica' | 'profunda' | 'avanzado';
 type SubmitState = 'idle' | 'sending' | 'confirmed' | 'error';
 
 /* ─── Benefits per type ─────────────────────────────────────────────── */
@@ -28,6 +28,12 @@ const BENEFITS: Record<ConsultaType, { emoji: string; text: string }[]> = {
         { emoji: '📊', text: 'Plan de acción personalizado 30 día' },
         { emoji: '📱', text: 'Acceso a la plataforma de Longevidad — 30 días' },
         { emoji: '💬', text: 'Seguimiento por WhatsApp con el equipo médico' },
+    ],
+    avanzado: [
+        { emoji: '🩺', text: 'Evaluación integral con equipo multidisciplinario' },
+        { emoji: '🧬', text: 'Biomarcadores avanzados y análisis genético' },
+        { emoji: '⭐', text: 'Plan maestro de salud y longevidad' },
+        { emoji: '🎯', text: 'Monitoreo continuo y ajustes personalizados' },
     ],
 };
 

@@ -16,6 +16,7 @@ const AgeBotFacial = React.lazy(() => import('./pages/public/AgeBotFacialPage'))
 const ResultadoScore = React.lazy(() => import('./pages/public/ResultadoScorePage'));
 const ConsultaExploratoria = React.lazy(() => import('./pages/public/ConsultaExploratoriaPage'));
 const MedicalNetwork = React.lazy(() => import('./pages/public/MedicalNetworkPage'));
+const TestsSelector = React.lazy(() => import('./pages/public/TestsSelectorPage'));
 
 // Pages
 import WelcomePage from './pages/WelcomePage';
@@ -169,7 +170,7 @@ const App: React.FC = () => {
   const notificationControls = useReminders([]);
 
   const isLoginPage = location.pathname === '/login';
-  const PUBLIC_ROUTES = ['/longevidad', '/test', '/agebot', '/resultado', '/consulta'];
+  const PUBLIC_ROUTES = ['/longevidad', '/longevidad-tests', '/test', '/agebot', '/resultado', '/consulta', '/medicos'];
   const isPublicRoute = PUBLIC_ROUTES.some(r => location.pathname.startsWith(r));
   const showHeaderFooter = session && !isLoginPage && !isPublicRoute;
   const isHome = location.pathname === '/';
@@ -278,6 +279,8 @@ const App: React.FC = () => {
 
             {/* Public growth engine routes — no auth required */}
             <Route path="/longevidad" element={<LandingPublica />} />
+            <Route path="/longevidad-tests" element={<TestsSelector />} />
+            <Route path="/welcome" element={<Navigate to="/longevidad" replace />} />
             <Route path="/test" element={<TestAntivejez />} />
             <Route path="/agebot" element={<AgeBotFacial />} />
             <Route path="/resultado" element={<ResultadoScore />} />

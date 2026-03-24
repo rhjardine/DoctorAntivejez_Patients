@@ -211,32 +211,63 @@ const TestAntivejezPage: React.FC = () => {
                                     <p className="text-[12px] font-black uppercase mb-2" style={{ color: WELLNESS.sage, letterSpacing: '0.1em' }}>
                                         PREGUNTA {qNumber}
                                     </p>
-                                    <p className="text-[18px] font-bold mb-6 leading-snug" style={{ color: WELLNESS.earthDark }}>
+                                    <p className="text-[16px] font-medium mb-6 leading-snug" style={{ color: '#5C4A32' }}>
                                         {q.text}
                                     </p>
                                     <div className="flex gap-2.5">
-                                        {/* SÍ */}
+                                        {/* Botón SÍ */}
                                         <button
                                             onClick={() => answer(q.id, true)}
-                                            className="flex-1 py-4 rounded-2xl text-[16px] transition-all duration-150 active:scale-95 shadow-sm"
                                             style={{
-                                                background: val === true ? WELLNESS.sage : 'transparent',
-                                                color: val === true ? 'white' : WELLNESS.sage,
-                                                fontWeight: 800,
-                                                border: `2px solid ${val === true ? WELLNESS.sage : `${WELLNESS.sage}40`}`,
+                                                flex: 1,
+                                                padding: '13px 0',
+                                                borderRadius: 16,
+                                                fontSize: val === true ? 16 : 14,
+                                                fontWeight: val === true ? 800 : 500,
+                                                fontFamily: 'Poppins, sans-serif',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.15s ease',
+                                                transform: val === true ? 'scale(1.02)' : 'scale(1)',
+                                                ...(val === true ? {
+                                                    background: '#7C9A7E',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    boxShadow: '0 2px 8px rgba(124,154,126,0.4)',
+                                                } : {
+                                                    background: 'transparent',
+                                                    color: '#A89880',
+                                                    border: '1px solid rgba(139,115,85,0.25)',
+                                                    boxShadow: 'none',
+                                                })
                                             }}
                                         >
                                             SÍ
                                         </button>
-                                        {/* NO */}
+
+                                        {/* Botón NO */}
                                         <button
                                             onClick={() => answer(q.id, false)}
-                                            className="flex-1 py-4 rounded-2xl text-[16px] transition-all duration-150 active:scale-95 shadow-sm"
                                             style={{
-                                                background: val === false ? WELLNESS.nut : 'transparent',
-                                                color: val === false ? 'white' : WELLNESS.nut,
-                                                fontWeight: 800,
-                                                border: `2px solid ${val === false ? WELLNESS.nut : `${WELLNESS.nut}40`}`,
+                                                flex: 1,
+                                                padding: '13px 0',
+                                                borderRadius: 16,
+                                                fontSize: val === false ? 16 : 14,
+                                                fontWeight: val === false ? 800 : 500,
+                                                fontFamily: 'Poppins, sans-serif',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.15s ease',
+                                                transform: val === false ? 'scale(1.02)' : 'scale(1)',
+                                                ...(val === false ? {
+                                                    background: '#5C4A32',
+                                                    color: '#FDFAF4',
+                                                    border: 'none',
+                                                    boxShadow: '0 2px 8px rgba(92,74,50,0.25)',
+                                                } : {
+                                                    background: 'transparent',
+                                                    color: '#A89880',
+                                                    border: '1px solid rgba(139,115,85,0.25)',
+                                                    boxShadow: 'none',
+                                                })
                                             }}
                                         >
                                             NO
