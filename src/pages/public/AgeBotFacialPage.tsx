@@ -137,8 +137,15 @@ const AgeBotFacialPage: React.FC = () => {
                         }
                     };
                 }
-            } catch (err) {
+            } catch (err: any) {
                 console.error("Camera access failed entirely:", err);
+                const errorName = err.name || 'UnknownError';
+                let msg = 'No se pudo acceder a la cámara.';
+                if (errorName === 'NotAllowedError') msg = 'Permiso denegado. Activa la cámara en los ajustes del navegador.';
+                else if (errorName === 'NotFoundError') msg = 'No se encontró ninguna cámara disponible.';
+                else if (errorName === 'NotReadableError') msg = 'La cámara está siendo usada por otra aplicación.';
+
+                setErrorMsg(msg);
                 setCameraError(true);
                 setIsCameraLoading(false);
             }
@@ -203,6 +210,12 @@ const AgeBotFacialPage: React.FC = () => {
         setErrorMsg('');
         setCameraError(false);
         setPhase('capture');
+    };
+
+    const retryCamera = () => {
+        setCameraError(false);
+        setErrorMsg('');
+        // This will trigger the useEffect to try starting again
     };
 
     return (
@@ -281,15 +294,21 @@ const AgeBotFacialPage: React.FC = () => {
                                 ) : (
                                     /* Camera unavailable — show upload only */
                                     <div className="flex flex-col items-center justify-center text-center px-8 z-10 p-6 rounded-3xl backdrop-blur-md" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                        <Camera size={48} className="mb-4" style={{ color: WELLNESS.earth }} />
-                                        <p className="text-white/90 text-sm mb-6 font-medium">
-                                            La cámara no está disponible. Sube una foto tuya.
+                                        <AlertTriangle size={48} className="mb-4 text-amber-500" />
+                                        <p className="text-white font-bold text-lg mb-2">Cámara no disponible</p>
+                                        <p className="text-white/70 text-sm mb-6 font-medium">
+                                            {errorMsg || 'La cámara no se pudo iniciar correctamente.'}
                                         </p>
-                                        <button onClick={() => fileInputRef.current?.click()}
-                                            className="px-6 py-3 rounded-full font-bold text-sm transition-transform active:scale-95"
-                                            style={{ background: WELLNESS.terracotta, color: WELLNESS.bgCard }}>
-                                            Seleccionar foto
-                                        </button>
+                                        <div className="flex flex-col w-full gap-3">
+                                            <button onClick={retryCamera}
+                                                className="w-full py-4 rounded-full font-bold text-sm transition-transform active:scale-95 bg-white text-black">
+                                                Reintentar conexión
+                                            </button>
+                                            <button onClick={() => fileInputRef.current?.click()}
+                                                className="w-full py-3 rounded-full font-bold text-xs transition-transform active:scale-95 border border-white/30 text-white">
+                                                Subir foto manualmente
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
                             </div>

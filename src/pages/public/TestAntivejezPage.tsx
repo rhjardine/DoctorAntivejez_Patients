@@ -157,7 +157,13 @@ const TestAntivejezPage: React.FC = () => {
     const next = () => {
         if (currentGroup < 5) {
             setCurrentGroup(prev => (prev + 1) as 1 | 2 | 3 | 4 | 5);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // ✅ ENHANCEMENT: Scroll correctly targeting main container
+            const mainContainer = document.getElementById('vytalix-main-container');
+            if (mainContainer) {
+                mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         } else {
             // Guarda y avanza al resultado (Stage 2)
             const resultado = calcularScore(answers);
@@ -171,13 +177,6 @@ const TestAntivejezPage: React.FC = () => {
 
     return (
         <div className="min-h-screen flex flex-col relative" style={{ background: WELLNESS.bg }}>
-            <ExitConfirmModal
-                isOpen={showConfirm}
-                onConfirm={confirmExit}
-                onCancel={cancelExit}
-                message={`Has respondido ${Object.keys(answers).length} de 45 preguntas. ¿Seguro que quieres salir?`}
-            />
-
             <PublicHeader
                 theme="wellness"
                 showBack={true}
@@ -309,6 +308,13 @@ const TestAntivejezPage: React.FC = () => {
                     Creado por Vytalix.io
                 </p>
             </div>
+
+            <ExitConfirmModal
+                isOpen={showConfirm}
+                onConfirm={confirmExit}
+                onCancel={cancelExit}
+                message={`Has respondido ${Object.keys(answers).length} de 45 preguntas. ¿Seguro que quieres salir?`}
+            />
         </div>
     );
 };

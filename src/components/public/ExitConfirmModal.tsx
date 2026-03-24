@@ -18,7 +18,7 @@ export const ExitConfirmModal: React.FC<ExitConfirmModalProps> = ({
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] px-6">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[999] px-6">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}

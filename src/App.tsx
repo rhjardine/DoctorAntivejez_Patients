@@ -70,7 +70,12 @@ const App: React.FC = () => {
 
   // ✅ ENHANCEMENT: Reset scroll on route change
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const mainContainer = document.getElementById('vytalix-main-container');
+    if (mainContainer) {
+      mainContainer.scrollTo(0, 0);
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, [location.pathname]);
 
   // ✅ ENHANCEMENT: Activate Dark Mode management
@@ -254,7 +259,7 @@ const App: React.FC = () => {
         </header>
       )}
 
-      <main className={`flex-1 overflow-y-auto no-scrollbar relative ${isPublicRoute ? '' : 'bg-[var(--background)]'}`} style={{ paddingBottom: isPublicRoute ? '0' : 'max(80px, env(safe-area-inset-bottom, 0px) + 64px)' }}>
+      <main id="vytalix-main-container" className={`flex-1 overflow-y-auto no-scrollbar relative ${isPublicRoute ? '' : 'bg-[var(--background)]'}`} style={{ paddingBottom: isPublicRoute ? '0' : 'max(80px, env(safe-area-inset-bottom, 0px) + 64px)' }}>
         <Suspense fallback={<div className="flex items-center justify-center h-screen" style={{ background: '#293B64' }}><div className="w-8 h-8 border-2 border-[#23BCEF] border-t-transparent rounded-full animate-spin" /></div>}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
