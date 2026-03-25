@@ -83,6 +83,7 @@ function barColor(v: number) {
 const ResultadoScorePage: React.FC = () => {
     const navigate = useNavigate();
     const [result, setResult] = useState<TestResult | null>(null);
+    const [selectedTier, setSelectedTier] = useState<'basica' | 'profunda' | null>(null);
 
     // Lead capture state
     const [leadName, setLeadName] = useState('');
@@ -415,11 +416,18 @@ const ResultadoScorePage: React.FC = () => {
                             Elige tu siguiente paso
                         </p>
 
-                        {/* Opción A — Programa de Optimización */}
+                        {/* Opción A — Programa de Optimización (Gratis) */}
                         <button
-                            onClick={() => navigate('/consulta?tipo=basica')}
+                            onClick={() => setSelectedTier('basica')}
                             className="w-full text-left rounded-2xl p-4 transition-all active:scale-95"
-                            style={{ border: `1.5px solid rgba(255,255,255,0.2)`, background: 'transparent' }}
+                            style={{
+                                border: selectedTier === 'basica'
+                                    ? `2px solid ${WELLNESS.earth}`
+                                    : `1.5px solid rgba(255,255,255,0.20)`,
+                                background: selectedTier === 'basica'
+                                    ? 'rgba(139,115,85,0.08)'
+                                    : 'transparent'
+                            }}
                         >
                             <div className="flex items-center gap-2 mb-1.5">
                                 <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full"
@@ -431,6 +439,22 @@ const ResultadoScorePage: React.FC = () => {
                             <p className="text-[12px] mt-1 leading-snug" style={{ color: `${WELLNESS.bgCard}8C` }}>
                                 Revisión de tu score con un profesional médico y definición de tus 2 prioridades
                             </p>
+
+                            {selectedTier === 'basica' && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                                    className="overflow-hidden mt-3"
+                                >
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); navigate('/consulta?tipo=basica'); }}
+                                        className="w-full py-3 rounded-full font-bold text-[13px] transition-all active:scale-95"
+                                        style={{ background: WELLNESS.tealMicro, color: WELLNESS.earthDark }}
+                                    >
+                                        Continuar con esta opción →
+                                    </button>
+                                </motion.div>
+                            )}
+
                             <div className="mt-2.5 flex flex-col gap-1">
                                 {['Análisis de tus 5 dimensiones', 'Identificación de áreas críticas', 'Recomendaciones iniciales del equipo médico'].map(b => (
                                     <p key={b} className="text-[11px] flex items-start gap-1.5" style={{ color: `${WELLNESS.bgCard}80` }}>
@@ -440,11 +464,18 @@ const ResultadoScorePage: React.FC = () => {
                             </div>
                         </button>
 
-                        {/* Opción B — Acompañamiento Médico */}
+                        {/* Opción B — Acompañamiento Médico (USD 49) */}
                         <button
-                            onClick={() => navigate('/consulta?tipo=profunda')}
+                            onClick={() => setSelectedTier('profunda')}
                             className="w-full text-left rounded-2xl p-4 relative transition-all active:scale-95"
-                            style={{ border: `1.5px solid ${WELLNESS.tealMicro}`, background: `${WELLNESS.tealMicro}18` }}
+                            style={{
+                                border: selectedTier === 'profunda'
+                                    ? `2px solid ${WELLNESS.tealMicro}`
+                                    : `1px solid rgba(78,205,196,0.35)`,
+                                background: selectedTier === 'profunda'
+                                    ? `${WELLNESS.tealMicro}18`
+                                    : 'transparent'
+                            }}
                         >
                             <span className="absolute top-3 right-3 text-[9px] font-black uppercase px-2 py-0.5 rounded-full"
                                 style={{ background: WELLNESS.tealMicro, color: WELLNESS.earthDark }}>
@@ -460,6 +491,22 @@ const ResultadoScorePage: React.FC = () => {
                             <p className="text-[12px] mt-1 leading-snug" style={{ color: `${WELLNESS.bgCard}8C` }}>
                                 Evaluación biofísica completa con especialista + reporte de optimización
                             </p>
+
+                            {selectedTier === 'profunda' && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+                                    className="overflow-hidden mt-3"
+                                >
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); navigate('/consulta?tipo=profunda'); }}
+                                        className="w-full py-3 rounded-full font-bold text-[13px] transition-all active:scale-95"
+                                        style={{ background: WELLNESS.tealMicro, color: WELLNESS.earthDark }}
+                                    >
+                                        Continuar con esta opción →
+                                    </button>
+                                </motion.div>
+                            )}
+
                             <div className="mt-2.5 flex flex-col gap-1">
                                 {[
                                     'Evaluación biofísica con especialista',

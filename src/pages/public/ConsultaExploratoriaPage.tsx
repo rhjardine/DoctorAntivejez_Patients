@@ -142,6 +142,17 @@ const ConsultaExploratoriaPage: React.FC = () => {
     const [card, setCard] = useState({ number: '', expiry: '', cvc: '', holder: '' });
     const [submitState, setSubmitState] = useState<SubmitState>('idle');
 
+    // ── FIX 4: Cleanup session flags ──
+    useEffect(() => {
+        // Clean up bridge flags when entering the form
+        sessionStorage.removeItem('da_result_source');
+
+        return () => {
+            // Also clean up on unmount if needed
+            sessionStorage.removeItem('da_result_source');
+        };
+    }, []);
+
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
     const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) =>
