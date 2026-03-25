@@ -106,6 +106,8 @@ const AgeBotFacialPage: React.FC = () => {
     const [isCameraLoading, setIsCameraLoading] = useState(false);
     const [cameraActive, setCameraActive] = useState(false); // ✅ true once video is live
     const [cameraRequested, setCameraRequested] = useState(false);
+    const [retryCount, setRetryCount] = useState(0); // ✅ Handle re-initialization explicitly
+    const [retrying, setRetrying] = useState(false); // ✅ Visual feedback for retry action
 
     /* ─── FIX 1: WebRTC — Robust camera initialization ──────────────────── */
     const startCamera = useCallback(async () => {
@@ -119,12 +121,17 @@ const AgeBotFacialPage: React.FC = () => {
         try {
             let mediaStream: MediaStream;
             try {
-                // Preferred: front-facing
+                // Preferred: front-facing (selfie) with ideal constraint for compatibility
                 mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                    video: {
+                        facingMode: { ideal: 'user' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
                     audio: false,
                 });
-            } catch {
+            } catch (prefErr) {
+                console.warn('[AgeBot] Ideal front-facing failed, falling back to any camera:', prefErr);
                 // Fallback: any camera
                 mediaStream = await navigator.mediaDevices.getUserMedia({
                     video: true,
@@ -173,7 +180,7 @@ const AgeBotFacialPage: React.FC = () => {
             streamRef.current = null;
             setCameraActive(false);
         };
-    }, [cameraRequested, phase, cameraError, startCamera]);
+    }, [cameraRequested, phase, cameraError, startCamera, retryCount]); // ✅ Inclusion of retryCount
 
     /* ─── FIX 2: Capture with Anti-False-Positive guard ─────────────────── */
     const capturePhoto = () => {
@@ -254,10 +261,14 @@ const AgeBotFacialPage: React.FC = () => {
         setPhase('capture');
     };
 
-    const retryCamera = () => {
+    const handleRetry = async () => {
+        setRetrying(true);
         setCameraError(false);
         setErrorMsg('');
-        setCameraRequested(true);
+        // Brief delay to allow React to clear the error state and hit the useEffect
+        await new Promise(r => setTimeout(r, 400));
+        setRetryCount(prev => prev + 1);
+        setRetrying(false);
     };
 
     /* ─── FIX 3: Correct final CTA — save to store then navigate ─────────── */
@@ -372,12 +383,12 @@ const AgeBotFacialPage: React.FC = () => {
                                                     Activar Cámara
                                                 </button>
 
-                                                {/* SECONDARY: subtle text link */}
+                                                {/* SECONDARY: subtle text link — Gallery */}
                                                 <button
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className="mt-5 text-sm underline decoration-gray-300 pointer-events-auto"
+                                                    className="mt-5 text-sm underline decoration-gray-300 pointer-events-auto hover:text-gray-400 transition-colors"
                                                     style={{ color: '#9ca3af' }}>
-                                                    O subir foto desde galería
+                                                    Subir foto desde galería
                                                 </button>
                                             </div>
                                         )}
@@ -387,17 +398,19 @@ const AgeBotFacialPage: React.FC = () => {
                                     <div className="flex flex-col items-center justify-center text-center px-8 z-10 p-6 h-full">
                                         <AlertTriangle size={48} className="mb-4 text-amber-500" />
                                         <p className="font-bold text-lg mb-2" style={{ color: WELLNESS.earthDark }}>Cámara no disponible</p>
-                                        <p className="text-sm mb-8 font-medium" style={{ color: '#6b7280' }}>
-                                            {errorMsg || 'La cámara no se pudo iniciar correctamente.'}
+                                        <p className="text-sm mb-8 font-medium leading-relaxed" style={{ color: '#6b7280' }}>
+                                            {errorMsg || 'Permiso de cámara denegado o no disponible en este navegador. Actívalo en los ajustes del navegador, o sube una foto.'}
                                         </p>
                                         <div className="flex flex-col w-full gap-3 max-w-[240px]">
-                                            <button onClick={retryCamera}
-                                                className="w-full py-4 rounded-xl font-bold text-sm transition-transform active:scale-95 bg-white border border-gray-200 shadow-sm pointer-events-auto"
+                                            <button
+                                                onClick={handleRetry}
+                                                disabled={retrying}
+                                                className="w-full py-4 rounded-xl font-bold text-sm transition-all active:scale-95 bg-white border border-gray-200 shadow-sm pointer-events-auto disabled:opacity-50 disabled:cursor-not-allowed"
                                                 style={{ color: WELLNESS.earthDark }}>
-                                                Reintentar conexión
+                                                {retrying ? 'Reintentando...' : 'Reintentar cámara'}
                                             </button>
                                             <button onClick={() => fileInputRef.current?.click()}
-                                                className="mt-2 text-sm underline decoration-gray-300 pointer-events-auto"
+                                                className="mt-2 text-sm underline decoration-gray-300 pointer-events-auto hover:text-gray-400"
                                                 style={{ color: '#9ca3af' }}>
                                                 Subir foto manual
                                             </button>
@@ -409,10 +422,10 @@ const AgeBotFacialPage: React.FC = () => {
                             {/* ── Shutter controls — FIX 2: disabled until readyState = 4 ── */}
                             {!cameraError && cameraRequested && (
                                 <div className="py-8 flex items-center justify-around px-8 mt-2">
-                                    {/* Secondary: upload icon */}
+                                    {/* Secondary: upload icon (Gallery) */}
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="w-14 h-14 rounded-full flex items-center justify-center transition-colors hover:bg-black/5"
+                                        className="w-14 h-14 rounded-full flex items-center justify-center transition-all hover:bg-black/5 active:scale-90"
                                         style={{ border: `1px solid ${WELLNESS.earth}22` }}>
                                         <ImageIcon size={22} style={{ color: WELLNESS.earth }} />
                                     </button>
