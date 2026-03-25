@@ -147,6 +147,18 @@ const TestAntivejezPage: React.FC = () => {
         message: `Has respondido ${totalAnswered} de 45 preguntas. ¿Seguro que quieres salir?`
     });
 
+    // ── FIX 1: Scroll to top on mount ──────────────────────────────────
+    useEffect(() => {
+        const scrollToTop = () => {
+            scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+            window.scrollTo({ top: 0, behavior: 'instant' });
+            document.getElementById('vytalix-main-container')?.scrollTo({ top: 0, behavior: 'instant' });
+        };
+        scrollToTop();
+        // Fallback for slower mobile renders
+        setTimeout(scrollToTop, 100);
+    }, []);
+
     const groupQuestions = QUESTIONS.filter(q => q.group === currentGroup);
     const allAnswered = groupQuestions.every(q => q.id in answers);
     // const progress = (currentGroup - 1) / 5; // This is no longer needed as PublicHeader handles progress
@@ -158,16 +170,18 @@ const TestAntivejezPage: React.FC = () => {
     const next = () => {
         if (currentGroup < 5) {
             setCurrentGroup(prev => (prev + 1) as 1 | 2 | 3 | 4 | 5);
-            // ✅ ENHANCEMENT: Scroll correctly targeting main container and local container
-            if (scrollRef.current) {
-                scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-            const mainContainer = document.getElementById('vytalix-main-container');
-            if (mainContainer) {
-                mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
+            // ── FIX 2: Scroll properly after group change (with delay) ──
+            setTimeout(() => {
+                if (scrollRef.current) {
+                    scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                const mainContainer = document.getElementById('vytalix-main-container');
+                if (mainContainer) {
+                    mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }, 50);
         } else {
             // Guarda y avanza al resultado (Stage 2)
             const resultado = calcularScore(answers);
@@ -190,7 +204,11 @@ const TestAntivejezPage: React.FC = () => {
             />
 
             {/* Questions */}
-            <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-4 pb-36">
+            {/* ── FIX 4 & 5: Scroll Container with excessive padding to avoid footer overlap ── */}
+            <div
+                ref={scrollRef}
+                className="flex-1 overflow-y-auto px-5 py-4"
+                style={{ paddingBottom: '260px' }}>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentGroup}
@@ -284,8 +302,13 @@ const TestAntivejezPage: React.FC = () => {
             </div>
 
             {/* Sticky footer */}
-            <div className="fixed bottom-0 left-0 right-0 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
-                style={{ background: WELLNESS.bgDeep, borderTop: `1px solid ${WELLNESS.earth}26` }}>
+            {/* ── FIX 5: Standardized sticky footer ── */}
+            <div className="fixed bottom-0 left-0 right-0 px-5 py-4 z-10"
+                style={{
+                    background: WELLNESS.bgDeep,
+                    borderTop: `1px solid ${WELLNESS.earth}26`,
+                    paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
+                }}>
                 {/* Disclaimer */}
                 <div className="mb-4">
                     <WellnessDisclaimer text="Esta evaluación facial y de hábitos es orientativa. No constituye un diagnóstico médico formal." />
