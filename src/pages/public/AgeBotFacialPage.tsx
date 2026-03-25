@@ -100,10 +100,11 @@ const AgeBotFacialPage: React.FC = () => {
     const [errorMsg, setErrorMsg] = useState<string>('');
     const [cameraError, setCameraError] = useState(false);
     const [isCameraLoading, setIsCameraLoading] = useState(false);
+    const [cameraRequested, setCameraRequested] = useState(false); // ✅ ENHANCEMENT: explicit interaction flag
 
     // Start front-facing camera for selfie with resilient fallback
     useEffect(() => {
-        if (phase !== 'capture' || cameraError) return;
+        if (phase !== 'capture' || cameraError || !cameraRequested) return;
 
         let activeStream: MediaStream | null = null;
 
@@ -215,7 +216,7 @@ const AgeBotFacialPage: React.FC = () => {
     const retryCamera = () => {
         setCameraError(false);
         setErrorMsg('');
-        // This will trigger the useEffect to try starting again
+        setCameraRequested(true);
     };
 
     return (
@@ -242,54 +243,75 @@ const AgeBotFacialPage: React.FC = () => {
                             <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
                                 {!cameraError ? (
                                     <>
-                                        <video ref={videoRef} autoPlay playsInline muted
-                                            onLoadedData={() => setIsCameraLoading(false)}
-                                            className="w-full h-full object-cover"
-                                            style={{ transform: 'scaleX(-1)' }} />
+                                        {cameraRequested ? (
+                                            <>
+                                                <video ref={videoRef} autoPlay playsInline muted
+                                                    onLoadedData={() => setIsCameraLoading(false)}
+                                                    className="w-full h-full object-cover"
+                                                    style={{ transform: 'scaleX(-1)' }} />
 
-                                        {isCameraLoading && (
-                                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-30">
-                                                <Loader2 size={40} className="animate-spin text-white mb-3" />
-                                                <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Iniciando cámara...</p>
+                                                {isCameraLoading && (
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-30">
+                                                        <Loader2 size={40} className="animate-spin text-white mb-3" />
+                                                        <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Iniciando cámara...</p>
+                                                    </div>
+                                                )}
+                                                {/* Ellipse guide overlay - High Precision HUD */}
+                                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                    <div className="relative">
+                                                        {/* Scanning Bar Animation */}
+                                                        {!isCameraLoading && (
+                                                            <motion.div
+                                                                className="absolute left-0 right-0 h-1 bg-sage/40 z-20"
+                                                                style={{ background: `${WELLNESS.sage}88`, boxShadow: `0 0 15px ${WELLNESS.sage}` }}
+                                                                animate={{ top: ['15%', '85%', '15%'] }}
+                                                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                                            />
+                                                        )}
+
+                                                        <div className="w-56 h-72 rounded-[40%] border-2"
+                                                            style={{
+                                                                borderColor: isCameraLoading ? 'rgba(255,255,255,0.2)' : `${WELLNESS.sage}88`,
+                                                                boxShadow: `0 0 0 4000px rgba(0,0,0,0.6)`
+                                                            }}>
+                                                            {/* HUD Corners */}
+                                                            <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
+                                                            <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
+                                                            <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
+                                                            <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
+                                                        </div>
+
+                                                        <div className="absolute -bottom-12 left-0 right-0 flex flex-col items-center gap-1">
+                                                            <p className="text-[10px] font-black uppercase tracking-[0.2em]"
+                                                                style={{ color: WELLNESS.sage }}>
+                                                                {isCameraLoading ? 'Sincronizando...' : 'Calibración Óptica Activa'}
+                                                            </p>
+                                                            <p className="text-[13px] font-medium"
+                                                                style={{ color: 'rgba(255,255,255,0.9)' }}>
+                                                                Centra tu rostro para análisis vital
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center text-center px-6 h-full backdrop-blur-md z-10" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                                                <Camera size={56} className="mb-4 text-white opacity-80" />
+                                                <p className="text-white font-bold text-lg mb-2">Análisis Facial AgeBot</p>
+                                                <p className="text-white/80 text-[13px] mb-8 leading-relaxed max-w-[260px]">
+                                                    AgeBot necesita acceso a tu cámara para analizar tus biomarcadores faciales.
+                                                </p>
+                                                <button onClick={() => setCameraRequested(true)}
+                                                    className="w-full max-w-[200px] py-3.5 rounded-full font-bold text-sm transition-transform active:scale-95 shadow-xl pointer-events-auto"
+                                                    style={{ background: WELLNESS.terracotta, color: WELLNESS.bgCard }}>
+                                                    Activar Cámara
+                                                </button>
+                                                <button onClick={() => fileInputRef.current?.click()}
+                                                    className="mt-4 text-white/70 text-xs font-semibold underline underline-offset-4 pointer-events-auto">
+                                                    O subir foto manual
+                                                </button>
                                             </div>
                                         )}
-                                        {/* Ellipse guide overlay - High Precision HUD */}
-                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                            <div className="relative">
-                                                {/* Scanning Bar Animation */}
-                                                {!isCameraLoading && (
-                                                    <motion.div
-                                                        className="absolute left-0 right-0 h-1 bg-sage/40 z-20"
-                                                        style={{ background: `${WELLNESS.sage}88`, boxShadow: `0 0 15px ${WELLNESS.sage}` }}
-                                                        animate={{ top: ['15%', '85%', '15%'] }}
-                                                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                                    />
-                                                )}
-
-                                                <div className="w-56 h-72 rounded-[40%] border-2"
-                                                    style={{
-                                                        borderColor: isCameraLoading ? 'rgba(255,255,255,0.2)' : `${WELLNESS.sage}88`,
-                                                        boxShadow: `0 0 0 4000px rgba(0,0,0,0.6)`
-                                                    }}>
-                                                    {/* HUD Corners */}
-                                                    <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
-                                                    <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
-                                                    <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
-                                                    <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
-                                                </div>
-
-                                                <div className="absolute -bottom-12 left-0 right-0 flex flex-col items-center gap-1">
-                                                    <p className="text-[10px] font-black uppercase tracking-[0.2em]"
-                                                        style={{ color: WELLNESS.sage }}>
-                                                        {isCameraLoading ? 'Sincronizando...' : 'Calibración Óptica Activa'}
-                                                    </p>
-                                                    <p className="text-[13px] font-medium"
-                                                        style={{ color: 'rgba(255,255,255,0.9)' }}>
-                                                        Centra tu rostro para análisis vital
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </>
                                 ) : (
                                     /* Camera unavailable — show upload only */
@@ -301,11 +323,11 @@ const AgeBotFacialPage: React.FC = () => {
                                         </p>
                                         <div className="flex flex-col w-full gap-3">
                                             <button onClick={retryCamera}
-                                                className="w-full py-4 rounded-full font-bold text-sm transition-transform active:scale-95 bg-white text-black">
+                                                className="w-full py-4 rounded-full font-bold text-sm transition-transform active:scale-95 bg-white text-black pointer-events-auto">
                                                 Reintentar conexión
                                             </button>
                                             <button onClick={() => fileInputRef.current?.click()}
-                                                className="w-full py-3 rounded-full font-bold text-xs transition-transform active:scale-95 border border-white/30 text-white">
+                                                className="w-full py-3 rounded-full font-bold text-xs transition-transform active:scale-95 border border-white/30 text-white pointer-events-auto">
                                                 Subir foto manualmente
                                             </button>
                                         </div>

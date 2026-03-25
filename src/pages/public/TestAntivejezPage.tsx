@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
@@ -132,9 +132,9 @@ function calcularScore(answers: Record<string, boolean>) {
     return { score, rawPoints, category, yearsBiological, gapText: '', dimensiones };
 }
 
-/* ─── Component ─────────────────────────────────────────────────────────── */
 const TestAntivejezPage: React.FC = () => {
     const navigate = useNavigate();
+    const scrollRef = useRef<HTMLDivElement>(null);
     const [answers, setAnswers] = useState<Record<string, boolean>>({});
     const [currentGroup, setCurrentGroup] = useState<1 | 2 | 3 | 4 | 5>(1);
 
@@ -157,7 +157,10 @@ const TestAntivejezPage: React.FC = () => {
     const next = () => {
         if (currentGroup < 5) {
             setCurrentGroup(prev => (prev + 1) as 1 | 2 | 3 | 4 | 5);
-            // ✅ ENHANCEMENT: Scroll correctly targeting main container
+            // ✅ ENHANCEMENT: Scroll correctly targeting main container and local container
+            if (scrollRef.current) {
+                scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+            }
             const mainContainer = document.getElementById('vytalix-main-container');
             if (mainContainer) {
                 mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
@@ -186,7 +189,7 @@ const TestAntivejezPage: React.FC = () => {
             />
 
             {/* Questions */}
-            <div className="flex-1 overflow-y-auto px-5 py-4 pb-36">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-4 pb-36">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentGroup}
