@@ -39,8 +39,8 @@ const TestsSelectorPage: React.FC = () => {
                     style={{ paddingTop: 24, textAlign: 'center', marginBottom: 32 }}
                 >
                     <p style={{
-                        fontSize: 11, letterSpacing: 2, color: EARTH,
-                        textTransform: 'uppercase', opacity: 0.7
+                        fontSize: 16, letterSpacing: 1, color: EARTH,
+                        textTransform: 'uppercase', opacity: 0.9, fontWeight: 600
                     }}>
                         Plataforma Digital de Longevidad
                     </p>
@@ -85,7 +85,7 @@ const TestsSelectorPage: React.FC = () => {
                         34 indicadores · 4 minutos
                     </span>
 
-                    <p style={{ fontSize: 14, color: TXT_SEC, lineHeight: 1.5, margin: 0 }}>
+                    <p style={{ fontSize: 14, color: TXT_SEC, lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
                         Cuestionario validado por especialistas en longevidad.
                         Evalúa energía, cognición, composición corporal y signos vitales.
                     </p>
@@ -128,7 +128,7 @@ const TestsSelectorPage: React.FC = () => {
                         IA · Análisis instantáneo
                     </span>
 
-                    <p style={{ fontSize: 14, color: TXT_SEC, lineHeight: 1.5, margin: 0 }}>
+                    <p style={{ fontSize: 14, color: TXT_SEC, lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
                         Tu rostro revela pistas sobre tu ritmo de envejecimiento.
                         Análisis de 23+ puntos de referencia con inteligencia artificial.
                     </p>

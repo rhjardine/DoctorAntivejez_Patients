@@ -5,6 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import PublicHeader from '../../components/public/PublicHeader';
 import { useExitConfirmation } from '../../hooks/useExitConfirmation';
 import ExitConfirmModal from '../../components/public/ExitConfirmModal';
+import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
 import { WELLNESS } from '../../styles/wellnessPalette';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 
@@ -286,10 +287,9 @@ const TestAntivejezPage: React.FC = () => {
             <div className="fixed bottom-0 left-0 right-0 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
                 style={{ background: WELLNESS.bgDeep, borderTop: `1px solid ${WELLNESS.earth}26` }}>
                 {/* Disclaimer */}
-                <p className="text-center text-[10px] mb-3 leading-relaxed px-2 italic"
-                    style={{ color: WELLNESS.textHint }}>
-                    Esta evaluación es orientativa. No constituye diagnóstico médico.
-                </p>
+                <div className="mb-4">
+                    <WellnessDisclaimer text="Esta evaluación facial y de hábitos es orientativa. No constituye un diagnóstico médico formal." />
+                </div>
                 <button
                     onClick={next}
                     disabled={!allAnswered}

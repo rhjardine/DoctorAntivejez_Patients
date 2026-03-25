@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, TrendingUp, ShieldCheck, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { WELLNESS } from '../../styles/wellnessPalette';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
+import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
 
 /* ─── Design tokens ────────────────────────────────────────────────── */
 const BG = `linear-gradient(160deg, ${WELLNESS.earth} 0%, ${WELLNESS.earthDark} 100%)`;
@@ -230,13 +231,9 @@ const ResultadoScorePage: React.FC = () => {
                         {hookConfig.opportunity}
                     </p>
                     {/* Disclaimer */}
-                    <div className="border-t mt-4 pt-3" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-                        <p className="text-[10px] leading-relaxed italic"
-                            style={{ color: `${WELLNESS.bgCard}73` }}>
-                            Nota: Este análisis es una estimación basada en sus respuestas de hábitos y no constituye un diagnóstico médico.
-                            La edad biológica real se determina mediante evaluación biofísica, bioquímica y genética en consulta con el
-                            equipo médico especialista.
-                        </p>
+                    <div className="border-t mt-4 pt-4" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+                        <WellnessDisclaimer text="Este análisis es una estimación basada en sus respuestas de hábitos. La edad biológica real se determina mediante evaluación clínica."
+                            className="bg-white/5 border-white/10" />
                     </div>
                 </motion.div>
 

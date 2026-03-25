@@ -43,8 +43,8 @@ const LandingPublicaPage: React.FC = () => {
                             VYTALIX
                         </div>
                         <div style={{
-                            fontSize: 11, letterSpacing: 2, color: SAGE,
-                            textTransform: 'uppercase', marginTop: 4
+                            fontSize: 18, fontWeight: 600, letterSpacing: 1, color: SAGE,
+                            textTransform: 'uppercase', marginTop: 8
                         }}>
                             por especialistas en longevidad
                         </div>
@@ -122,8 +122,8 @@ const LandingPublicaPage: React.FC = () => {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.5 }}
                         style={{
-                            fontSize: 14, color: TXT_SEC, textAlign: 'center',
-                            lineHeight: 1.6, marginBottom: 48
+                            fontSize: 18, color: TXT_SEC, textAlign: 'center',
+                            lineHeight: 1.6, marginBottom: 48, fontWeight: 500
                         }}
                     >
                         El envejecimiento ya no es un destino inevitable,

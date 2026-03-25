@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import PublicHeader from '../../components/public/PublicHeader';
+import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
 import { WELLNESS } from '../../styles/wellnessPalette';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 
@@ -238,16 +239,16 @@ const AgeBotFacialPage: React.FC = () => {
                     {/* ── CAPTURE ── */}
                     {phase === 'capture' && (
                         <motion.div key="capture" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            className="flex-1 flex flex-col">
-                            {/* Camera viewfinder */}
-                            <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
+                            className="flex-1 flex flex-col p-4 sm:p-6">
+                            {/* Camera viewfinder card wrapper */}
+                            <div className="relative flex-1 bg-white rounded-[2rem] p-2 sm:p-3 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-gray-100 flex items-center justify-center overflow-hidden">
                                 {!cameraError ? (
                                     <>
                                         {cameraRequested ? (
                                             <>
                                                 <video ref={videoRef} autoPlay playsInline muted
                                                     onLoadedData={() => setIsCameraLoading(false)}
-                                                    className="w-full h-full object-cover"
+                                                    className="w-full h-full object-cover rounded-[1.5rem]"
                                                     style={{ transform: 'scaleX(-1)' }} />
 
                                                 {isCameraLoading && (
@@ -295,40 +296,45 @@ const AgeBotFacialPage: React.FC = () => {
                                                 </div>
                                             </>
                                         ) : (
-                                            <div className="flex flex-col items-center justify-center text-center px-6 h-full backdrop-blur-md z-10" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                                                <Camera size={56} className="mb-4 text-white opacity-80" />
-                                                <p className="text-white font-bold text-lg mb-2">Análisis Facial AgeBot</p>
-                                                <p className="text-white/80 text-[13px] mb-8 leading-relaxed max-w-[260px]">
-                                                    AgeBot necesita acceso a tu cámara para analizar tus biomarcadores faciales.
+                                            <div className="flex flex-col items-center justify-center text-center px-6 h-full z-10">
+                                                <div className="w-20 h-20 rounded-full bg-sage/10 flex items-center justify-center mb-6">
+                                                    <Camera size={40} style={{ color: WELLNESS.sage }} />
+                                                </div>
+                                                <p className="text-darkBlue font-black text-xl mb-3" style={{ color: WELLNESS.earthDark }}>Análisis Facial AgeBot</p>
+                                                <p className="text-gray-600 font-medium text-sm mb-10 leading-relaxed max-w-[260px]">
+                                                    AgeBot necesita acceso a tu cámara para analizar tus biomarcadores faciales en tiempo real.
                                                 </p>
+
                                                 <button onClick={() => setCameraRequested(true)}
-                                                    className="w-full max-w-[200px] py-3.5 rounded-full font-bold text-sm transition-transform active:scale-95 shadow-xl pointer-events-auto"
+                                                    className="w-full max-w-[240px] py-4 rounded-xl font-bold text-base transition-all active:scale-95 shadow-lg shadow-terracotta/20 pointer-events-auto"
                                                     style={{ background: WELLNESS.terracotta, color: WELLNESS.bgCard }}>
                                                     Activar Cámara
                                                 </button>
+
                                                 <button onClick={() => fileInputRef.current?.click()}
-                                                    className="mt-4 text-white/70 text-xs font-semibold underline underline-offset-4 pointer-events-auto">
-                                                    O subir foto manual
+                                                    className="mt-6 text-sm text-gray-500 underline decoration-gray-300 hover:text-darkBlue transition-colors cursor-pointer text-center w-full block pointer-events-auto">
+                                                    O subir foto desde galería
                                                 </button>
                                             </div>
                                         )}
                                     </>
                                 ) : (
                                     /* Camera unavailable — show upload only */
-                                    <div className="flex flex-col items-center justify-center text-center px-8 z-10 p-6 rounded-3xl backdrop-blur-md" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <div className="flex flex-col items-center justify-center text-center px-8 z-10 p-6 h-full">
                                         <AlertTriangle size={48} className="mb-4 text-amber-500" />
-                                        <p className="text-white font-bold text-lg mb-2">Cámara no disponible</p>
-                                        <p className="text-white/70 text-sm mb-6 font-medium">
+                                        <p className="text-darkBlue font-bold text-lg mb-2">Cámara no disponible</p>
+                                        <p className="text-gray-600 text-sm mb-8 font-medium">
                                             {errorMsg || 'La cámara no se pudo iniciar correctamente.'}
                                         </p>
-                                        <div className="flex flex-col w-full gap-3">
+                                        <div className="flex flex-col w-full gap-3 max-w-[240px]">
                                             <button onClick={retryCamera}
-                                                className="w-full py-4 rounded-full font-bold text-sm transition-transform active:scale-95 bg-white text-black pointer-events-auto">
+                                                className="w-full py-4 rounded-xl font-bold text-sm transition-transform active:scale-95 bg-white border border-gray-200 text-darkBlue shadow-sm pointer-events-auto"
+                                                style={{ color: WELLNESS.earthDark }}>
                                                 Reintentar conexión
                                             </button>
                                             <button onClick={() => fileInputRef.current?.click()}
-                                                className="w-full py-3 rounded-full font-bold text-xs transition-transform active:scale-95 border border-white/30 text-white pointer-events-auto">
-                                                Subir foto manualmente
+                                                className="mt-2 text-sm text-gray-500 underline decoration-gray-300 pointer-events-auto">
+                                                Subir foto manual
                                             </button>
                                         </div>
                                     </div>
@@ -336,19 +342,19 @@ const AgeBotFacialPage: React.FC = () => {
                             </div>
 
                             {/* Controls */}
-                            {!cameraError && (
-                                <div className="py-6 flex items-center justify-around px-8"
-                                    style={{ background: 'rgba(0,0,0,0.8)' }}>
+                            {!cameraError && cameraRequested && (
+                                <div className="py-8 flex items-center justify-around px-8 mt-2">
                                     {/* Upload */}
                                     <button onClick={() => fileInputRef.current?.click()}
-                                        className="w-14 h-14 rounded-full flex items-center justify-center"
-                                        style={{ background: 'rgba(255,255,255,0.1)' }}>
-                                        <ImageIcon size={22} color="white" />
+                                        className="w-14 h-14 rounded-full flex items-center justify-center transition-colors hover:bg-black/5"
+                                        style={{ border: `1px solid ${WELLNESS.earth}22` }}>
+                                        <ImageIcon size={22} style={{ color: WELLNESS.earth }} />
                                     </button>
                                     {/* Shutter */}
                                     <button onClick={capturePhoto}
-                                        className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-90 transition-transform">
-                                        <div className="w-16 h-16 rounded-full bg-white" />
+                                        className="w-20 h-20 rounded-full border-4 flex items-center justify-center active:scale-90 transition-transform shadow-xl"
+                                        style={{ borderColor: WELLNESS.terracotta }}>
+                                        <div className="w-16 h-16 rounded-full" style={{ background: WELLNESS.terracotta }} />
                                     </button>
                                     <div className="w-14 h-14" /> {/* spacer */}
                                 </div>
@@ -435,11 +441,9 @@ const AgeBotFacialPage: React.FC = () => {
                             {/* Disclaimer */}
                             <motion.div
                                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-                                className="w-full max-w-sm rounded-2xl px-5 py-4 mb-6"
-                                style={{ background: `${WELLNESS.warn}1A`, border: `1px solid ${WELLNESS.warn}33` }}>
-                                <p className="text-[11px] leading-relaxed italic text-center" style={{ color: WELLNESS.earthDark }}>
-                                    Este análisis visual es orientativo y solo refleja pistas faciales de vitalidad. Tu Edad Celular real se determina con indicadores biológicos completos.
-                                </p>
+                                className="w-full max-w-sm mb-8"
+                            >
+                                <WellnessDisclaimer text="Este análisis visual es un indicador preliminar del ritmo de envejecimiento. Tu Edad Celular completa requiere la integración de tus marcadores de vitalidad." />
                             </motion.div>
 
                             {/* CTAs */}
