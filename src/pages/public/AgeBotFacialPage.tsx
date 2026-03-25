@@ -108,6 +108,7 @@ const AgeBotFacialPage: React.FC = () => {
     const [cameraRequested, setCameraRequested] = useState(false);
     const [retryCount, setRetryCount] = useState(0); // ✅ Handle re-initialization explicitly
     const [retrying, setRetrying] = useState(false); // ✅ Visual feedback for retry action
+    const [showDiagnostics, setShowDiagnostics] = useState(false);
 
     /* ─── FIX 1: WebRTC — Robust camera initialization ──────────────────── */
     const startCamera = useCallback(async () => {
@@ -431,6 +432,22 @@ const AgeBotFacialPage: React.FC = () => {
                                                 style={{ color: '#9ca3af' }}>
                                                 Subir foto manual
                                             </button>
+
+                                            <button
+                                                onClick={() => setShowDiagnostics(!showDiagnostics)}
+                                                className="mt-8 text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity"
+                                                style={{ color: WELLNESS.earth }}>
+                                                {showDiagnostics ? 'Ocultar diagnóstico' : 'Ver diagnóstico técnico'}
+                                            </button>
+
+                                            {showDiagnostics && (
+                                                <div className="mt-4 p-3 rounded-lg bg-black/5 text-[10px] text-left font-mono break-all" style={{ color: WELLNESS.earth }}>
+                                                    <p>Secure Context: {window.isSecureContext ? 'YES' : 'NO'}</p>
+                                                    <p>MediaDevices: {navigator.mediaDevices ? 'YES' : 'NO'}</p>
+                                                    <p>UserAgent: {navigator.userAgent}</p>
+                                                    <p>Error: {errorMsg}</p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 )}

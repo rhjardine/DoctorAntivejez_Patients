@@ -135,7 +135,7 @@ function calcularScore(answers: Record<string, boolean>) {
 
 const TestAntivejezPage: React.FC = () => {
     const navigate = useNavigate();
-    const scrollRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [answers, setAnswers] = useState<Record<string, boolean>>({});
     const [currentGroup, setCurrentGroup] = useState<1 | 2 | 3 | 4 | 5>(1);
 
@@ -150,7 +150,7 @@ const TestAntivejezPage: React.FC = () => {
     // ── FIX 1: Scroll to top on mount ──────────────────────────────────
     useEffect(() => {
         const scrollToTop = () => {
-            scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+            scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'instant' });
             window.scrollTo({ top: 0, behavior: 'instant' });
             document.getElementById('vytalix-main-container')?.scrollTo({ top: 0, behavior: 'instant' });
         };
@@ -172,8 +172,8 @@ const TestAntivejezPage: React.FC = () => {
             setCurrentGroup(prev => (prev + 1) as 1 | 2 | 3 | 4 | 5);
             // ── FIX 2: Scroll properly after group change (with delay) ──
             setTimeout(() => {
-                if (scrollRef.current) {
-                    scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+                if (scrollContainerRef.current) {
+                    scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
                 }
                 const mainContainer = document.getElementById('vytalix-main-container');
                 if (mainContainer) {
@@ -206,7 +206,7 @@ const TestAntivejezPage: React.FC = () => {
             {/* Questions */}
             {/* ── FIX 4 & 5: Scroll Container with excessive padding to avoid footer overlap ── */}
             <div
-                ref={scrollRef}
+                ref={scrollContainerRef}
                 className="flex-1 overflow-y-auto px-5 py-4"
                 style={{ paddingBottom: '260px' }}>
                 <AnimatePresence mode="wait">
