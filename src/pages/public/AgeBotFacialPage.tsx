@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle, Info } from 'lucide-react';
@@ -6,6 +6,7 @@ import PublicHeader from '../../components/public/PublicHeader';
 import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
 import { WELLNESS } from '../../styles/wellnessPalette';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
+import { usePublicFunnelStore } from '../../store/usePublicFunnelStore';
 
 type Phase = 'capture' | 'analyzing' | 'result' | 'error';
 
@@ -90,6 +91,8 @@ const FacialOverlay: React.FC<{ size: number }> = ({ size }) => {
 /* ─── Main Component ─────────────────────────────────────────────────────── */
 const AgeBotFacialPage: React.FC = () => {
     const navigate = useNavigate();
+    const { setAgeBotResult, setCurrentStep } = usePublicFunnelStore();
+
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
@@ -101,84 +104,116 @@ const AgeBotFacialPage: React.FC = () => {
     const [errorMsg, setErrorMsg] = useState<string>('');
     const [cameraError, setCameraError] = useState(false);
     const [isCameraLoading, setIsCameraLoading] = useState(false);
-    const [cameraRequested, setCameraRequested] = useState(false); // ✅ ENHANCEMENT: explicit interaction flag
+    const [cameraActive, setCameraActive] = useState(false); // ✅ true once video is live
+    const [cameraRequested, setCameraRequested] = useState(false);
 
-    // Start front-facing camera for selfie with resilient fallback
+    /* ─── FIX 1: WebRTC — Robust camera initialization ──────────────────── */
+    const startCamera = useCallback(async () => {
+        if (streamRef.current) {
+            // already running — do not double-init
+            return;
+        }
+        setIsCameraLoading(true);
+        setCameraActive(false);
+
+        try {
+            let mediaStream: MediaStream;
+            try {
+                // Preferred: front-facing
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: false,
+                });
+            } catch {
+                // Fallback: any camera
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false,
+                });
+            }
+
+            streamRef.current = mediaStream;
+
+            if (videoRef.current) {
+                videoRef.current.srcObject = mediaStream;
+                // ✅ CRITICAL for iOS/Safari: must call .play() after setting srcObject
+                videoRef.current.onloadedmetadata = async () => {
+                    try {
+                        await videoRef.current!.play();
+                        setIsCameraLoading(false);
+                        setCameraActive(true);
+                    } catch (playErr) {
+                        console.error('[AgeBot] play() failed:', playErr);
+                        setIsCameraLoading(false);
+                    }
+                };
+            }
+        } catch (err: any) {
+            console.error('[AgeBot] Camera access FAILED:', err);
+            const errorName: string = (err as { name?: string }).name || 'UnknownError';
+            let msg = 'No se pudo acceder a la cámara.';
+            if (errorName === 'NotAllowedError') msg = 'Permiso denegado. Activa la cámara en los ajustes del navegador.';
+            else if (errorName === 'NotFoundError') msg = 'No se encontró ninguna cámara disponible en este dispositivo.';
+            else if (errorName === 'NotReadableError') msg = 'La cámara está siendo usada por otra aplicación.';
+
+            setErrorMsg(msg);
+            setCameraError(true);
+            setIsCameraLoading(false);
+        }
+    }, []);
+
+    // Trigger camera only after explicit user action (required by mobile browsers)
     useEffect(() => {
         if (phase !== 'capture' || cameraError || !cameraRequested) return;
-
-        let activeStream: MediaStream | null = null;
-
-        const start = async () => {
-            setIsCameraLoading(true);
-            try {
-                // Constraint 1: Standard Selfie - highly compatible across all devices
-                let mediaStream: MediaStream;
-                try {
-                    mediaStream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: 'user' }
-                    });
-                } catch (e) {
-                    console.warn("Retrying with any available video device", e);
-                    // Constraint 2: Fallback to any video capability
-                    mediaStream = await navigator.mediaDevices.getUserMedia({
-                        video: true
-                    });
-                }
-
-                activeStream = mediaStream;
-                streamRef.current = mediaStream;
-                if (videoRef.current) {
-                    videoRef.current.srcObject = mediaStream;
-                    videoRef.current.onloadedmetadata = async () => {
-                        try {
-                            await videoRef.current?.play();
-                            setIsCameraLoading(false);
-                        } catch (pErr) {
-                            console.error("Play failed:", pErr);
-                        }
-                    };
-                }
-            } catch (err: any) {
-                console.error("Camera access failed entirely:", err);
-                const errorName = err.name || 'UnknownError';
-                let msg = 'No se pudo acceder a la cámara.';
-                if (errorName === 'NotAllowedError') msg = 'Permiso denegado. Activa la cámara en los ajustes del navegador.';
-                else if (errorName === 'NotFoundError') msg = 'No se encontró ninguna cámara disponible.';
-                else if (errorName === 'NotReadableError') msg = 'La cámara está siendo usada por otra aplicación.';
-
-                setErrorMsg(msg);
-                setCameraError(true);
-                setIsCameraLoading(false);
-            }
-        };
-
-        start();
+        startCamera();
 
         return () => {
-            activeStream?.getTracks().forEach(t => t.stop());
-            if (streamRef.current) {
-                streamRef.current.getTracks().forEach(t => t.stop());
-                streamRef.current = null;
-            }
+            // Cleanup: stop all tracks when leaving the capture phase
+            streamRef.current?.getTracks().forEach(t => t.stop());
+            streamRef.current = null;
+            setCameraActive(false);
         };
-    }, [phase, cameraError]);
+    }, [cameraRequested, phase, cameraError, startCamera]);
 
+    /* ─── FIX 2: Capture with Anti-False-Positive guard ─────────────────── */
     const capturePhoto = () => {
-        if (!videoRef.current || !canvasRef.current) return;
-        const v = videoRef.current;
-        const c = canvasRef.current;
-        c.width = v.videoWidth || 640;
-        c.height = v.videoHeight || 640;
-        const ctx = c.getContext('2d');
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        if (!video || !canvas) return;
+
+        // ✅ GUARD: Only capture when video has enough data (readyState === 4)
+        if (video.readyState < 4) {
+            console.warn('[AgeBot] Capture aborted — video not ready');
+            return;
+        }
+
+        const width = video.videoWidth || 640;
+        const height = video.videoHeight || 640;
+
+        // ✅ GUARD: Reject a black/empty canvas (dimensions 0×0)
+        if (width === 0 || height === 0) {
+            console.warn('[AgeBot] Capture aborted — invalid video dimensions');
+            return;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
         if (!ctx) return;
-        // Mirror the image for front camera
+
+        // Mirror for front camera (selfie)
         ctx.save();
         ctx.scale(-1, 1);
-        ctx.drawImage(v, -c.width, 0, c.width, c.height);
+        ctx.drawImage(video, -width, 0, width, height);
         ctx.restore();
-        const dataUrl = c.toDataURL('image/jpeg', 0.85);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+        // Stop camera after capture
         streamRef.current?.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+        setCameraActive(false);
+
         processImage(dataUrl);
     };
 
@@ -188,6 +223,7 @@ const AgeBotFacialPage: React.FC = () => {
         const reader = new FileReader();
         reader.onloadend = () => {
             streamRef.current?.getTracks().forEach(t => t.stop());
+            streamRef.current = null;
             processImage(reader.result as string);
         };
         reader.readAsDataURL(file);
@@ -211,6 +247,10 @@ const AgeBotFacialPage: React.FC = () => {
         setResult(null);
         setErrorMsg('');
         setCameraError(false);
+        setCameraActive(false);
+        setCameraRequested(false);
+        streamRef.current?.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
         setPhase('capture');
     };
 
@@ -218,6 +258,15 @@ const AgeBotFacialPage: React.FC = () => {
         setCameraError(false);
         setErrorMsg('');
         setCameraRequested(true);
+    };
+
+    /* ─── FIX 3: Correct final CTA — save to store then navigate ─────────── */
+    const handleFinalCTA = () => {
+        if (result) {
+            setAgeBotResult(result.estimatedAge);
+            setCurrentStep('RESULTADO');
+        }
+        navigate('/resultado');
     };
 
     return (
@@ -231,7 +280,7 @@ const AgeBotFacialPage: React.FC = () => {
 
             {/* Hidden canvas for capture */}
             <canvas ref={canvasRef} className="hidden" />
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+            <input ref={fileInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleFileUpload} />
 
             <div className="flex-1 flex flex-col overflow-hidden">
                 <AnimatePresence mode="wait">
@@ -240,100 +289,116 @@ const AgeBotFacialPage: React.FC = () => {
                     {phase === 'capture' && (
                         <motion.div key="capture" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="flex-1 flex flex-col p-4 sm:p-6">
-                            {/* Camera viewfinder card wrapper */}
+
+                            {/* ── Tarea 4: Card-wrapped viewfinder ── */}
                             <div className="relative flex-1 bg-white rounded-[2rem] p-2 sm:p-3 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-gray-100 flex items-center justify-center overflow-hidden">
                                 {!cameraError ? (
                                     <>
                                         {cameraRequested ? (
                                             <>
-                                                <video ref={videoRef} autoPlay playsInline muted
-                                                    onLoadedData={() => setIsCameraLoading(false)}
+                                                <video
+                                                    ref={videoRef}
+                                                    autoPlay
+                                                    playsInline
+                                                    muted
                                                     className="w-full h-full object-cover rounded-[1.5rem]"
-                                                    style={{ transform: 'scaleX(-1)' }} />
+                                                    style={{ transform: 'scaleX(-1)' }}
+                                                />
 
                                                 {isCameraLoading && (
-                                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-30">
-                                                        <Loader2 size={40} className="animate-spin text-white mb-3" />
-                                                        <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Iniciando cámara...</p>
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[1.5rem] z-30"
+                                                        style={{ background: 'rgba(253,251,247,0.85)', backdropFilter: 'blur(4px)' }}>
+                                                        <Loader2 size={40} className="animate-spin mb-3" style={{ color: WELLNESS.terracotta }} />
+                                                        <p className="text-xs font-bold tracking-widest uppercase" style={{ color: WELLNESS.earth }}>Iniciando cámara...</p>
                                                     </div>
                                                 )}
-                                                {/* Ellipse guide overlay - High Precision HUD */}
-                                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                                    <div className="relative">
-                                                        {/* Scanning Bar Animation */}
-                                                        {!isCameraLoading && (
+
+                                                {/* HUD overlay — only show when camera is live */}
+                                                {cameraActive && !isCameraLoading && (
+                                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                        <div className="relative">
+                                                            {/* Scanning bar */}
                                                             <motion.div
-                                                                className="absolute left-0 right-0 h-1 bg-sage/40 z-20"
-                                                                style={{ background: `${WELLNESS.sage}88`, boxShadow: `0 0 15px ${WELLNESS.sage}` }}
+                                                                className="absolute left-0 right-0 h-0.5 z-20"
+                                                                style={{ background: `${WELLNESS.sage}88`, boxShadow: `0 0 12px ${WELLNESS.sage}` }}
                                                                 animate={{ top: ['15%', '85%', '15%'] }}
-                                                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                                                transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
                                                             />
-                                                        )}
-
-                                                        <div className="w-56 h-72 rounded-[40%] border-2"
-                                                            style={{
-                                                                borderColor: isCameraLoading ? 'rgba(255,255,255,0.2)' : `${WELLNESS.sage}88`,
-                                                                boxShadow: `0 0 0 4000px rgba(0,0,0,0.6)`
-                                                            }}>
-                                                            {/* HUD Corners */}
-                                                            <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
-                                                            <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
-                                                            <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
-                                                            <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
-                                                        </div>
-
-                                                        <div className="absolute -bottom-12 left-0 right-0 flex flex-col items-center gap-1">
-                                                            <p className="text-[10px] font-black uppercase tracking-[0.2em]"
-                                                                style={{ color: WELLNESS.sage }}>
-                                                                {isCameraLoading ? 'Sincronizando...' : 'Calibración Óptica Activa'}
-                                                            </p>
-                                                            <p className="text-[13px] font-medium"
-                                                                style={{ color: 'rgba(255,255,255,0.9)' }}>
-                                                                Centra tu rostro para análisis vital
-                                                            </p>
+                                                            <div className="w-56 h-72 rounded-[40%] border-2"
+                                                                style={{
+                                                                    borderColor: `${WELLNESS.sage}88`,
+                                                                    boxShadow: `0 0 0 4000px rgba(0,0,0,0.35)`
+                                                                }}>
+                                                                {/* HUD corners */}
+                                                                <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
+                                                                <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
+                                                                <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
+                                                                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
+                                                            </div>
+                                                            <div className="absolute -bottom-12 left-0 right-0 flex flex-col items-center gap-1">
+                                                                <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: WELLNESS.sage }}>
+                                                                    Calibración Óptica Activa
+                                                                </p>
+                                                                <p className="text-[13px] font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                                                                    Centra tu rostro para análisis vital
+                                                                </p>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                )}
                                             </>
                                         ) : (
+                                            /* ── Tarea 4: Primary CTA = Activar Cámara ── */
                                             <div className="flex flex-col items-center justify-center text-center px-6 h-full z-10">
-                                                <div className="w-20 h-20 rounded-full bg-sage/10 flex items-center justify-center mb-6">
+                                                <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
+                                                    style={{ background: `${WELLNESS.sage}18` }}>
                                                     <Camera size={40} style={{ color: WELLNESS.sage }} />
                                                 </div>
-                                                <p className="text-darkBlue font-black text-xl mb-3" style={{ color: WELLNESS.earthDark }}>Análisis Facial AgeBot</p>
-                                                <p className="text-gray-600 font-medium text-sm mb-10 leading-relaxed max-w-[260px]">
+                                                <p className="font-black text-xl mb-3" style={{ color: WELLNESS.earthDark }}>Análisis Facial AgeBot</p>
+                                                {/* ── Tarea 5: font-medium subtítulo ── */}
+                                                <p className="font-medium text-sm mb-10 leading-relaxed max-w-[260px]" style={{ color: '#6b7280' }}>
                                                     AgeBot necesita acceso a tu cámara para analizar tus biomarcadores faciales en tiempo real.
                                                 </p>
 
-                                                <button onClick={() => setCameraRequested(true)}
-                                                    className="w-full max-w-[240px] py-4 rounded-xl font-bold text-base transition-all active:scale-95 shadow-lg shadow-terracotta/20 pointer-events-auto"
-                                                    style={{ background: WELLNESS.terracotta, color: WELLNESS.bgCard }}>
+                                                {/* PRIMARY CTA */}
+                                                <button
+                                                    onClick={() => setCameraRequested(true)}
+                                                    className="w-full max-w-[260px] py-4 rounded-xl font-bold text-base transition-all active:scale-95 pointer-events-auto"
+                                                    style={{
+                                                        background: WELLNESS.terracotta,
+                                                        color: WELLNESS.bgCard,
+                                                        boxShadow: `0 8px 24px ${WELLNESS.terracotta}44`
+                                                    }}>
                                                     Activar Cámara
                                                 </button>
 
-                                                <button onClick={() => fileInputRef.current?.click()}
-                                                    className="mt-6 text-sm text-gray-500 underline decoration-gray-300 hover:text-darkBlue transition-colors cursor-pointer text-center w-full block pointer-events-auto">
+                                                {/* SECONDARY: subtle text link */}
+                                                <button
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                    className="mt-5 text-sm underline decoration-gray-300 pointer-events-auto"
+                                                    style={{ color: '#9ca3af' }}>
                                                     O subir foto desde galería
                                                 </button>
                                             </div>
                                         )}
                                     </>
                                 ) : (
-                                    /* Camera unavailable — show upload only */
+                                    /* Camera unavailable */
                                     <div className="flex flex-col items-center justify-center text-center px-8 z-10 p-6 h-full">
                                         <AlertTriangle size={48} className="mb-4 text-amber-500" />
-                                        <p className="text-darkBlue font-bold text-lg mb-2">Cámara no disponible</p>
-                                        <p className="text-gray-600 text-sm mb-8 font-medium">
+                                        <p className="font-bold text-lg mb-2" style={{ color: WELLNESS.earthDark }}>Cámara no disponible</p>
+                                        <p className="text-sm mb-8 font-medium" style={{ color: '#6b7280' }}>
                                             {errorMsg || 'La cámara no se pudo iniciar correctamente.'}
                                         </p>
                                         <div className="flex flex-col w-full gap-3 max-w-[240px]">
                                             <button onClick={retryCamera}
-                                                className="w-full py-4 rounded-xl font-bold text-sm transition-transform active:scale-95 bg-white border border-gray-200 text-darkBlue shadow-sm pointer-events-auto"
+                                                className="w-full py-4 rounded-xl font-bold text-sm transition-transform active:scale-95 bg-white border border-gray-200 shadow-sm pointer-events-auto"
                                                 style={{ color: WELLNESS.earthDark }}>
                                                 Reintentar conexión
                                             </button>
                                             <button onClick={() => fileInputRef.current?.click()}
-                                                className="mt-2 text-sm text-gray-500 underline decoration-gray-300 pointer-events-auto">
+                                                className="mt-2 text-sm underline decoration-gray-300 pointer-events-auto"
+                                                style={{ color: '#9ca3af' }}>
                                                 Subir foto manual
                                             </button>
                                         </div>
@@ -341,24 +406,32 @@ const AgeBotFacialPage: React.FC = () => {
                                 )}
                             </div>
 
-                            {/* Controls */}
+                            {/* ── Shutter controls — FIX 2: disabled until readyState = 4 ── */}
                             {!cameraError && cameraRequested && (
                                 <div className="py-8 flex items-center justify-around px-8 mt-2">
-                                    {/* Upload */}
-                                    <button onClick={() => fileInputRef.current?.click()}
+                                    {/* Secondary: upload icon */}
+                                    <button
+                                        onClick={() => fileInputRef.current?.click()}
                                         className="w-14 h-14 rounded-full flex items-center justify-center transition-colors hover:bg-black/5"
                                         style={{ border: `1px solid ${WELLNESS.earth}22` }}>
                                         <ImageIcon size={22} style={{ color: WELLNESS.earth }} />
                                     </button>
-                                    {/* Shutter */}
-                                    <button onClick={capturePhoto}
-                                        className="w-20 h-20 rounded-full border-4 flex items-center justify-center active:scale-90 transition-transform shadow-xl"
+                                    {/* Shutter button — disabled until video is live */}
+                                    <button
+                                        onClick={capturePhoto}
+                                        disabled={!cameraActive}
+                                        className="w-20 h-20 rounded-full border-4 flex items-center justify-center active:scale-90 transition-all shadow-xl disabled:opacity-30 disabled:cursor-not-allowed"
                                         style={{ borderColor: WELLNESS.terracotta }}>
                                         <div className="w-16 h-16 rounded-full" style={{ background: WELLNESS.terracotta }} />
                                     </button>
                                     <div className="w-14 h-14" /> {/* spacer */}
                                 </div>
                             )}
+
+                            {/* ── Tarea 5: Styled disclaimer ── */}
+                            <div className="mt-2">
+                                <WellnessDisclaimer text="AgeBot analiza marcadores faciales de vitalidad. No sustituye un diagnóstico médico clínico." />
+                            </div>
                         </motion.div>
                     )}
 
@@ -379,7 +452,7 @@ const AgeBotFacialPage: React.FC = () => {
                             <p className="text-lg font-bold mb-2" style={{ fontFamily: 'Poppins, sans-serif', color: WELLNESS.textPrimary }}>
                                 Analizando tu vitalidad facial con IA...
                             </p>
-                            <p className="text-sm" style={{ color: WELLNESS.earth }}>
+                            <p className="text-sm font-medium" style={{ color: WELLNESS.earth }}>
                                 Detectando {24} puntos de referencia facial
                             </p>
                         </motion.div>
@@ -420,7 +493,7 @@ const AgeBotFacialPage: React.FC = () => {
                                     {result.estimatedAge}
                                     <span className="text-2xl ml-1" style={{ color: WELLNESS.earth }}>años</span>
                                 </p>
-                                <div className="inline-block mt-1 mb-3 bg-sage-50 rounded-full px-3 py-1" style={{ background: `${WELLNESS.sage}1A` }}>
+                                <div className="inline-block mt-1 mb-3 rounded-full px-3 py-1" style={{ background: `${WELLNESS.sage}1A` }}>
                                     <p className="text-[10px] font-medium" style={{ color: WELLNESS.sage }}>basado en análisis visual de vitalidad</p>
                                 </div>
                                 <div className="flex items-center justify-center gap-4 mt-1">
@@ -438,20 +511,19 @@ const AgeBotFacialPage: React.FC = () => {
                                 </div>
                             </motion.div>
 
-                            {/* Disclaimer */}
+                            {/* ── Tarea 5: Styled disclaimer ── */}
                             <motion.div
                                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-                                className="w-full max-w-sm mb-8"
-                            >
-                                <WellnessDisclaimer text="Este análisis visual es un indicador preliminar del ritmo de envejecimiento. Tu Edad Celular completa requiere la integración de tus marcadores de vitalidad." />
+                                className="w-full max-w-sm mb-8">
+                                <WellnessDisclaimer text="Este análisis visual es un indicador preliminar del ritmo de envejecimiento. Tu Edad Celular completa requiere la integración de todos tus marcadores de vitalidad." />
                             </motion.div>
 
-                            {/* CTAs */}
+                            {/* ── FIX 3: Correct CTA — saves to store then navigates ── */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
                                 className="w-full max-w-sm flex flex-col gap-3">
                                 <button
-                                    onClick={() => navigate('/resultado')}
+                                    onClick={handleFinalCTA}
                                     className="w-full font-bold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-95"
                                     style={{ background: WELLNESS.terracotta, color: WELLNESS.bgCard, borderRadius: 32, padding: '15px 0', fontFamily: 'Poppins, sans-serif' }}>
                                     Descubrir mi Edad Celular completa <ArrowRight size={18} />
@@ -476,7 +548,7 @@ const AgeBotFacialPage: React.FC = () => {
                             className="flex-1 flex flex-col items-center justify-center px-8 text-center">
                             <AlertTriangle size={48} className="mb-4" style={{ color: WELLNESS.terracotta }} />
                             <p className="text-lg font-bold mb-2" style={{ color: WELLNESS.earthDark }}>No pudimos analizar la imagen</p>
-                            <p className="text-sm mb-8" style={{ color: WELLNESS.earth }}>{errorMsg}</p>
+                            <p className="text-sm mb-8 font-medium" style={{ color: WELLNESS.earth }}>{errorMsg}</p>
                             <button onClick={reset}
                                 className="px-8 py-4 rounded-full font-bold hover:opacity-90 transition-opacity"
                                 style={{ background: WELLNESS.terracotta, color: WELLNESS.bgCard }}>
