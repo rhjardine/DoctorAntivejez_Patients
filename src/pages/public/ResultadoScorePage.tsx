@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, TrendingUp, ShieldCheck, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { AlertTriangle, TrendingUp, ShieldCheck, CheckCircle, ArrowRight, Loader2, Info } from 'lucide-react';
 import { WELLNESS } from '../../styles/wellnessPalette';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
@@ -92,8 +92,37 @@ const ResultadoScorePage: React.FC = () => {
 
     useEffect(() => {
         const raw = sessionStorage.getItem('vx_test_result');
+        const ageBotRaw = sessionStorage.getItem('da_agebot_result');
+
         if (raw) {
-            try { setResult(JSON.parse(raw)); } catch { navigate('/longevidad'); }
+            try {
+                setResult(JSON.parse(raw));
+                sessionStorage.setItem('da_result_source', 'test');
+            } catch { navigate('/longevidad'); }
+        } else if (ageBotRaw) {
+            // Usuario entró desde AgeBot sin hacer el test completo
+            try {
+                const ageBotData = JSON.parse(ageBotRaw);
+                // Generar un resultado estimado basado en la edad facial
+                // Score estimado: inversamente proporcional a la edad (referencia 30 años = 100%)
+                const estimatedScore = Math.max(20, Math.min(85,
+                    Math.round(100 - (ageBotData.estimatedAge - 30) * 0.8)
+                ));
+
+                const category: Category = estimatedScore >= 80 ? 'EXCELENTE'
+                    : estimatedScore >= 60 ? 'BUENO'
+                        : estimatedScore >= 40 ? 'REGULAR' : 'CRITICO';
+
+                setResult({
+                    score: estimatedScore,
+                    category,
+                    dimensiones: {
+                        grupo1: estimatedScore, grupo2: estimatedScore,
+                        grupo3: estimatedScore, grupo4: estimatedScore, grupo5: estimatedScore
+                    }
+                });
+                sessionStorage.setItem('da_result_source', 'agebot');
+            } catch { navigate('/longevidad'); }
         } else {
             navigate('/longevidad');
         }
@@ -206,6 +235,34 @@ const ResultadoScorePage: React.FC = () => {
                     >
                         <span className="font-bold text-sm">{cat.label}</span>
                     </motion.div>
+
+                    {/* ── FIX 4: Banner informativo para AgeBot ── */}
+                    {sessionStorage.getItem('da_result_source') === 'agebot' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}
+                            className="mt-6 w-full max-w-sm rounded-2xl p-4 flex flex-col gap-3"
+                            style={{ background: `${WELLNESS.warn}22`, border: `1px solid ${WELLNESS.warn}44` }}
+                        >
+                            <div className="flex items-start gap-3">
+                                <Info className="w-5 h-5 shrink-0 mt-0.5" style={{ color: WELLNESS.bgCard }} />
+                                <p className="text-[12px] leading-relaxed" style={{ color: WELLNESS.bgCard }}>
+                                    Este score es una **estimación basada en tu análisis facial**.
+                                    Para un resultado clínico preciso, realiza el Test de Vitalidad completo (4 min).
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => navigate('/test')}
+                                className="w-full py-2.5 rounded-full font-bold text-xs transition-all active:scale-95 border"
+                                style={{
+                                    background: 'transparent',
+                                    borderColor: WELLNESS.tealMicro,
+                                    color: WELLNESS.tealMicro
+                                }}
+                            >
+                                Completar Test de Vitalidad →
+                            </button>
+                        </motion.div>
+                    )}
                 </motion.div>
 
                 {/* ── BLOQUE 2: Hook — dato → contexto → oportunidad ── */}

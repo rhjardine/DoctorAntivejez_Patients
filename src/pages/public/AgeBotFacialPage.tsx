@@ -171,8 +171,7 @@ const AgeBotFacialPage: React.FC = () => {
 
     // Trigger camera only after explicit user action (required by mobile browsers)
     useEffect(() => {
-        if (phase !== 'capture' || cameraError || !cameraRequested) return;
-        startCamera();
+        if (phase !== 'capture') return;
 
         return () => {
             // Cleanup: stop all tracks when leaving the capture phase
@@ -180,7 +179,7 @@ const AgeBotFacialPage: React.FC = () => {
             streamRef.current = null;
             setCameraActive(false);
         };
-    }, [cameraRequested, phase, cameraError, startCamera, retryCount]); // ✅ Inclusion of retryCount
+    }, [phase]);
 
     /* ─── FIX 2: Capture with Anti-False-Positive guard ─────────────────── */
     const capturePhoto = () => {
@@ -261,21 +260,43 @@ const AgeBotFacialPage: React.FC = () => {
         setPhase('capture');
     };
 
+    const handleActivateCamera = async () => {
+        setCameraRequested(true);
+        await startCamera();
+    };
+
+    const handleSkipToUpload = () => {
+        setCameraRequested(true);
+        fileInputRef.current?.click();
+    };
+
     const handleRetry = async () => {
         setRetrying(true);
         setCameraError(false);
         setErrorMsg('');
-        // Brief delay to allow React to clear the error state and hit the useEffect
+        // Brief delay to allow React to clear the error state UI
         await new Promise(r => setTimeout(r, 400));
         setRetryCount(prev => prev + 1);
+        await startCamera(); // ✅ Direct call after user interaction
         setRetrying(false);
     };
 
     /* ─── FIX 3: Correct final CTA — save to store then navigate ─────────── */
     const handleFinalCTA = () => {
         if (result) {
+            // 1. Sync to Zustand store (existing)
             setAgeBotResult(result.estimatedAge);
             setCurrentStep('RESULTADO');
+
+            // 2. Sync to sessionStorage for ResultadoScorePage (bridge)
+            sessionStorage.setItem('da_agebot_result', JSON.stringify({
+                estimatedAge: result.estimatedAge,
+                confidence: result.confidence,
+                analysisPoints: result.analysisPoints,
+                source: 'agebot',
+                timestamp: Date.now()
+            }));
+            sessionStorage.setItem('da_result_source', 'agebot');
         }
         navigate('/resultado');
     };
@@ -373,13 +394,9 @@ const AgeBotFacialPage: React.FC = () => {
 
                                                 {/* PRIMARY CTA */}
                                                 <button
-                                                    onClick={() => setCameraRequested(true)}
-                                                    className="w-full max-w-[260px] py-4 rounded-xl font-bold text-base transition-all active:scale-95 pointer-events-auto"
-                                                    style={{
-                                                        background: WELLNESS.terracotta,
-                                                        color: WELLNESS.bgCard,
-                                                        boxShadow: `0 8px 24px ${WELLNESS.terracotta}44`
-                                                    }}>
+                                                    onClick={handleActivateCamera}
+                                                    className="w-full py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 transform active:scale-95 transition-all text-sm pointer-events-auto"
+                                                    style={{ background: WELLNESS.terracotta }}>
                                                     Activar Cámara
                                                 </button>
 
