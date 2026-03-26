@@ -65,9 +65,9 @@ const BiomicsPage: React.FC = () => {
             particles.push(new Particle());
         }
 
+        let animationFrameId: number;
         const animate = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // Draw background gradient (dark blue to lighter blue)
             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
             gradient.addColorStop(0, '#1e3a8a');
             gradient.addColorStop(1, '#172554');
@@ -78,7 +78,7 @@ const BiomicsPage: React.FC = () => {
                 particle.update();
                 particle.draw();
             });
-            requestAnimationFrame(animate);
+            animationFrameId = requestAnimationFrame(animate);
         };
 
         animate();
@@ -89,7 +89,10 @@ const BiomicsPage: React.FC = () => {
         };
 
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        return () => {
+            cancelAnimationFrame(animationFrameId);
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
     return (

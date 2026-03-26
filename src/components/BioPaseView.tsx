@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { ShieldCheck, RefreshCw, CheckCircle, Info, QrCode, ArrowLeft, Loader2 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { COLORS } from '../types';
 
 interface BioPaseViewProps {
@@ -68,7 +69,14 @@ const BioPaseView: React.FC<BioPaseViewProps> = ({ patientId, onRefresh, onBack 
             <div className="relative bg-white p-4 rounded-xl shadow-md flex items-center justify-center">
               {patientId ? (
                 <div className="flex flex-col items-center gap-2">
-                  <QrCode size={180} className="text-darkBlue" strokeWidth={1.5} />
+                  <QRCodeSVG
+                    value={`doctorantivejez://checkin/${patientId}`}
+                    size={180}
+                    bgColor="transparent"
+                    fgColor="#293B64"
+                    level="M"
+                    includeMargin={false}
+                  />
                   <span className="text-xs font-bold text-textMedium">Scan para check-in</span>
                 </div>
               ) : (
