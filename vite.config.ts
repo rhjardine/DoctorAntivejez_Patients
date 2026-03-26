@@ -33,10 +33,10 @@ export default defineConfig(({ mode }) => {
           start_url: '/',
           scope: '/',
           icons: [
-            { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-            { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
-            { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-            { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+            { src: '/Icono_app.jpeg', sizes: '192x192', type: 'image/jpeg', purpose: 'any' },
+            { src: '/Icono_app.jpeg', sizes: '192x192', type: 'image/jpeg', purpose: 'maskable' },
+            { src: '/Icono_app.jpeg', sizes: '512x512', type: 'image/jpeg', purpose: 'any' },
+            { src: '/Icono_app.jpeg', sizes: '512x512', type: 'image/jpeg', purpose: 'maskable' },
           ],
         },
         workbox: {
@@ -60,6 +60,22 @@ export default defineConfig(({ mode }) => {
         }
       })
     ],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-motion': ['framer-motion'],
+            'vendor-charts': ['recharts'],
+            'vendor-icons': ['lucide-react'],
+            'vendor-router': ['react-router-dom'],
+            'vendor-sentry': ['@sentry/react'],
+            'vendor-fingerprint': ['@fingerprintjs/fingerprintjs'],
+            'vendor-utils': ['axios', 'date-fns', 'zustand'],
+          }
+        }
+      }
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

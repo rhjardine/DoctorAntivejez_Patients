@@ -8,14 +8,6 @@ const ENCRYPTION_SEED =
         ? 'dev-only-insecure-seed-do-not-use-in-prod'
         : null);
 
-if (!import.meta.env.VITE_ENCRYPTION_SEED) {
-    if (import.meta.env.DEV) {
-        logger.warn('VITE_ENCRYPTION_SEED not set — using dev fallback. Safe for local only.');
-    } else {
-        logger.error('CRITICAL: VITE_ENCRYPTION_SEED missing in production. Configure in Render env.');
-    }
-}
-
 /**
  * Servicio de Encriptación PHI (Personal Health Information).
  * Utiliza Web Crypto API (AES-GCM) para encriptar datos sensibles en el dispositivo.
@@ -33,6 +25,11 @@ class CryptoService {
      * Inicializa el servicio derivando la llave de encriptación.
      */
     async init() {
+        // ✅ HARDENING: Throw error in production if seed is missing
+        if (!ENCRYPTION_SEED && import.meta.env.PROD) {
+            throw new Error('VITE_ENCRYPTION_SEED missing in production');
+        }
+
         try {
             // 1. Obtener huella digital del dispositivo
             const fp = await FingerprintJS.load();

@@ -64,11 +64,34 @@ async function main() {
 
   // Warm up crypto before React hydrates
   // This guarantees the key is ready before any Zustand persist read is attempted
-  await cryptoService.init().catch(() => {
-    // If crypto fails, the store falls back to returning null for profileData
-    // user sees loading state, not a crash
+  try {
+    await cryptoService.init();
+  } catch (error: any) {
+    // Check if it's the critical production seed error
+    if (import.meta.env.PROD && error.message?.includes('VITE_ENCRYPTION_SEED missing')) {
+      if (container) {
+        const root = createRoot(container);
+        root.render(
+          <div style={{
+            height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: '#F8FAFC', color: '#1E293B', fontFamily: 'system-ui', padding: '20px', textAlign: 'center'
+          }}>
+            <div style={{ maxWidth: '400px' }}>
+              <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔐</div>
+              <h1 style={{ fontSize: '20px', fontWeight: 'bold' }}>Error de configuración de seguridad</h1>
+              <p style={{ marginTop: '10px', color: '#64748B', lineHeight: '1.5' }}>
+                Contacte al administrador del sistema para verificar las variables de entorno.
+              </p>
+            </div>
+          </div>
+        );
+      }
+      return; // STOP BOOT
+    }
+
+    // For other failures (e.g. FingerprintJS or subtle crypto issues), fall back gracefully
     console.warn('[Boot] Crypto init failed — profile will re-fetch from network');
-  });
+  }
 
   const root = createRoot(container);
   root.render(
