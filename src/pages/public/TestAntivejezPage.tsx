@@ -18,7 +18,7 @@ type Question = {
     weight: number;
 };
 
-const QUESTIONS: Question[] = [
+export const QUESTIONS: Question[] = [
     // GRUPO 1 — ENERGÍA Y ESTADO MENTAL
     { id: 'R1a', text: 'Se siente frecuentemente agotado', direction: 'negative', weight: 2, group: 1 },
     { id: 'R2a', text: 'Se siente feliz la mayor parte del tiempo', direction: 'positive', weight: 1, group: 1 },
@@ -80,7 +80,7 @@ const GROUP_NAMES: Record<number, string> = {
 };
 
 /* ─── Score calculation ─────────────────────────────────────────────────── */
-function calcularScore(answers: Record<string, boolean>) {
+export function calcularScore(answers: Record<string, boolean>) {
     const maxPossibleNegative = QUESTIONS
         .filter(q => q.direction === 'negative')
         .reduce((acc, q) => acc + q.weight, 0);

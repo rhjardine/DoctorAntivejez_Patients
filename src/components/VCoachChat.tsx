@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { COLORS, ChatMessage } from '../types';
 import { Send, Bot, User, Sparkles } from 'lucide-react';
+import { sendMessageToVCoach } from '../services/geminiService';
 
 const VCoachChat: React.FC = () => {
   const [input, setInput] = useState('');
@@ -10,12 +11,10 @@ const VCoachChat: React.FC = () => {
       id: '1',
       role: 'model',
       text: '¡Hola! Soy tu VCoach de Doctor Antivejez. '
-        + 'Estoy en fase de activación y pronto estaré '
-        + 'completamente operativo para apoyar tu salud '
-        + 'y longevidad. 🚀\n\n'
-        + 'Mientras tanto, revisa tu Guía del Paciente '
-        + 'y tu Plan de Alimentación para comenzar tu '
-        + 'protocolo antienvejecimiento.',
+        + 'Estoy listo para apoyarte en tu camino hacia '
+        + 'una mayor salud y longevidad. 🚀\n\n'
+        + '¿En qué puedo ayudarte hoy con tu protocolo '
+        + 'antienvejecimiento?',
       timestamp: new Date().toISOString()
     }
   ]);
@@ -44,25 +43,37 @@ const VCoachChat: React.FC = () => {
     setInput('');
     setIsLoading(true);
 
-    // Short delay for natural feel
-    await new Promise(resolve => setTimeout(resolve, 800));
+    try {
+      // 1. Construir chatHistory mapeando roles y partes
+      const chatHistory = messages.map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.text }]
+      }));
 
-    const betaResponse: ChatMessage = {
-      id: (Date.now() + 1).toString(),
-      role: 'model',
-      text: '¡Hola! Estoy en fase de activación para '
-        + 'acompañarte mejor. Muy pronto estaré '
-        + 'completamente operativo para responder '
-        + 'todas tus preguntas sobre tu plan de salud, '
-        + 'nutrición y longevidad. 🌱\n\n'
-        + 'Por ahora, cualquier duda puedes consultarla '
-        + 'directamente con tu Coach Antivejez o Médico Tratante '
-        + 'a través del WhatsApp o coordenada de contacto.',
-      timestamp: new Date().toISOString()
-    };
+      // 2. Llamar al servicio real
+      const responseText = await sendMessageToVCoach(input, chatHistory);
 
-    setMessages(prev => [...prev, betaResponse]);
-    setIsLoading(false);
+      // 3. Crear mensaje del bot
+      const botMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'model',
+        text: responseText,
+        timestamp: new Date().toISOString()
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      // 4. Fallback en caso de error
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'model',
+        text: "No pude conectarme en este momento. Por favor contacta a tu médico directamente si tienes una duda urgente.",
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
