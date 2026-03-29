@@ -17,6 +17,7 @@ const ResultadoScore = React.lazy(() => import('./pages/public/ResultadoScorePag
 const ConsultaExploratoria = React.lazy(() => import('./pages/public/ConsultaExploratoriaPage'));
 const MedicalNetwork = React.lazy(() => import('./pages/public/MedicalNetworkPage'));
 const TestsSelector = React.lazy(() => import('./pages/public/TestsSelectorPage'));
+const UserProfileGateway = React.lazy(() => import('./pages/public/UserProfileGatewayPage'));
 
 // Pages
 import WelcomePage from './pages/WelcomePage';
@@ -58,7 +59,7 @@ import { offlineQueue } from './services/offlineQueue';
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { session } = useAuthStore();
   if (!session) {
-    return <Navigate to="/longevidad" replace />;
+    return <Navigate to="/acceso" replace />;
   }
   return <>{children}</>;
 };
@@ -180,7 +181,7 @@ const App: React.FC = () => {
   const notificationControls = useReminders([]);
 
   const isLoginPage = location.pathname === '/login';
-  const PUBLIC_ROUTES = ['/longevidad', '/longevidad-tests', '/test', '/agebot', '/resultado', '/consulta', '/medicos'];
+  const PUBLIC_ROUTES = ['/acceso', '/longevidad', '/longevidad-tests', '/test', '/agebot', '/resultado', '/consulta', '/medicos'];
   const isPublicRoute = PUBLIC_ROUTES.some(r => location.pathname.startsWith(r));
   const showHeaderFooter = session && !isLoginPage && !isPublicRoute;
   const isHome = location.pathname === '/';
@@ -287,10 +288,11 @@ const App: React.FC = () => {
             <Route path="/history" element={<ProtectedRoute><ConsultationHistoryView onBack={() => navigate(-1)} onInfoPress={() => toggleClinicalInfo(true)} /></ProtectedRoute>} />
             <Route path="/biopase" element={<ProtectedRoute><BioPaseView patientId={session?.id || ''} onRefresh={async () => { }} onBack={() => navigate(-1)} /></ProtectedRoute>} />
 
-            {/* Public growth engine routes — no auth required */}
+            {/* Public entry + growth engine routes — no auth required */}
+            <Route path="/acceso" element={<UserProfileGateway />} />
             <Route path="/longevidad" element={<LandingPublica />} />
             <Route path="/longevidad-tests" element={<TestsSelector />} />
-            <Route path="/welcome" element={<Navigate to="/longevidad" replace />} />
+            <Route path="/welcome" element={<Navigate to="/acceso" replace />} />
             <Route path="/test" element={<TestAntivejez />} />
             <Route path="/agebot" element={<AgeBotFacial />} />
             <Route path="/resultado" element={<ResultadoScore />} />
