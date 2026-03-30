@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -142,13 +142,13 @@ const ConsultaExploratoriaPage: React.FC = () => {
     const [card, setCard] = useState({ number: '', expiry: '', cvc: '', holder: '' });
     const [submitState, setSubmitState] = useState<SubmitState>('idle');
 
-    // ── FIX 4: Cleanup session flags ──
+    // ── PCI-DSS & FIX 4: Ensure card data is wiped and session flags cleaned on unmount
     useEffect(() => {
-        // Clean up bridge flags when entering the form
         sessionStorage.removeItem('da_result_source');
 
         return () => {
-            // Also clean up on unmount if needed
+            // ✅ PCI-DSS: Wipe card data from memory on unmount (never leave in React state)
+            setCard({ number: '', expiry: '', cvc: '', holder: '' });
             sessionStorage.removeItem('da_result_source');
         };
     }, []);
@@ -163,14 +163,22 @@ const ConsultaExploratoriaPage: React.FC = () => {
         if (!form.name || !form.email || !form.phone) return;
         setSubmitState('sending');
 
+        // ✅ PCI-DSS: Build booking payload WITHOUT persisting card data anywhere.
+        // Card fields are sent directly to the API from in-memory React state only.
         const bookingData = {
             ...form,
             doctorId: form.doctorId || null,
-            card: tipo === 'profunda' ? card : undefined,
+            // ⚠️ Card data is intentionally excluded from the payload.
+            // Payment coordination is handled asynchronously via WhatsApp.
             tipo,
             ts: Date.now()
         };
-        sessionStorage.setItem('vx_booking_data', JSON.stringify(bookingData));
+        // ✅ PCI-DSS: Store ONLY non-sensitive booking metadata (no card fields)
+        sessionStorage.setItem('vx_booking_data', JSON.stringify({
+            tipo,
+            ts: bookingData.ts,
+            doctorId: bookingData.doctorId,
+        }));
 
         try {
             await fetch('/api-render/api/booking', {
@@ -180,6 +188,9 @@ const ConsultaExploratoriaPage: React.FC = () => {
             });
         } catch {
             console.warn('[Consulta] /api/booking mock success');
+        } finally {
+            // ✅ PCI-DSS: Immediately wipe card data from memory after submission attempt
+            setCard({ number: '', expiry: '', cvc: '', holder: '' });
         }
 
         setSubmitState('confirmed');

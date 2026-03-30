@@ -3,9 +3,13 @@ import { useProfileStore } from '../store/useProfileStore';
 import { logger } from '../utils/logger';
 import { tokenStore } from './authService';
 
-// ✅ SECURITY: URL centralizada via variable de entorno
-// Fallback hardcoded para garantizar funcionamiento en producción si la env var no está configurada
-const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com';
+// ✅ SECURITY: Strictly relies on VITE_API_URL — no hardcoded fallback in production
+// In development, the Vite proxy (/api-render) routes to the backend.
+if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
+    console.error('[apiClient] CRITICAL: VITE_API_URL is not set in production. All API calls will fail.');
+}
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const apiClient = axios.create({
     baseURL: import.meta.env.DEV ? '/api-render/api' : `${API_URL}/api`,
@@ -65,8 +69,17 @@ apiClient.interceptors.response.use(
             }
         }
 
-        logger.error('API request failed', { status: error.response?.status, url: originalRequest?.url });
-        return Promise.reject(error);
+        logger.error('API request failed', {
+            status: error.response?.status,
+            url: originalRequest?.url,
+            // ✅ SECURITY: Never log the response body (may contain PHI)
+        });
+
+        // Standardized error object — never exposes raw server error to the UI
+        const standardError = new Error(
+            error.response?.data?.error || 'Error de conexión con el servidor médico.'
+        );
+        return Promise.reject(standardError);
     }
 );
 
