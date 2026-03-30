@@ -11,9 +11,9 @@ const ResultadoScore = React.lazy(() => import('../pages/public/ResultadoScorePa
 const ConsultaExploratoria = React.lazy(() => import('../pages/public/ConsultaExploratoriaPage'));
 const MedicalNetwork = React.lazy(() => import('../pages/public/MedicalNetworkPage'));
 const TestsSelector = React.lazy(() => import('../pages/public/TestsSelectorPage'));
+const UserProfileGateway = React.lazy(() => import('../pages/public/UserProfileGatewayPage'));
 
 // Private pages
-import WelcomePage from '../pages/WelcomePage';
 import LoginPage from '../pages/LoginPage';
 import HomePage from '../pages/HomePage';
 const PatientGuidePage = React.lazy(() => import('../pages/PatientGuidePage'));
@@ -40,7 +40,7 @@ const BioPaseView = React.lazy(() => import('../components/BioPaseView'));
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { session } = useAuthStore();
-    if (!session) return <Navigate to="/longevidad" replace />;
+    if (!session) return <Navigate to="/acceso" replace />;
     return <>{children}</>;
 };
 
@@ -77,10 +77,11 @@ const AppRouter: React.FC = () => {
             <Route path="/history" element={<ProtectedRoute><ConsultationHistoryView onBack={() => navigate(-1)} onInfoPress={() => toggleClinicalInfo(true)} /></ProtectedRoute>} />
             <Route path="/biopase" element={<ProtectedRoute><BioPaseView patientId={session?.id || ''} onRefresh={async () => { }} onBack={() => navigate(-1)} /></ProtectedRoute>} />
 
-            {/* Public growth engine routes — no auth required */}
+            {/* Public entry + growth engine routes — no auth required */}
+            <Route path="/acceso" element={<UserProfileGateway />} />
             <Route path="/longevidad" element={<LandingPublica />} />
             <Route path="/longevidad-tests" element={<TestsSelector />} />
-            <Route path="/welcome" element={<Navigate to="/longevidad" replace />} />
+            <Route path="/welcome" element={<Navigate to="/acceso" replace />} />
             <Route path="/test" element={<TestAntivejez />} />
             <Route path="/agebot" element={<AgeBotFacial />} />
             <Route path="/resultado" element={<ResultadoScore />} />
