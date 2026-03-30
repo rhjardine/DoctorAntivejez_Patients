@@ -1,75 +1,91 @@
-import React, { ErrorInfo } from 'react';
-import * as Sentry from '@sentry/react';
-import { WELLNESS } from '../styles/wellnessPalette';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 interface Props {
-    children: React.ReactNode;
+    children?: ReactNode;
 }
 
 interface State {
     hasError: boolean;
-    error: Error | null;
+    error?: Error;
 }
 
-class ErrorBoundary extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        this.state = { hasError: false, error: null };
-    }
+/**
+ * Global Error Boundary (H25/HOTFIX)
+ * 
+ * Catches runtime errors across the React tree to prevent White Screen of Death.
+ * Displays a stylized fallback UI with error details and recovery options.
+ */
+class ErrorBoundary extends Component<Props, State> {
+    public state: State = {
+        hasError: false
+    };
 
-    static getDerivedStateFromError(error: Error): State {
+    public static getDerivedStateFromError(error: Error): State {
+        // Update state so the next render will show the fallback UI.
         return { hasError: true, error };
     }
 
-    componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        console.error('ErrorBoundary caught an error:', error, errorInfo);
-        if (import.meta.env.PROD) {
-            Sentry.captureException(error, { extra: errorInfo as any });
-        }
+    public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+        console.error('[ErrorBoundary] Uncaught error:', error, errorInfo);
+        // You could also log to Sentry here if not already handled
     }
 
-    render() {
+    private handleReset = () => {
+        // Clear potentially corrupted state
+        sessionStorage.clear();
+        // Redirect to home and reload
+        window.location.assign('/?clear=1');
+    };
+
+    public render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center" style={{ background: '#FDFCF9' }}>
-                    <img src="/Logo_azul_oscuro.png" alt="Doctor Antivejez" className="h-12 mb-8 opacity-80" />
+                <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6 font-sans">
+                    <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl border border-blue-50 p-8 text-center animate-in fade-in zoom-in duration-500">
+                        <div className="w-20 h-20 bg-amber-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border-2 border-amber-100/50">
+                            <AlertTriangle className="text-amber-500" size={40} />
+                        </div>
 
-                    <div className="bg-white p-8 rounded-[2rem] shadow-xl border border-gray-100 max-w-md w-full">
-                        <h2 className="text-xl font-black text-darkBlue mb-4 uppercase tracking-tight">Algo salió mal</h2>
-                        <p className="text-sm text-textMedium font-medium mb-8 leading-relaxed">
-                            La sesión encontró un error inesperado. Por favor recarga la aplicación para continuar.
+                        <h1 className="text-2xl font-black text-[#1E293B] tracking-tight mb-3">
+                            Algo salió mal
+                        </h1>
+
+                        <p className="text-slate-500 text-sm leading-relaxed mb-8">
+                            La aplicación encontró un error inesperado al intentar renderizar la vista. No te preocupes, tus datos están seguros.
                         </p>
 
-                        {import.meta.env.DEV && this.state.error && (
-                            <div className="mb-8 p-4 bg-red-50 rounded-xl text-left overflow-auto max-h-40">
-                                <p className="text-[10px] font-mono text-red-600 font-bold">{this.state.error.message}</p>
-                                <pre className="text-[8px] text-red-400 mt-2">{this.state.error.stack}</pre>
-                            </div>
-                        )}
+                        <div className="bg-slate-50 rounded-2xl p-4 mb-8 text-left border border-slate-100 overflow-hidden">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Detalles Técnicos</p>
+                            <p className="text-[11px] font-mono text-amber-700 break-all leading-tight">
+                                {this.state.error?.message || 'Error desconocido'}
+                            </p>
+                        </div>
 
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="w-full bg-primary text-white py-4 rounded-full font-black uppercase tracking-widest text-sm shadow-lg shadow-blue-200 active:scale-95 transition-all mb-4"
-                        >
-                            Recargar Aplicación
-                        </button>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="flex items-center justify-center gap-2 py-4 px-4 bg-slate-100 text-[#1E293B] rounded-2xl font-bold text-xs hover:bg-slate-200 transition-all active:scale-95"
+                            >
+                                <RefreshCw size={16} /> Reintentar
+                            </button>
+                            <button
+                                onClick={this.handleReset}
+                                className="flex items-center justify-center gap-2 py-4 px-4 bg-[#23BCEF] text-white rounded-2xl font-bold text-xs shadow-lg shadow-blue-200 hover:opacity-90 transition-all active:scale-95"
+                            >
+                                <Home size={16} /> Reiniciar App
+                            </button>
+                        </div>
 
-                        <a
-                            href="/?clear=1"
-                            className="text-[10px] font-black uppercase text-textLight underline underline-offset-4 opacity-60 hover:opacity-100"
-                        >
-                            Si el problema persiste, haz clic aquí para resetear
-                        </a>
+                        <p className="mt-8 text-[10px] text-slate-400 font-medium">
+                            Si el problema persiste, por favor contacte a soporte médico.
+                        </p>
                     </div>
-
-                    <p className="mt-12 text-[9px] font-black uppercase tracking-[0.3em] opacity-30 text-darkBlue">
-                        Protocolo de Seguridad v2.0
-                    </p>
                 </div>
             );
         }
 
-        return this.props.children;
+        return this.children;
     }
 }
 

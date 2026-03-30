@@ -69,23 +69,21 @@ async function main() {
   } catch (error: any) {
     // Check if it's the critical production seed error
     if (import.meta.env.PROD && error.message?.includes('VITE_ENCRYPTION_SEED missing')) {
-      if (container) {
-        const root = createRoot(container);
-        root.render(
-          <div style={{
-            height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#F8FAFC', color: '#1E293B', fontFamily: 'system-ui', padding: '20px', textAlign: 'center'
-          }}>
-            <div style={{ maxWidth: '400px' }}>
-              <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔐</div>
-              <h1 style={{ fontSize: '20px', fontWeight: 'bold' }}>Error de configuración de seguridad</h1>
-              <p style={{ marginTop: '10px', color: '#64748B', lineHeight: '1.5' }}>
-                Contacte al administrador del sistema para verificar las variables de entorno.
-              </p>
-            </div>
+      const root = createRoot(container);
+      root.render(
+        <div style={{
+          height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#F8FAFC', color: '#1E293B', fontFamily: 'system-ui', padding: '20px', textAlign: 'center'
+        }}>
+          <div style={{ maxWidth: '400px' }}>
+            <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔐</div>
+            <h1 style={{ fontSize: '20px', fontWeight: 'bold' }}>Error de configuración de seguridad</h1>
+            <p style={{ marginTop: '10px', color: '#64748B', lineHeight: '1.5' }}>
+              Contacte al administrador del sistema para verificar las variables de entorno (SEED).
+            </p>
           </div>
-        );
-      }
+        </div>
+      );
       return; // STOP BOOT
     }
 
@@ -96,9 +94,7 @@ async function main() {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <App />
     </React.StrictMode>
   );
 }

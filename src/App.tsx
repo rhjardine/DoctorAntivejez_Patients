@@ -2,6 +2,7 @@ import React from 'react';
 import AppProviders from './providers/AppProviders';
 import MainLayout from './components/MainLayout';
 import AppRouter from './routes/AppRouter';
+import ErrorBoundary from './components/ErrorBoundary';
 
 /**
  * App.tsx — Minimal entry point
@@ -9,11 +10,13 @@ import AppRouter from './routes/AppRouter';
  */
 const App: React.FC = () => {
   return (
-    <AppProviders>
-      <MainLayout>
-        <AppRouter />
-      </MainLayout>
-    </AppProviders>
+    <ErrorBoundary>
+      <AppProviders>
+        <MainLayout>
+          <AppRouter />
+        </MainLayout>
+      </AppProviders>
+    </ErrorBoundary>
   );
 };
 
