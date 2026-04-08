@@ -11,7 +11,7 @@ const ResultadoScore = React.lazy(() => import('../pages/public/ResultadoScorePa
 const ConsultaExploratoria = React.lazy(() => import('../pages/public/ConsultaExploratoriaPage'));
 const MedicalNetwork = React.lazy(() => import('../pages/public/MedicalNetworkPage'));
 const TestsSelector = React.lazy(() => import('../pages/public/TestsSelectorPage'));
-const UserProfileGateway = React.lazy(() => import('../pages/public/UserProfileGatewayPage'));
+const UniversalEntry = React.lazy(() => import('../pages/public/UniversalEntry'));
 
 // Private pages
 import LoginPage from '../pages/LoginPage';
@@ -78,7 +78,7 @@ const AppRouter: React.FC = () => {
             <Route path="/biopase" element={<ProtectedRoute><BioPaseView patientId={session?.id || ''} onRefresh={async () => { }} onBack={() => navigate(-1)} /></ProtectedRoute>} />
 
             {/* Public entry + growth engine routes — no auth required */}
-            <Route path="/acceso" element={<UserProfileGateway />} />
+            <Route path="/acceso" element={<UniversalEntry />} />
             <Route path="/longevidad" element={<LandingPublica />} />
             <Route path="/longevidad-tests" element={<TestsSelector />} />
             <Route path="/welcome" element={<Navigate to="/acceso" replace />} />

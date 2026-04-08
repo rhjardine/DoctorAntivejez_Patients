@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import PublicHeader from '../../components/public/PublicHeader';
 import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
-import { WELLNESS } from '../../styles/wellnessPalette';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 import { usePublicFunnelStore } from '../../store/usePublicFunnelStore';
 
@@ -68,7 +67,8 @@ const FacialOverlay: React.FC<{ size: number }> = ({ size }) => {
                     key={i}
                     x1={points[a].x} y1={points[a].y}
                     x2={points[b].x} y2={points[b].y}
-                    stroke={WELLNESS.sage} strokeWidth="1" opacity="0.5"
+                    stroke="#5A7163" // vytalix-sage
+                    strokeWidth="1" opacity="0.5"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{ pathLength: 1, opacity: 0.5 }}
                     transition={{ delay: i * 0.04, duration: 0.5 }}
@@ -78,7 +78,7 @@ const FacialOverlay: React.FC<{ size: number }> = ({ size }) => {
                 <motion.circle
                     key={i}
                     cx={p.x} cy={p.y} r="2.5"
-                    fill={WELLNESS.sage}
+                    fill="#5A7163" // vytalix-sage
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 0.9 }}
                     transition={{ delay: i * 0.03, type: 'spring' }}
@@ -303,7 +303,7 @@ const AgeBotFacialPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col" style={{ background: WELLNESS.bg }}>
+        <div className="min-h-screen flex flex-col bg-vytalix-sand">
             <PublicHeader
                 theme="wellness"
                 title={capturedImage ? "Análisis Facial" : "AgeBot Facial"}
@@ -313,7 +313,7 @@ const AgeBotFacialPage: React.FC = () => {
 
             {/* Hidden canvas for capture */}
             <canvas ref={canvasRef} className="hidden" />
-            <input ref={fileInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleFileUpload} />
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
 
             <div className="flex-1 flex flex-col overflow-hidden">
                 <AnimatePresence mode="wait">
@@ -339,10 +339,9 @@ const AgeBotFacialPage: React.FC = () => {
                                                 />
 
                                                 {isCameraLoading && (
-                                                    <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[1.5rem] z-30"
-                                                        style={{ background: 'rgba(253,251,247,0.85)', backdropFilter: 'blur(4px)' }}>
-                                                        <Loader2 size={40} className="animate-spin mb-3" style={{ color: WELLNESS.terracotta }} />
-                                                        <p className="text-xs font-bold tracking-widest uppercase" style={{ color: WELLNESS.earth }}>Iniciando cámara...</p>
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[1.5rem] z-30 bg-vytalix-sand/85 backdrop-blur-sm">
+                                                        <Loader2 size={40} className="animate-spin mb-3 text-vytalix-terracotta" />
+                                                        <p className="text-xs font-bold tracking-widest uppercase text-vytalix-graphite/60 text-center px-4">Iniciando cámara...</p>
                                                     </div>
                                                 )}
 
@@ -352,27 +351,22 @@ const AgeBotFacialPage: React.FC = () => {
                                                         <div className="relative">
                                                             {/* Scanning bar */}
                                                             <motion.div
-                                                                className="absolute left-0 right-0 h-0.5 z-20"
-                                                                style={{ background: `${WELLNESS.sage}88`, boxShadow: `0 0 12px ${WELLNESS.sage}` }}
+                                                                className="absolute left-0 right-0 h-0.5 z-20 bg-vytalix-sage/50 shadow-[0_0_12px_rgba(90,113,99,0.5)]"
                                                                 animate={{ top: ['15%', '85%', '15%'] }}
                                                                 transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
                                                             />
-                                                            <div className="w-56 h-72 rounded-[40%] border-2"
-                                                                style={{
-                                                                    borderColor: `${WELLNESS.sage}88`,
-                                                                    boxShadow: `0 0 0 4000px rgba(0,0,0,0.35)`
-                                                                }}>
+                                                            <div className="w-56 h-72 rounded-[40%] border-2 border-vytalix-sage/50 shadow-[0_0_0_4000px_rgba(0,0,0,0.35)]">
                                                                 {/* HUD corners */}
-                                                                <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
-                                                                <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
-                                                                <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2" style={{ borderColor: WELLNESS.sage }} />
-                                                                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2" style={{ borderColor: WELLNESS.sage }} />
+                                                                <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-vytalix-sage" />
+                                                                <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-vytalix-sage" />
+                                                                <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-vytalix-sage" />
+                                                                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-vytalix-sage" />
                                                             </div>
                                                             <div className="absolute -bottom-12 left-0 right-0 flex flex-col items-center gap-1">
-                                                                <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: WELLNESS.sage }}>
+                                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-vytalix-sage">
                                                                     Calibración Óptica Activa
                                                                 </p>
-                                                                <p className="text-[13px] font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                                                                <p className="text-[13px] font-medium text-white/90">
                                                                     Centra tu rostro para análisis vital
                                                                 </p>
                                                             </div>
@@ -383,29 +377,26 @@ const AgeBotFacialPage: React.FC = () => {
                                         ) : (
                                             /* ── Tarea 4: Primary CTA = Activar Cámara ── */
                                             <div className="flex flex-col items-center justify-center text-center px-6 h-full z-10">
-                                                <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
-                                                    style={{ background: `${WELLNESS.sage}18` }}>
-                                                    <Camera size={40} style={{ color: WELLNESS.sage }} />
+                                                <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-vytalix-sage/10">
+                                                    <Camera size={40} className="text-vytalix-sage" />
                                                 </div>
-                                                <p className="font-black text-xl mb-3" style={{ color: WELLNESS.earthDark }}>Análisis Facial AgeBot</p>
+                                                <p className="font-black text-xl mb-3 text-vytalix-graphite uppercase tracking-tight">Análisis Facial AgeBot</p>
                                                 {/* ── Tarea 5: font-medium subtítulo ── */}
-                                                <p className="font-medium text-sm mb-10 leading-relaxed max-w-[260px]" style={{ color: '#6b7280' }}>
+                                                <p className="font-medium text-sm mb-10 leading-relaxed max-w-[260px] text-gray-500">
                                                     AgeBot necesita acceso a tu cámara para analizar tus biomarcadores faciales en tiempo real.
                                                 </p>
 
                                                 {/* PRIMARY CTA */}
                                                 <button
                                                     onClick={handleActivateCamera}
-                                                    className="w-full py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 transform active:scale-95 transition-all text-sm pointer-events-auto"
-                                                    style={{ background: WELLNESS.terracotta }}>
+                                                    className="w-full py-4 bg-vytalix-terracotta text-white font-bold rounded-xl shadow-lg shadow-vytalix-terracotta/30 transform active:scale-95 transition-all text-sm pointer-events-auto">
                                                     Activar Cámara
                                                 </button>
 
                                                 {/* SECONDARY: subtle text link — Gallery */}
                                                 <button
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className="mt-5 text-sm underline decoration-gray-300 pointer-events-auto hover:text-gray-400 transition-colors"
-                                                    style={{ color: '#9ca3af' }}>
+                                                    className="mt-5 text-sm underline decoration-gray-300 pointer-events-auto text-vytalix-graphite/40 hover:text-vytalix-graphite/60 transition-colors">
                                                     Subir foto desde galería
                                                 </button>
                                             </div>
@@ -415,33 +406,30 @@ const AgeBotFacialPage: React.FC = () => {
                                     /* Camera unavailable */
                                     <div className="flex flex-col items-center justify-center text-center px-8 z-10 p-6 h-full">
                                         <AlertTriangle size={48} className="mb-4 text-amber-500" />
-                                        <p className="font-bold text-lg mb-2" style={{ color: WELLNESS.earthDark }}>Cámara no disponible</p>
-                                        <p className="text-sm mb-8 font-medium leading-relaxed" style={{ color: '#6b7280' }}>
+                                        <p className="font-bold text-lg mb-2 text-vytalix-graphite">Cámara no disponible</p>
+                                        <p className="text-sm mb-8 font-medium leading-relaxed text-gray-500">
                                             {errorMsg || 'Permiso de cámara denegado o no disponible en este navegador. Actívalo en los ajustes del navegador, o sube una foto.'}
                                         </p>
                                         <div className="flex flex-col w-full gap-3 max-w-[240px]">
                                             <button
                                                 onClick={handleRetry}
                                                 disabled={retrying}
-                                                className="w-full py-4 rounded-xl font-bold text-sm transition-all active:scale-95 bg-white border border-gray-200 shadow-sm pointer-events-auto disabled:opacity-50 disabled:cursor-not-allowed"
-                                                style={{ color: WELLNESS.earthDark }}>
+                                                className="w-full py-4 rounded-xl font-bold text-sm transition-all active:scale-95 bg-white border border-gray-200 shadow-sm pointer-events-auto disabled:opacity-50 disabled:cursor-not-allowed text-vytalix-graphite">
                                                 {retrying ? 'Reintentando...' : 'Reintentar cámara'}
                                             </button>
                                             <button onClick={() => fileInputRef.current?.click()}
-                                                className="mt-2 text-sm underline decoration-gray-300 pointer-events-auto hover:text-gray-400"
-                                                style={{ color: '#9ca3af' }}>
+                                                className="mt-2 text-sm underline decoration-gray-300 pointer-events-auto text-vytalix-graphite/40 hover:text-vytalix-graphite/60 transition-colors">
                                                 Subir foto manual
                                             </button>
 
                                             <button
                                                 onClick={() => setShowDiagnostics(!showDiagnostics)}
-                                                className="mt-8 text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity"
-                                                style={{ color: WELLNESS.earth }}>
+                                                className="mt-8 text-[10px] uppercase tracking-widest text-vytalix-graphite/40 hover:text-vytalix-graphite/70 transition-opacity">
                                                 {showDiagnostics ? 'Ocultar diagnóstico' : 'Ver diagnóstico técnico'}
                                             </button>
 
                                             {showDiagnostics && (
-                                                <div className="mt-4 p-3 rounded-lg bg-black/5 text-[10px] text-left font-mono break-all" style={{ color: WELLNESS.earth }}>
+                                                <div className="mt-4 p-3 rounded-lg bg-black/5 text-[10px] text-left font-mono break-all text-vytalix-graphite/60">
                                                     <p>Secure Context: {window.isSecureContext ? 'YES' : 'NO'}</p>
                                                     <p>MediaDevices: {navigator.mediaDevices ? 'YES' : 'NO'}</p>
                                                     <p>UserAgent: {navigator.userAgent}</p>
@@ -459,17 +447,15 @@ const AgeBotFacialPage: React.FC = () => {
                                     {/* Secondary: upload icon (Gallery) */}
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="w-14 h-14 rounded-full flex items-center justify-center transition-all hover:bg-black/5 active:scale-90"
-                                        style={{ border: `1px solid ${WELLNESS.earth}22` }}>
-                                        <ImageIcon size={22} style={{ color: WELLNESS.earth }} />
+                                        className="w-14 h-14 rounded-full flex items-center justify-center transition-all hover:bg-black/5 active:scale-90 border border-vytalix-graphite/10">
+                                        <ImageIcon size={22} className="text-vytalix-graphite/60" />
                                     </button>
                                     {/* Shutter button — disabled until video is live */}
                                     <button
                                         onClick={capturePhoto}
                                         disabled={!cameraActive}
-                                        className="w-20 h-20 rounded-full border-4 flex items-center justify-center active:scale-90 transition-all shadow-xl disabled:opacity-30 disabled:cursor-not-allowed"
-                                        style={{ borderColor: WELLNESS.terracotta }}>
-                                        <div className="w-16 h-16 rounded-full" style={{ background: WELLNESS.terracotta }} />
+                                        className="w-20 h-20 rounded-full border-4 border-vytalix-terracotta flex items-center justify-center active:scale-90 transition-all shadow-xl disabled:opacity-30 disabled:cursor-not-allowed">
+                                        <div className="w-16 h-16 rounded-full bg-vytalix-terracotta" />
                                     </button>
                                     <div className="w-14 h-14" /> {/* spacer */}
                                 </div>
@@ -485,21 +471,20 @@ const AgeBotFacialPage: React.FC = () => {
                     {/* ── ANALYZING ── */}
                     {phase === 'analyzing' && (
                         <motion.div key="analyzing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            className="flex-1 flex flex-col items-center justify-center px-8 text-center">
+                            className="flex-1 flex flex-col items-center justify-center px-8 text-center uppercase tracking-tight">
                             <div className="relative mb-8">
                                 {capturedImage && (
                                     <img src={capturedImage} alt="Foto capturada"
-                                        className="w-40 h-40 object-cover rounded-full opacity-40"
-                                        style={{ border: `3px solid ${WELLNESS.terracotta}` }} />
+                                        className="w-40 h-40 object-cover rounded-full opacity-40 border-2 border-vytalix-terracotta" />
                                 )}
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <Loader2 size={52} style={{ color: WELLNESS.terracotta }} className="animate-spin" />
+                                    <Loader2 size={52} className="text-vytalix-terracotta animate-spin" />
                                 </div>
                             </div>
-                            <p className="text-lg font-bold mb-2" style={{ fontFamily: 'Poppins, sans-serif', color: WELLNESS.textPrimary }}>
+                            <p className="text-lg font-black mb-2 text-vytalix-graphite uppercase">
                                 Analizando tu vitalidad facial con IA...
                             </p>
-                            <p className="text-sm font-medium" style={{ color: WELLNESS.earth }}>
+                            <p className="text-sm font-medium text-vytalix-graphite/60">
                                 Detectando {24} puntos de referencia facial
                             </p>
                         </motion.div>
@@ -514,46 +499,43 @@ const AgeBotFacialPage: React.FC = () => {
                             <div className="relative w-52 h-52 mb-6">
                                 {capturedImage && (
                                     <img src={capturedImage} alt="Analysis"
-                                        className="w-full h-full object-cover rounded-3xl"
-                                        style={{ border: `2px solid ${WELLNESS.sage}88`, boxShadow: '0 8px 32px rgba(0,0,0,0.08)' }} />
+                                        className="w-full h-full object-cover rounded-3xl border-2 border-vytalix-sage/30 shadow-[0_8px_32px_rgba(0,0,0,0.08)]" />
                                 )}
                                 <FacialOverlay size={208} />
                                 {/* Badge */}
                                 <motion.div
                                     initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5, type: 'spring' }}
-                                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-full"
-                                    style={{ background: WELLNESS.good, whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                                    <CheckCircle size={14} color={WELLNESS.bgCard} />
-                                    <span className="text-xs font-black uppercase tracking-wide" style={{ color: WELLNESS.bgCard }}>ANÁLISIS COMPLETADO</span>
+                                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#10B981] whitespace-nowrap shadow-lg">
+                                    <CheckCircle size={14} className="text-white" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-white leading-none">ANÁLISIS COMPLETADO</span>
                                 </motion.div>
                             </div>
 
                             {/* Age result */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                                className="w-full max-w-sm rounded-3xl p-6 mb-5 text-center"
-                                style={{ background: WELLNESS.bgCard, border: `1px solid ${WELLNESS.earth}33`, boxShadow: '0 4px 24px rgba(0,0,0,0.04)' }}>
-                                <p className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: WELLNESS.earth }}>
+                                className="w-full max-w-sm rounded-[2.5rem] p-8 mb-6 text-center bg-white border border-vytalix-graphite/5 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+                                <p className="text-[11px] uppercase tracking-[0.2em] font-black mb-3 text-vytalix-graphite/40">
                                     Tu {VITALITY_LABELS.age_result}
                                 </p>
-                                <p className="text-6xl font-black mb-1" style={{ fontFamily: 'Poppins, sans-serif', color: WELLNESS.earthDark }}>
+                                <p className="text-7xl font-black mb-2 text-vytalix-graphite tracking-tighter">
                                     {result.estimatedAge}
-                                    <span className="text-2xl ml-1" style={{ color: WELLNESS.earth }}>años</span>
+                                    <span className="text-2xl ml-1 text-vytalix-graphite/40">años</span>
                                 </p>
-                                <div className="inline-block mt-1 mb-3 rounded-full px-3 py-1" style={{ background: `${WELLNESS.sage}1A` }}>
-                                    <p className="text-[10px] font-medium" style={{ color: WELLNESS.sage }}>basado en análisis visual de vitalidad</p>
+                                <div className="inline-block mt-2 mb-6 rounded-full px-4 py-1.5 bg-vytalix-sage/10">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-vytalix-sage">ANÁLISIS DE VITALIDAD IA</p>
                                 </div>
-                                <div className="flex items-center justify-center gap-4 mt-1">
+                                <div className="flex items-center justify-center gap-8 mt-2">
                                     <div className="text-center">
-                                        <p className="text-[10px] uppercase mb-1" style={{ color: WELLNESS.textHint }}>Confianza</p>
-                                        <p className="text-sm font-bold" style={{ color: WELLNESS.earthDark }}>
+                                        <p className="text-[10px] uppercase font-black tracking-widest mb-1 text-vytalix-graphite/30">Confianza</p>
+                                        <p className="text-base font-black text-vytalix-graphite tracking-tight">
                                             {Math.round(result.confidence * 100)}%
                                         </p>
                                     </div>
-                                    <div className="w-px h-8" style={{ background: `${WELLNESS.earth}26` }} />
+                                    <div className="w-px h-8 bg-vytalix-graphite/10" />
                                     <div className="text-center">
-                                        <p className="text-[10px] uppercase mb-1" style={{ color: WELLNESS.textHint }}>Puntos analizados</p>
-                                        <p className="text-sm font-bold" style={{ color: WELLNESS.earthDark }}>{result.analysisPoints}</p>
+                                        <p className="text-[10px] uppercase font-black tracking-widest mb-1 text-vytalix-graphite/30">Marcadores</p>
+                                        <p className="text-base font-black text-vytalix-graphite tracking-tight">{result.analysisPoints}</p>
                                     </div>
                                 </div>
                             </motion.div>
@@ -571,18 +553,15 @@ const AgeBotFacialPage: React.FC = () => {
                                 className="w-full max-w-sm flex flex-col gap-3">
                                 <button
                                     onClick={handleFinalCTA}
-                                    className="w-full font-bold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-95"
-                                    style={{ background: WELLNESS.terracotta, color: WELLNESS.bgCard, borderRadius: 32, padding: '15px 0', fontFamily: 'Poppins, sans-serif' }}>
-                                    Descubrir mi Edad Celular completa <ArrowRight size={18} />
+                                    className="w-full py-5 bg-vytalix-terracotta text-white font-black text-[15px] flex items-center justify-center gap-2 rounded-full shadow-xl shadow-vytalix-terracotta/20 transform active:scale-95 transition-all uppercase tracking-widest">
+                                    Descubrir mi Edad Celular <ArrowRight size={18} strokeWidth={3} />
                                 </button>
                                 <button onClick={() => navigate('/test')}
-                                    className="w-full font-medium text-sm py-3 transition-all"
-                                    style={{ color: WELLNESS.earth }}>
-                                    También quiero contestar el Test de Vitalidad →
+                                    className="w-full font-bold text-xs py-3 text-vytalix-graphite/50 hover:text-vytalix-graphite transition-all uppercase tracking-widest">
+                                    Test de Vitalidad Completo →
                                 </button>
                                 <button onClick={reset}
-                                    className="w-full font-medium text-xs py-2 flex items-center justify-center gap-1.5 transition-all mt-4"
-                                    style={{ color: WELLNESS.textHint }}>
+                                    className="w-full font-bold text-[10px] py-2 flex items-center justify-center gap-2 text-vytalix-graphite/30 hover:text-vytalix-graphite/50 transition-all mt-6 uppercase tracking-widest">
                                     <RefreshCw size={12} /> Analizar otra foto
                                 </button>
                             </motion.div>
@@ -592,13 +571,12 @@ const AgeBotFacialPage: React.FC = () => {
                     {/* ── ERROR ── */}
                     {phase === 'error' && (
                         <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                            className="flex-1 flex flex-col items-center justify-center px-8 text-center">
-                            <AlertTriangle size={48} className="mb-4" style={{ color: WELLNESS.terracotta }} />
-                            <p className="text-lg font-bold mb-2" style={{ color: WELLNESS.earthDark }}>No pudimos analizar la imagen</p>
-                            <p className="text-sm mb-8 font-medium" style={{ color: WELLNESS.earth }}>{errorMsg}</p>
+                            className="flex-1 flex flex-col items-center justify-center px-8 text-center bg-vytalix-sand">
+                            <AlertTriangle size={48} className="mb-4 text-vytalix-terracotta" />
+                            <p className="text-xl font-black mb-2 text-vytalix-graphite uppercase">Error de análisis</p>
+                            <p className="text-sm mb-8 font-medium text-vytalix-graphite/60 leading-relaxed">{errorMsg}</p>
                             <button onClick={reset}
-                                className="px-8 py-4 rounded-full font-bold hover:opacity-90 transition-opacity"
-                                style={{ background: WELLNESS.terracotta, color: WELLNESS.bgCard }}>
+                                className="px-10 py-4 bg-vytalix-terracotta text-white rounded-full font-black uppercase tracking-widest text-sm shadow-xl shadow-vytalix-terracotta/20 active:scale-95 transition-all">
                                 Intentar de nuevo
                             </button>
                         </motion.div>

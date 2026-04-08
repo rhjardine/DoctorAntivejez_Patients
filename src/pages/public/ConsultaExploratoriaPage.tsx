@@ -6,7 +6,6 @@ import {
     Video, ClipboardList, ArrowRight
 } from 'lucide-react';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
-import { WELLNESS } from '../../styles/wellnessPalette';
 import { MEDICAL_NETWORK } from '../../data/medicalNetwork';
 
 const WHATSAPP_NUMBER = '18296440000'; // TODO: set real number
@@ -17,103 +16,72 @@ type SubmitState = 'idle' | 'sending' | 'confirmed' | 'error';
 /* ─── Benefits per type ─────────────────────────────────────────────── */
 const BENEFITS: Record<ConsultaType, { emoji: string; text: string }[]> = {
     basica: [
-        { emoji: '🎯', text: `Revisión de tu ${VITALITY_LABELS.age_front} con especialista del equipo` },
-        { emoji: '📊', text: 'Identificación de tus 2 dimensiones más críticas' },
-        { emoji: '💡', text: 'Orientación inicial del equipo especialista' },
-        { emoji: '⏱️', text: '20 minutos · Virtual · Sin costo' },
+        { emoji: '🎯', text: `Revisión de tu ${VITALITY_LABELS.age_front} con especialista del equipo.` },
+        { emoji: '📊', text: 'Identificación de tus 2 dimensiones biológicas prioritarias.' },
+        { emoji: '💡', text: 'Orientación inicial estratégica del equipo clínico.' },
+        { emoji: '⏱️', text: '20 minutos · Virtual · Protocolo Inicial.' },
     ],
     profunda: [
-        { emoji: '🧬', text: 'Evaluación biofísica completa con médico especialista' },
-        { emoji: '📋', text: `Reporte de ${VITALITY_LABELS.age_result} (4 dimensiones)` },
-        { emoji: '📊', text: 'Plan de acción personalizado 30 día' },
-        { emoji: '📱', text: 'Acceso a la plataforma de Longevidad — 30 días' },
-        { emoji: '💬', text: 'Seguimiento por WhatsApp con el equipo médico' },
+        { emoji: '🧬', text: 'Evaluación biofísica multimodal con médico especialista.' },
+        { emoji: '📋', text: `Reporte de Edad Celular y Vitalidad (4 dimensiones).` },
+        { emoji: '📊', text: 'Plan de acción personalizado de 30 días.' },
+        { emoji: '📱', text: 'Acceso a la Longevity Suite — 30 días.' },
+        { emoji: '💬', text: 'Seguimiento por WhatsApp con el equipo médico.' },
     ],
     avanzado: [
-        { emoji: '🩺', text: 'Evaluación integral con equipo multidisciplinario' },
-        { emoji: '🧬', text: 'Biomarcadores avanzados y análisis genético' },
-        { emoji: '⭐', text: 'Plan maestro de salud y longevidad' },
-        { emoji: '🎯', text: 'Monitoreo continuo y ajustes personalizados' },
+        { emoji: '🩺', text: 'Evaluación integral con equipo multidisciplinario.' },
+        { emoji: '🧬', text: 'Biomarcadores avanzados y análisis genético.' },
+        { emoji: '⭐', text: 'Plan maestro de salud y longevidad.' },
+        { emoji: '🎯', text: 'Monitoreo continuo y ajustes personalizados.' },
     ],
-};
-
-/* ─── Dynamic Styles ────────────────────────────────────────────────── */
-const INPUT_STYLE: React.CSSProperties = {
-    background: 'white',
-    border: `1px solid ${WELLNESS.earth}33`,
-    borderRadius: 16,
-    padding: '14px 16px',
-    color: WELLNESS.earthDark,
-    fontFamily: 'Poppins, sans-serif',
-    fontSize: 15,
-    fontWeight: 500,
-    width: '100%',
-    outline: 'none',
-};
-
-const CARD_STYLE: React.CSSProperties = {
-    background: 'white',
-    border: `1px solid ${WELLNESS.earth}1A`,
-    borderRadius: 32,
-    padding: 24,
-    boxShadow: '0 10px 30px -10px rgba(92,74,50,0.06)',
 };
 
 /* ─── Confirmation Screen ───────────────────────────────────────────── */
 const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate: ReturnType<typeof useNavigate> }> = ({ tipo, name, navigate }) => {
     const message = encodeURIComponent(
-        `Hola, soy ${name}. Acabo de completar el protocolo y me gustaría coordinar mi ${tipo === 'basica' ? 'Programa de Optimización sin costo' : 'Evaluación de Longevidad'}.`
+        `Hola, soy ${name}. Acabo de completar el protocolo y me gustaría coordinar mi ${tipo === 'basica' ? 'Programa de Optimización' : 'Evaluación de Longevidad'}.`
     );
     const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
 
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.93 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center text-center px-8 py-16 min-h-screen"
-            style={{ background: WELLNESS.bg }}
+            initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center text-center px-8 py-16 min-h-screen bg-vytalix-sand"
         >
-            <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
-                style={{ background: `${WELLNESS.sage}22` }}>
-                <CheckCircle size={40} style={{ color: WELLNESS.sage }} />
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-8 bg-vytalix-sage/10 border border-vytalix-sage/20">
+                <CheckCircle size={48} className="text-vytalix-sage" />
             </div>
-            <h2 className="text-2xl font-black mb-4" style={{ color: WELLNESS.earthDark }}>
-                ¡Solicitud registrada!
+
+            <h2 className="text-3xl font-black text-vytalix-graphite mb-4 tracking-tight">
+                Instrucciones Generadas
             </h2>
-            {tipo === 'basica' ? (
-                <p className="text-[15px] leading-relaxed mb-10" style={{ color: WELLNESS.textSecond }}>
-                    Nuestro equipo te contactará en <strong style={{ color: WELLNESS.earthDark }}>menos de 24 horas</strong> para coordinar
-                    tu <strong style={{ color: WELLNESS.earthDark }}>Programa de Optimización</strong>.<br />
-                    Revisa tu WhatsApp o Email.
-                </p>
-            ) : (
-                <>
-                    <p className="text-[15px] leading-relaxed mb-4" style={{ color: WELLNESS.textSecond }}>
-                        Tu reserva fue registrada. Un especialista te contactará en
-                        <strong style={{ color: WELLNESS.earthDark }}> menos de 24 horas</strong> para confirmar tu
-                        <strong style={{ color: WELLNESS.earthDark }}> Evaluación de Longevidad</strong>.
+
+            <div className="max-w-[320px] mb-12">
+                {tipo === 'basica' ? (
+                    <p className="text-[15px] leading-relaxed text-vytalix-graphite/60 font-medium">
+                        Tu solicitud para el <strong className="text-vytalix-graphite">Programa de Optimización</strong> ha sido procesada. Un especialista te contactará en <strong className="text-vytalix-terracotta uppercase tracking-widest text-[11px]">menos de 24 horas</strong>.
                     </p>
-                    <p className="text-[11px] italic mb-10 leading-relaxed" style={{ color: WELLNESS.textHint }}>
-                        El pago de USD 49 se coordina en la confirmación de cita. Aceptamos transferencia, Zelle y tarjeta internacional.
+                ) : (
+                    <p className="text-[15px] leading-relaxed text-vytalix-graphite/60 font-medium">
+                        Tu <strong className="text-vytalix-graphite">Evaluación de Longevidad</strong> ha sido pre-agendada. Recibirás la confirmación técnica y el protocolo de preparación en WhatsApp.
                     </p>
-                </>
-            )}
-            <a
-                href={waLink} target="_blank" rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 font-black text-[16px] mb-6 transition-all active:scale-95 shadow-lg shadow-green-200"
-                style={{ background: '#25D366', color: 'white', borderRadius: 32, padding: '16px 0' }}
-            >
-                <MessageCircle size={20} /> Confirmar por WhatsApp
-            </a>
-            <button
-                onClick={() => navigate('/longevidad')}
-                className="text-sm font-bold uppercase tracking-widest opacity-60"
-                style={{ color: WELLNESS.earth }}
-            >
-                Volver al inicio
-            </button>
-            <div className="mt-auto opacity-40">
-                <p className="text-[10px] font-black uppercase tracking-widest">Creado por Vytalix.io</p>
+                )}
+            </div>
+
+            <div className="w-full max-w-[340px] space-y-4">
+                <a href={waLink} target="_blank" rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-3 bg-[#25D366] text-white py-5 rounded-2xl font-black text-base uppercase tracking-widest shadow-xl shadow-green-200 transition-all active:scale-95">
+                    <MessageCircle size={22} /> Confirmar WhatsApp
+                </a>
+
+                <button onClick={() => navigate('/longevidad')}
+                    className="w-full py-5 bg-white text-vytalix-graphite border border-vytalix-graphite/10 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all hover:bg-vytalix-sand">
+                    Finalizar Sesión
+                </button>
+            </div>
+
+            <div className="mt-auto pt-10">
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-vytalix-graphite/20">VYTALIX Longevity Suite</p>
             </div>
         </motion.div>
     );
@@ -142,14 +110,10 @@ const ConsultaExploratoriaPage: React.FC = () => {
     const [card, setCard] = useState({ number: '', expiry: '', cvc: '', holder: '' });
     const [submitState, setSubmitState] = useState<SubmitState>('idle');
 
-    // ── PCI-DSS & FIX 4: Ensure card data is wiped and session flags cleaned on unmount
     useEffect(() => {
         sessionStorage.removeItem('da_result_source');
-
         return () => {
-            // ✅ PCI-DSS: Wipe card data from memory on unmount (never leave in React state)
             setCard({ number: '', expiry: '', cvc: '', holder: '' });
-            sessionStorage.removeItem('da_result_source');
         };
     }, []);
 
@@ -163,17 +127,13 @@ const ConsultaExploratoriaPage: React.FC = () => {
         if (!form.name || !form.email || !form.phone) return;
         setSubmitState('sending');
 
-        // ✅ PCI-DSS: Build booking payload WITHOUT persisting card data anywhere.
-        // Card fields are sent directly to the API from in-memory React state only.
         const bookingData = {
             ...form,
             doctorId: form.doctorId || null,
-            // ⚠️ Card data is intentionally excluded from the payload.
-            // Payment coordination is handled asynchronously via WhatsApp.
             tipo,
             ts: Date.now()
         };
-        // ✅ PCI-DSS: Store ONLY non-sensitive booking metadata (no card fields)
+
         sessionStorage.setItem('vx_booking_data', JSON.stringify({
             tipo,
             ts: bookingData.ts,
@@ -186,10 +146,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(bookingData),
             });
-        } catch {
-            console.warn('[Consulta] /api/booking mock success');
-        } finally {
-            // ✅ PCI-DSS: Immediately wipe card data from memory after submission attempt
+        } catch { /* Mock success */ } finally {
             setCard({ number: '', expiry: '', cvc: '', holder: '' });
         }
 
@@ -204,227 +161,145 @@ const ConsultaExploratoriaPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen w-full flex flex-col items-center overflow-y-auto pb-16 selection:bg-[#D97A5B] selection:text-white"
-            style={{ background: WELLNESS.bg, color: WELLNESS.textPrimary, fontFamily: 'Poppins, sans-serif' }}>
+        <div className="min-h-screen w-full flex flex-col items-center overflow-y-auto pb-20 bg-vytalix-sand">
+            <div className="w-full max-w-[440px] px-6 pt-12">
 
-            <div className="w-full max-w-md px-6 pt-12">
-
-                {/* ── Brand Reinforcement ── */}
-                <motion.div
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                    className="flex flex-col items-center mb-10"
-                >
-                    <img src="/Logo_azul_oscuro.png" alt="Doctor Antivejez" className="h-10 w-auto object-contain mb-2 opacity-80" />
-                    <p className="text-[9px] uppercase tracking-[0.25em] font-black opacity-40 text-center">
-                        Centro de Medicina Antienvejecimiento<br />
-                        Plataforma de Longevidad Certificada
-                    </p>
-                </motion.div>
-
-                {/* Header */}
-                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8 text-center px-4">
-                    <p className="text-[12px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: WELLNESS.sage }}>
-                        Tu Siguiente Paso
-                    </p>
-                    <h1 className="text-[28px] font-black leading-tight mb-3" style={{ color: WELLNESS.earthDark }}>
-                        {tipo === 'basica' ? 'Programa de Optimización' : 'Edad Celular y Plan Personalizado de Longevidad'}
-                    </h1>
-                    <p className="text-[15px] font-semibold opacity-70" style={{ color: WELLNESS.textSecond }}>
-                        {tipo === 'basica' ? '20 minutos · Virtual · Sin costo' : '45 minutos · Presencial o Virtual · USD 49'}
-                    </p>
-                </motion.div>
-
-                {/* Benefits */}
-                <motion.div
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-                    className="mb-8"
-                    style={CARD_STYLE}
-                >
-                    <div className="flex items-center gap-2.5 mb-5 border-b pb-4" style={{ borderColor: `${WELLNESS.earth}1A` }}>
-                        {tipo === 'basica'
-                            ? <Video size={20} style={{ color: WELLNESS.sage }} />
-                            : <ClipboardList size={20} style={{ color: WELLNESS.sage }} />}
-                        <p className="text-[15px] font-black uppercase tracking-wide" style={{ color: WELLNESS.earthDark }}>
-                            Inclusiones del Programa
+                {/* Header Section */}
+                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10 text-center">
+                    <div className="inline-block px-4 py-1.5 rounded-full bg-vytalix-sage/10 border border-vytalix-sage/20 mb-6">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-vytalix-sage">
+                            Protocolo de Longevidad
                         </p>
                     </div>
-                    <div className="space-y-4">
+                    <h1 className="text-3xl font-black leading-tight text-vytalix-graphite tracking-tight mb-4">
+                        {tipo === 'basica' ? 'Programa de Optimización' : 'Evaluación de Edad Celular Full'}
+                    </h1>
+                    <p className="text-base font-medium text-vytalix-graphite/50 px-4">
+                        {tipo === 'basica' ? 'Análisis estratégico · Virtual · Sin costo' : 'Evaluación biofísica con especialista · USD 49'}
+                    </p>
+                </motion.div>
+
+                {/* Benefits Card */}
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+                    className="bg-white rounded-[2rem] p-8 border border-vytalix-graphite/5 shadow-sm mb-8">
+                    <div className="flex items-center gap-3 mb-8 pb-4 border-b border-vytalix-graphite/5">
+                        <div className="p-2.5 bg-vytalix-sand rounded-xl">
+                            {tipo === 'basica' ? <Video size={18} className="text-vytalix-sage" /> : <ClipboardList size={18} className="text-vytalix-sage" />}
+                        </div>
+                        <p className="text-[12px] font-black uppercase tracking-widest text-vytalix-graphite">Inclusiones</p>
+                    </div>
+                    <div className="space-y-6">
                         {BENEFITS[tipo].map((b, i) => (
                             <div key={i} className="flex items-start gap-4">
-                                <span className="text-xl leading-none">{b.emoji}</span>
-                                <p className="text-[14px] font-semibold leading-relaxed" style={{ color: WELLNESS.textSecond }}>{b.text}</p>
+                                <span className="text-lg leading-none shrink-0">{b.emoji}</span>
+                                <p className="text-[14px] font-medium leading-relaxed text-vytalix-graphite/70">{b.text}</p>
                             </div>
                         ))}
                     </div>
                 </motion.div>
 
                 {/* Booking Form */}
-                <motion.form
-                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                    onSubmit={handleSubmit}
-                    className="flex flex-col gap-5 mb-8"
-                    style={CARD_STYLE}
-                >
-                    <p className="text-[15px] font-black uppercase tracking-wide mb-1" style={{ color: WELLNESS.earthDark }}>
-                        Datos para tu reserva
-                    </p>
+                <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                    onSubmit={handleSubmit} className="bg-white rounded-[2rem] p-8 border border-vytalix-graphite/5 shadow-sm mb-8 space-y-4">
 
-                    <input name="name" type="text" placeholder="Nombre completo *" required
-                        value={form.name} onChange={handleFormChange} style={INPUT_STYLE} />
-                    <input name="email" type="email" placeholder="Email *" required
-                        value={form.email} onChange={handleFormChange} style={INPUT_STYLE} />
-                    <input name="phone" type="tel" placeholder="WhatsApp / Teléfono *" required
-                        value={form.phone} onChange={handleFormChange} style={INPUT_STYLE} />
+                    <p className="text-[12px] font-black uppercase tracking-widest text-vytalix-graphite mb-2">Reserva Técnica</p>
+
+                    <div className="space-y-3">
+                        <input name="name" type="text" placeholder="TU NOMBRE *" required value={form.name} onChange={handleFormChange}
+                            className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite placeholder:text-vytalix-graphite/20 focus:ring-1 focus:ring-vytalix-sage outline-none" />
+                        <input name="email" type="email" placeholder="TU@EMAIL.COM *" required value={form.email} onChange={handleFormChange}
+                            className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite placeholder:text-vytalix-graphite/20 focus:ring-1 focus:ring-vytalix-sage outline-none" />
+                        <input name="phone" type="tel" placeholder="WHATSAPP / TEL *" required value={form.phone} onChange={handleFormChange}
+                            className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite placeholder:text-vytalix-graphite/20 focus:ring-1 focus:ring-vytalix-sage outline-none" />
+                    </div>
 
                     <div className="relative">
                         <select name="country" value={form.country} onChange={handleFormChange}
-                            style={{ ...INPUT_STYLE, appearance: 'none' }}>
-                            {['Venezuela', 'Colombia', 'Panamá', 'EEUU', 'Otro'].map(c =>
-                                <option key={c} value={c}>{c}</option>
-                            )}
+                            className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite appearance-none outline-none">
+                            {['Venezuela', 'Colombia', 'Panamá', 'EEUU', 'Otro'].map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
-                            <ArrowRight size={16} className="rotate-90" />
-                        </div>
+                        <ArrowRight size={14} className="absolute right-5 top-1/2 -translate-y-1/2 rotate-90 text-vytalix-graphite/30" />
                     </div>
 
-                    <div className="flex flex-col gap-2 mt-1">
-                        <label className="text-[11px] font-black uppercase tracking-widest ml-1 opacity-50">Especialista de preferencia</label>
+                    <div className="space-y-2 pt-2">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-vytalix-graphite/30 ml-1">Especialista Preferido</p>
                         {!showSelector && preselectedDoc ? (
-                            <div className="flex items-center justify-between p-4 rounded-2xl border"
-                                style={{ background: '#F8F1E9', borderColor: `${WELLNESS.sage}40` }}>
+                            <div className="flex items-center justify-between p-4 rounded-2xl bg-vytalix-sand/50 border border-vytalix-graphite/5">
                                 <div className="flex items-center gap-3">
-                                    <img src={preselectedDoc.imageUrl} alt={preselectedDoc.name}
-                                        className="w-10 h-10 rounded-full object-cover shadow-sm"
-                                        style={{ border: `2px solid white` }}
-                                        onError={(e) => {
-                                            const target = e.target as HTMLImageElement;
-                                            target.onerror = null;
-                                            target.style.display = 'none';
-                                            target.parentElement!.innerHTML += `<div class="w-10 h-10 rounded-full flex items-center justify-center font-black text-xs" style="background:${WELLNESS.sage}20; color:${WELLNESS.sage}">${preselectedDoc.name.substring(0, 2)}</div>`;
-                                        }}
-                                    />
+                                    <div className="w-10 h-10 rounded-full bg-vytalix-graphite/5 overflow-hidden border-2 border-white shadow-sm">
+                                        {preselectedDoc.imageUrl ? <img src={preselectedDoc.imageUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center font-black text-xs text-vytalix-graphite/30">{preselectedDoc.name[0]}</div>}
+                                    </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[14px] font-black leading-tight" style={{ color: WELLNESS.earthDark }}>{preselectedDoc.name}</span>
-                                        <span className="text-[10px] uppercase font-bold opacity-50">{preselectedDoc.location}</span>
+                                        <span className="text-[13px] font-black text-vytalix-graphite leading-none mb-1">{preselectedDoc.name}</span>
+                                        <span className="text-[10px] uppercase font-bold text-vytalix-graphite/40">{preselectedDoc.location}</span>
                                     </div>
                                 </div>
-                                <button type="button" onClick={() => { setShowSelector(true); setForm(f => ({ ...f, doctorId: '' })); }}
-                                    className="text-[11px] font-black uppercase tracking-wider underline underline-offset-4"
-                                    style={{ color: WELLNESS.terracotta }}>
-                                    Cambiar
-                                </button>
+                                <button type="button" onClick={() => setShowSelector(true)} className="text-[10px] font-black uppercase text-vytalix-terracotta underline decoration-vytalix-terracotta/20 underline-offset-4">Cambiar</button>
                             </div>
                         ) : (
                             <div className="relative">
                                 <select name="doctorId" value={form.doctorId} onChange={handleFormChange}
-                                    style={{ ...INPUT_STYLE, appearance: 'none' }}>
-                                    <option value="">Cualquier especialista disponible</option>
-                                    {availableDoctors.map(doc => (
-                                        <option key={doc.id} value={doc.id}>
-                                            {doc.name} ({doc.location.split(',')[0]})
-                                        </option>
-                                    ))}
+                                    className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite appearance-none outline-none">
+                                    <option value="">Cualquier Especialista Disponible</option>
+                                    {availableDoctors.map(doc => <option key={doc.id} value={doc.id}>{doc.name} ({doc.location.split(',')[0]})</option>)}
                                 </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
-                                    <ArrowRight size={16} className="rotate-90" />
-                                </div>
+                                <ArrowRight size={14} className="absolute right-5 top-1/2 -translate-y-1/2 rotate-90 text-vytalix-graphite/30" />
                             </div>
                         )}
                     </div>
 
-                    <div className="relative">
-                        <select name="horario" value={form.horario} onChange={handleFormChange}
-                            style={{ ...INPUT_STYLE, appearance: 'none' }}>
-                            {['Mañana', 'Tarde', 'Flexible'].map(h =>
-                                <option key={h} value={h}>Preferencia: {h}</option>
-                            )}
-                        </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
-                            <ArrowRight size={16} className="rotate-90" />
-                        </div>
-                    </div>
-
-                    {/* Payment (profunda only) */}
+                    {/* Payment Section - High Security Feel */}
                     <AnimatePresence>
                         {tipo === 'profunda' && (
-                            <motion.div
-                                key="payment"
-                                initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-                                className="flex flex-col gap-4 pt-4 border-t"
-                                style={{ borderColor: `${WELLNESS.earth}1A` }}
-                            >
-                                <p className="text-[15px] font-black uppercase tracking-wide" style={{ color: WELLNESS.earthDark }}>
-                                    Información de pago
-                                </p>
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-6 border-t border-vytalix-graphite/5 space-y-4 overflow-hidden">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Lock size={12} className="text-vytalix-sage" />
+                                    <p className="text-[11px] font-black uppercase tracking-widest text-vytalix-sage">Pasarela Segura (Pre-Autorización)</p>
+                                </div>
 
-                                <div className="flex items-start gap-3 rounded-2xl p-4"
-                                    style={{ background: `${WELLNESS.nut}10`, border: `1px solid ${WELLNESS.nut}30` }}>
-                                    <Info size={18} style={{ color: WELLNESS.nut }} className="mt-0.5 flex-shrink-0" />
-                                    <p className="text-[12px] font-semibold leading-relaxed" style={{ color: WELLNESS.earthDark }}>
-                                        Para agilizar tu proceso, puedes coordinar el pago vía Zelle o Transferencia una vez confirmada la cita.
+                                <div className="p-4 bg-vytalix-sage/5 rounded-2xl border border-vytalix-sage/10 mb-4">
+                                    <p className="text-[11px] font-medium leading-relaxed text-vytalix-graphite/70">
+                                        Coordinamos el pago de <strong>USD 49</strong> vía Zelle o transferencia una vez confirmada la cita. Introduce tus datos para pre-autorizar el protocolo.
                                     </p>
                                 </div>
 
-                                <input name="number" type="tel" placeholder="Número de tarjeta"
-                                    value={card.number} onChange={handleCardChange}
-                                    style={INPUT_STYLE} maxLength={19} />
+                                <input name="number" type="tel" placeholder="NÚMERO DE TARJETA" value={card.number} onChange={handleCardChange} maxLength={19}
+                                    className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite outline-none" />
                                 <div className="grid grid-cols-2 gap-4">
-                                    <input name="expiry" type="text" placeholder="MM/AA"
-                                        value={card.expiry} onChange={handleCardChange} style={INPUT_STYLE} maxLength={5} />
-                                    <input name="cvc" type="tel" placeholder="CVC"
-                                        value={card.cvc} onChange={handleCardChange} style={INPUT_STYLE} maxLength={4} />
+                                    <input name="expiry" type="text" placeholder="MM/AA" value={card.expiry} onChange={handleCardChange} maxLength={5}
+                                        className="bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite outline-none" />
+                                    <input name="cvc" type="tel" placeholder="CVC" value={card.cvc} onChange={handleCardChange} maxLength={4}
+                                        className="bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite outline-none" />
                                 </div>
-                                <input name="holder" type="text" placeholder="Nombre en la tarjeta"
-                                    value={card.holder} onChange={handleCardChange} style={INPUT_STYLE} />
+                                <input name="holder" type="text" placeholder="TITULAR DE LA TARJETA" value={card.holder} onChange={handleCardChange}
+                                    className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite outline-none uppercase" />
                             </motion.div>
                         )}
                     </AnimatePresence>
 
-                    {/* Submit */}
-                    <button
-                        type="submit"
-                        disabled={!isFormValid || submitState === 'sending'}
-                        className="w-full font-black text-[17px] flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-30 shadow-xl shadow-terracotta/20"
-                        style={{ background: WELLNESS.terracotta, color: 'white', borderRadius: 32, padding: '18px 0', marginTop: 8 }}
-                    >
-                        {submitState === 'sending' ? (
-                            <Loader2 size={24} className="animate-spin" />
-                        ) : tipo === 'profunda' ? (
-                            <><Lock size={18} /> Solicitar Evaluación — USD 49</>
-                        ) : (
-                            <>Solicitar Programa <ArrowRight size={20} /></>
-                        )}
+                    {/* Submit Button */}
+                    <button type="submit" disabled={!isFormValid || submitState === 'sending'}
+                        className="w-full py-5 mt-6 bg-vytalix-terracotta text-white font-black text-[15px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-vytalix-terracotta/20 transition-all active:scale-95 disabled:opacity-30">
+                        {submitState === 'sending' ? <Loader2 size={24} className="animate-spin mx-auto" /> :
+                            tipo === 'profunda' ? 'Confirmar Evaluación (USD 49)' : 'Activar Mi Programa →'}
                     </button>
+
+                    <p className="text-center text-[10px] font-bold text-vytalix-graphite/30 uppercase tracking-widest mt-4">
+                        Cifrado de grado clínico SSL/AES-256
+                    </p>
                 </motion.form>
 
-                {/* Back */}
-                <div className="text-center mb-10">
-                    <button onClick={() => navigate(-1)}
-                        className="text-[11px] font-black uppercase tracking-widest opacity-40 underline underline-offset-8"
-                        style={{ color: WELLNESS.earth }}>
-                        ← Volver a mis resultados
+                <div className="text-center pb-8 flex flex-col items-center gap-6">
+                    <button onClick={() => navigate(-1)} className="text-[11px] font-black uppercase tracking-[0.2em] text-vytalix-graphite/40 hover:text-vytalix-graphite transition-colors">
+                        ← Ver mis resultados de vitalidad
+                    </button>
+
+                    <div className="h-px w-20 bg-vytalix-graphite/10" />
+
+                    <button onClick={() => navigate('/login')} className="text-xs font-black text-vytalix-graphite/50 underline decoration-vytalix-graphite/20 underline-offset-4">
+                        Acceso Médico Autorizado →
                     </button>
                 </div>
-
-                {/* ── LINK DISCRETO PACIENTES ── */}
-                <div className="text-center opacity-60 mb-6 mt-4">
-                    <span className="text-[12px]" style={{ color: WELLNESS.earthDark }}>
-                        ¿Ya eres parte del programa?{' '}
-                        <button
-                            onClick={() => navigate('/login')}
-                            className="underline font-bold"
-                            style={{ color: WELLNESS.earthDark }}
-                        >
-                            Ingresar →
-                        </button>
-                    </span>
-                </div>
-
-                {/* Final Footer */}
-                <p className="text-center text-[10px] font-black uppercase tracking-[0.25em] opacity-30">
-                    Creado por Vytalix.io
-                </p>
             </div>
         </div>
     );

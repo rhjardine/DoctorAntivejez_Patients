@@ -6,7 +6,6 @@ import PublicHeader from '../../components/public/PublicHeader';
 import { useExitConfirmation } from '../../hooks/useExitConfirmation';
 import ExitConfirmModal from '../../components/public/ExitConfirmModal';
 import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
-import { WELLNESS } from '../../styles/wellnessPalette';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 
 /* ─── Question definitions ─────────────────────────────────────────────── */
@@ -161,7 +160,6 @@ const TestAntivejezPage: React.FC = () => {
 
     const groupQuestions = QUESTIONS.filter(q => q.group === currentGroup);
     const allAnswered = groupQuestions.every(q => q.id in answers);
-    // const progress = (currentGroup - 1) / 5; // This is no longer needed as PublicHeader handles progress
 
     const answer = (id: string, val: boolean) => {
         setAnswers(prev => ({ ...prev, [id]: val }));
@@ -194,7 +192,7 @@ const TestAntivejezPage: React.FC = () => {
     const questionOffset = QUESTIONS.filter(q => q.group < currentGroup).length;
 
     return (
-        <div className="min-h-screen flex flex-col relative" style={{ background: WELLNESS.bg }}>
+        <div className="min-h-screen flex flex-col relative bg-vytalix-sand">
             <PublicHeader
                 theme="wellness"
                 showBack={true}
@@ -204,63 +202,38 @@ const TestAntivejezPage: React.FC = () => {
             />
 
             {/* Questions */}
-            {/* ── FIX 4 & 5: Scroll Container with excessive padding to avoid footer overlap ── */}
             <div
                 ref={scrollContainerRef}
-                className="flex-1 overflow-y-auto px-5 py-4"
-                style={{ paddingBottom: '260px' }}>
+                className="flex-1 overflow-y-auto px-5 py-6"
+                style={{ paddingBottom: '280px' }}>
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={currentGroup}
-                        initial={{ opacity: 0, x: 24 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -24 }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.25 }}
-                        className="space-y-3"
+                        className="space-y-4"
                     >
                         {groupQuestions.map((q, idx) => {
                             const qNumber = questionOffset + idx + 1;
                             const val = answers[q.id];
                             return (
-                                <div key={q.id} className="p-5"
-                                    style={{
-                                        background: WELLNESS.bgCard,
-                                        border: `1px solid ${WELLNESS.earth}26`, // 0.15 alpha
-                                        borderRadius: 16,
-                                        boxShadow: '0 4px 14px rgba(0,0,0,0.03)'
-                                    }}>
-                                    <p className="text-[12px] font-black uppercase mb-2" style={{ color: WELLNESS.sage, letterSpacing: '0.1em' }}>
-                                        PREGUNTA {qNumber}
+                                <div key={q.id} className="p-6 bg-white rounded-[1.5rem] border border-vytalix-graphite/5 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-vytalix-sage">
+                                        ANÁLISIS VITAL {qNumber}
                                     </p>
-                                    <p className="text-[16px] font-medium mb-6 leading-snug" style={{ color: '#5C4A32' }}>
+                                    <p className="text-[17px] font-semibold mb-8 leading-tight text-vytalix-graphite tracking-tight">
                                         {q.text}
                                     </p>
-                                    <div className="flex gap-2.5">
+                                    <div className="flex gap-3">
                                         {/* Botón SÍ */}
                                         <button
                                             onClick={() => answer(q.id, true)}
-                                            style={{
-                                                flex: 1,
-                                                padding: '13px 0',
-                                                borderRadius: 16,
-                                                fontSize: val === true ? 16 : 14,
-                                                fontWeight: val === true ? 800 : 500,
-                                                fontFamily: 'Poppins, sans-serif',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.15s ease',
-                                                transform: val === true ? 'scale(1.02)' : 'scale(1)',
-                                                ...(val === true ? {
-                                                    background: '#7C9A7E',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    boxShadow: '0 2px 8px rgba(124,154,126,0.4)',
-                                                } : {
-                                                    background: 'transparent',
-                                                    color: '#A89880',
-                                                    border: '1px solid rgba(139,115,85,0.25)',
-                                                    boxShadow: 'none',
-                                                })
-                                            }}
+                                            className={`flex-1 py-4 rounded-2xl font-black text-sm transition-all duration-200 active:scale-95 ${val === true
+                                                ? 'bg-vytalix-sage text-white shadow-lg shadow-vytalix-sage/30'
+                                                : 'bg-vytalix-sand text-vytalix-graphite/40 border border-vytalix-graphite/10'
+                                                }`}
                                         >
                                             SÍ
                                         </button>
@@ -268,28 +241,10 @@ const TestAntivejezPage: React.FC = () => {
                                         {/* Botón NO */}
                                         <button
                                             onClick={() => answer(q.id, false)}
-                                            style={{
-                                                flex: 1,
-                                                padding: '13px 0',
-                                                borderRadius: 16,
-                                                fontSize: val === false ? 16 : 14,
-                                                fontWeight: val === false ? 800 : 500,
-                                                fontFamily: 'Poppins, sans-serif',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.15s ease',
-                                                transform: val === false ? 'scale(1.02)' : 'scale(1)',
-                                                ...(val === false ? {
-                                                    background: '#5C4A32',
-                                                    color: '#FDFAF4',
-                                                    border: 'none',
-                                                    boxShadow: '0 2px 8px rgba(92,74,50,0.25)',
-                                                } : {
-                                                    background: 'transparent',
-                                                    color: '#A89880',
-                                                    border: '1px solid rgba(139,115,85,0.25)',
-                                                    boxShadow: 'none',
-                                                })
-                                            }}
+                                            className={`flex-1 py-4 rounded-2xl font-black text-sm transition-all duration-200 active:scale-95 ${val === false
+                                                ? 'bg-vytalix-graphite text-vytalix-sand shadow-lg shadow-vytalix-graphite/30'
+                                                : 'bg-vytalix-sand text-vytalix-graphite/40 border border-vytalix-graphite/10'
+                                                }`}
                                         >
                                             NO
                                         </button>
@@ -302,36 +257,25 @@ const TestAntivejezPage: React.FC = () => {
             </div>
 
             {/* Sticky footer */}
-            {/* ── FIX 5: Standardized sticky footer ── */}
-            <div className="fixed bottom-0 left-0 right-0 px-5 py-4 z-10"
-                style={{
-                    background: WELLNESS.bgDeep,
-                    borderTop: `1px solid ${WELLNESS.earth}26`,
-                    paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
-                }}>
+            <div className="fixed bottom-0 left-0 right-0 px-6 py-5 z-20 bg-vytalix-sand/90 backdrop-blur-md border-t border-vytalix-graphite/5"
+                style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
                 {/* Disclaimer */}
-                <div className="mb-4">
-                    <WellnessDisclaimer text="Esta evaluación facial y de hábitos es orientativa. No constituye un diagnóstico médico formal." />
+                <div className="mb-6">
+                    <WellnessDisclaimer text="Esta evaluación de biomarcadores y hábitos es orientativa. No constituye un diagnóstico médico formal." />
                 </div>
                 <button
                     onClick={next}
                     disabled={!allAnswered}
-                    className="w-full font-bold text-[15px] flex items-center justify-center gap-2 transition-all"
-                    style={{
-                        background: WELLNESS.terracotta, color: WELLNESS.bgCard, borderRadius: 28,
-                        padding: '15px 0', fontFamily: 'Poppins, sans-serif',
-                        opacity: allAnswered ? 1 : 0.4,
-                        transform: allAnswered ? 'scale(1)' : 'scale(0.98)'
-                    }}
+                    className="w-full py-5 bg-vytalix-terracotta text-white font-black text-[15px] flex items-center justify-center gap-2 rounded-full shadow-xl shadow-vytalix-terracotta/20 transform active:scale-95 transition-all uppercase tracking-[0.15em] disabled:opacity-40 disabled:scale-100"
                 >
                     {currentGroup < 5 ? (
-                        <>Siguiente grupo <ChevronRight size={18} /></>
+                        <>Siguiente bloque <ChevronRight size={18} strokeWidth={3} /></>
                     ) : (
-                        <>Ver mis Resultados <ChevronRight size={18} /></>
+                        <>Consultar Vitalidad <ChevronRight size={18} strokeWidth={3} /></>
                     )}
                 </button>
-                <p className="text-center text-[10px] mt-2 font-black uppercase tracking-[0.2em] opacity-40" style={{ color: WELLNESS.textSecond }}>
-                    Creado por Vytalix.io
+                <p className="text-center text-[9px] mt-4 font-black uppercase tracking-[0.3em] text-vytalix-graphite/30">
+                    SISTEMA BIOMÉTRICO VYTALIX
                 </p>
             </div>
 
