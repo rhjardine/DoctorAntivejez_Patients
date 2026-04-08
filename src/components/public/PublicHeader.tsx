@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { ChevronLeft } from 'lucide-react';
 
 interface PublicHeaderProps {
     title?: string;
