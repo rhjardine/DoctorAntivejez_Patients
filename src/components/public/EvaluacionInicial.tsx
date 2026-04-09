@@ -1,3 +1,4 @@
+// Componente de Evaluación Inicial - Vytalix Premium
 import React from 'react';
 import { motion, Variants } from 'framer-motion';
 import { Dna, ScanFace, Watch, HeartPulse, ChevronRight, Activity } from 'lucide-react';
