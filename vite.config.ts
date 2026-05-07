@@ -1,10 +1,8 @@
-import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, '.', '');
+export default defineConfig(() => {
   return {
     server: {
       port: 3000,
@@ -33,10 +31,30 @@ export default defineConfig(({ mode }) => {
           start_url: '/',
           scope: '/',
           icons: [
-            { src: '/Icono_app.jpeg', sizes: '192x192', type: 'image/jpeg', purpose: 'any' },
-            { src: '/Icono_app.jpeg', sizes: '192x192', type: 'image/jpeg', purpose: 'maskable' },
-            { src: '/Icono_app.jpeg', sizes: '512x512', type: 'image/jpeg', purpose: 'any' },
-            { src: '/Icono_app.jpeg', sizes: '512x512', type: 'image/jpeg', purpose: 'maskable' },
+            {
+              src: '/Icono_app.jpeg',
+              sizes: '192x192',
+              type: 'image/jpeg',
+              purpose: 'any',
+            },
+            {
+              src: '/Icono_app.jpeg',
+              sizes: '192x192',
+              type: 'image/jpeg',
+              purpose: 'maskable',
+            },
+            {
+              src: '/Icono_app.jpeg',
+              sizes: '512x512',
+              type: 'image/jpeg',
+              purpose: 'any',
+            },
+            {
+              src: '/Icono_app.jpeg',
+              sizes: '512x512',
+              type: 'image/jpeg',
+              purpose: 'maskable',
+            },
           ],
         },
         workbox: {
@@ -55,10 +73,10 @@ export default defineConfig(({ mode }) => {
                 url.pathname.includes('auth/refresh') ||
                 url.pathname.includes('/api/'),
               handler: 'NetworkOnly',
-            }
-          ]
-        }
-      })
+            },
+          ],
+        },
+      }),
     ],
     build: {
       rollupOptions: {
@@ -72,14 +90,14 @@ export default defineConfig(({ mode }) => {
             'vendor-sentry': ['@sentry/react'],
             'vendor-fingerprint': ['@fingerprintjs/fingerprintjs'],
             'vendor-utils': ['axios', 'date-fns', 'zustand'],
-          }
-        }
-      }
+          },
+        },
+      },
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
-      }
-    }
+        '@': new URL('./src', import.meta.url).pathname,
+      },
+    },
   };
 });

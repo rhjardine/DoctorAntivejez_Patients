@@ -1,8 +1,13 @@
 import { PatientProtocol, NutrigenomicPlan } from '../types';
-import { authService, tokenStore } from './authService';
+import { tokenStore } from './authService';
 import apiClient from './apiClient';
 import { offlineQueue } from './offlineQueue';
 import { useProfileStore } from '../store/useProfileStore';
+import {
+  buildNutrigenomicPlan,
+  normalizeAlimentacion,
+  normalizePatientProtocol,
+} from './clinicalPayloadNormalizer';
 
 // ✅ SECURITY: Cache de protocolo en sessionStorage (se limpia al cerrar tab)
 // Los datos clínicos NO deben persistir entre sesiones distintas
@@ -36,58 +41,24 @@ const clearSessionCache = (): void => {
 // ─── ProtocolService ─────────────────────────────────────────────────────────
 
 export const ProtocolService = {
-
   /**
    * Obtiene el protocolo activo del paciente.
    * El backend (mobile-profile-v1) ya devuelve PatientProtocol[] serializados.
    * Caché en sessionStorage — se limpia automáticamente al cerrar la pestaña.
    */
-  fetchActiveProtocol: async (patientId: string): Promise<PatientProtocol[]> => {
+  fetchActiveProtocol: async (
+    patientId: string,
+  ): Promise<PatientProtocol[]> => {
     try {
       const profile = await ProtocolService.getMyProfile();
+      const items = normalizePatientProtocol(profile);
 
-      if (!profile?.guides?.length) return [];
-
-      // ✅ El backend devuelve `protocol` ya serializado como PatientProtocol[]
-      // Si el backend aún devuelve `selections` raw, usar el fallback de mapeo
-      const guide = profile.guides[0];
-
-      // Caso A: backend ya devuelve protocol serializado (nuevo comportamiento)
-      if (guide.protocol && Array.isArray(guide.protocol)) {
-        const items = guide.protocol as PatientProtocol[];
+      if (items.length > 0) {
         setToSession(PROTOCOL_CACHE_KEY, items);
         return items;
       }
 
-      // Caso B: backend devuelve selections raw (comportamiento actual)
-      // Mapeo local hasta que el endpoint se actualice (Bloque A paso 2)
-      if (guide.selections && typeof guide.selections === 'object') {
-        const items: PatientProtocol[] = [];
-        Object.keys(guide.selections).forEach(category => {
-          const categoryItems = (guide.selections as any)[category];
-          if (Array.isArray(categoryItems)) {
-            categoryItems.forEach((item: any) => {
-              items.push({
-                id: item.id || `${category}_${Math.random().toString(36).substr(2, 6)}`,
-                category: category as any,
-                itemName: item.name || item.itemName || 'Sin nombre',
-                dose: item.dose || '',
-                schedule: item.schedule || '',
-                observations: item.observations || '',
-                status: item.status || 'pending',
-                timeSlot: item.timeSlot || 'ANYTIME',
-                prescribedAt: guide.createdAt || new Date().toISOString(),
-                updatedAt: guide.updatedAt || guide.createdAt || new Date().toISOString(),
-              });
-            });
-          }
-        });
-        setToSession(PROTOCOL_CACHE_KEY, items);
-        return items;
-      }
-
-      return [];
-
+      return getFromSession<PatientProtocol[]>(PROTOCOL_CACHE_KEY) ?? [];
     } catch (error) {
       console.error('[ProtocolService] Error fetching protocol:', error);
 
@@ -100,32 +71,19 @@ export const ProtocolService = {
   /**
    * Obtiene el plan nutrigenómico del paciente.
    */
-  fetchNutrigenomicPlan: async (patientId: string): Promise<NutrigenomicPlan | null> => {
+  fetchNutrigenomicPlan: async (
+    patientId: string,
+  ): Promise<NutrigenomicPlan | null> => {
     try {
       const profile = await ProtocolService.getMyProfile();
-      if (!profile?.foodPlans?.length) return null;
+      const plan = buildNutrigenomicPlan(profile);
 
-      const foodPlan = profile.foodPlans[0];
-      const foods: any[] = (foodPlan.items ?? []).map((item: any) => ({
-        id: item.id,
-        name: item.name,
-        category: 'General',
-        mealTypes: [item.mealType],
-        isClinicalPriority: false,
-        notes: '',
-      }));
+      if (plan) {
+        setToSession(NUTRITION_CACHE_KEY, plan);
+        return plan;
+      }
 
-      const plan: NutrigenomicPlan = {
-        bloodType: profile.bloodType as any,
-        dietTypes: profile.selectedDiets || [],
-        forbidden: [],
-        foods,
-        updatedAt: foodPlan.updatedAt,
-      };
-
-      setToSession(NUTRITION_CACHE_KEY, plan);
-      return plan;
-
+      return getFromSession<NutrigenomicPlan>(NUTRITION_CACHE_KEY);
     } catch (error) {
       console.error('[ProtocolService] Error fetching nutrition plan:', error);
       return getFromSession<NutrigenomicPlan>(NUTRITION_CACHE_KEY);
@@ -139,13 +97,13 @@ export const ProtocolService = {
   updateItemStatus: async (
     patientId: string,
     itemId: string,
-    status: 'pending' | 'completed'
+    status: 'pending' | 'completed',
   ): Promise<boolean> => {
     // Actualización optimista en caché
     const cached = getFromSession<PatientProtocol[]>(PROTOCOL_CACHE_KEY);
     if (cached) {
-      const updated = cached.map(item =>
-        item.id === itemId ? { ...item, status } : item
+      const updated = cached.map((item) =>
+        item.id === itemId ? { ...item, status } : item,
       );
       setToSession(PROTOCOL_CACHE_KEY, updated);
     }
@@ -153,13 +111,19 @@ export const ProtocolService = {
     try {
       // Intentar sincronizar con backend
       // Si el endpoint no existe aún, falla silenciosamente (local-first)
-      const response = await apiClient.patch(`/protocols/${itemId}/status`, { status });
+      const response = await apiClient.patch(`/protocols/${itemId}/status`, {
+        status,
+      });
       return response.status === 200 || response.status === 204;
     } catch {
       // El caché local ya está actualizado — encolar en background sync
-      console.warn("[ProtocolService] Network failed, enqueueing protocol status update offline");
+      console.warn(
+        '[ProtocolService] Network failed, enqueueing protocol status update offline',
+      );
       const baseUrl = apiClient.defaults.baseURL || '';
-      const fullUrl = baseUrl.endsWith('/') ? `${baseUrl}protocols/${itemId}/status` : `${baseUrl}/protocols/${itemId}/status`;
+      const fullUrl = baseUrl.endsWith('/')
+        ? `${baseUrl}protocols/${itemId}/status`
+        : `${baseUrl}/protocols/${itemId}/status`;
 
       await offlineQueue.enqueue({
         url: fullUrl,
@@ -167,7 +131,7 @@ export const ProtocolService = {
         body: JSON.stringify({ status }),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${tokenStore.getAccessToken() || ''}`,
+          Authorization: `Bearer ${tokenStore.getAccessToken() || ''}`,
         },
       });
 
@@ -189,7 +153,11 @@ export const ProtocolService = {
         return profileData;
       }
       const response = await apiClient.get('/mobile-profile-v1');
-      return response.data;
+      const profile = response.data;
+      return {
+        ...profile,
+        alimentacion: normalizeAlimentacion(profile),
+      };
     } catch (error) {
       console.error('[ProtocolService] Error fetching profile:', error);
       return null;

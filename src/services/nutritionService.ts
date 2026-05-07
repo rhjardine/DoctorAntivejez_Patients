@@ -1,98 +1,18 @@
-import { NutrigenomicPlan, NutrigenomicFood, MealType, BloodType, DietType } from '../types';
+import { NutrigenomicPlan } from '../types';
 import { useProfileStore } from '../store/useProfileStore';
-import { DEFAULTS_O_B, DEFAULTS_A_AB, DEFAULTS_COMUNES } from './nutrigenomicaDefaults';
+import { buildNutrigenomicPlan } from './clinicalPayloadNormalizer';
 
 export const nutritionService = {
-    getSmartNutritionPlan: async (): Promise<NutrigenomicPlan> => {
-        // En lugar de hacer Fetch, leer directamente de perfil que ya tiene la info.
-        const profileData = useProfileStore.getState().profileData;
-        const alimentacion = profileData?.alimentacion;
+  getSmartNutritionPlan: async (): Promise<NutrigenomicPlan> => {
+    const profileData = useProfileStore.getState().profileData;
+    const plan = buildNutrigenomicPlan(profileData);
 
-        if (!alimentacion) {
-            throw new Error("No hay un plan de nutrición nutrigenómica configurado por el médico.");
-        }
-
-        const bloodGrpGroup = alimentacion.grupoSanguineo; // 'O_B' | 'A_AB'
-        const defaults = bloodGrpGroup === 'A_AB' ? DEFAULTS_A_AB : DEFAULTS_O_B;
-
-        const foods: NutrigenomicFood[] = [];
-        let idCounter = 1;
-
-        // Dynamic Lists from Database or Defaults
-        const lDesayuno = alimentacion.planAlimentario?.desayuno || defaults.desayuno;
-        const lAlmuerzo = alimentacion.planAlimentario?.almuerzo || defaults.almuerzo;
-        const lCena = alimentacion.planAlimentario?.cenaComunes || defaults.cena.comunes;
-        const lMeriendas = alimentacion.planAlimentario?.meriendas || DEFAULTS_COMUNES.meriendas;
-
-        // Mapear Desayuno
-        lDesayuno.forEach((item: string) => {
-            foods.push({
-                id: `bf_${idCounter++}`,
-                name: item,
-                category: 'Beneficios',
-                mealTypes: ['BREAKFAST'],
-                isClinicalPriority: true
-            });
-        });
-
-        // Mapear Almuerzo
-        lAlmuerzo.forEach((item: string) => {
-            foods.push({
-                id: `l_${idCounter++}`,
-                name: item,
-                category: 'Beneficios',
-                mealTypes: ['LUNCH'],
-                isClinicalPriority: true
-            });
-        });
-
-        // Mapear Cena
-        lCena.forEach((item: string) => {
-            foods.push({
-                id: `d_${idCounter++}`,
-                name: item,
-                category: 'Beneficios',
-                mealTypes: ['DINNER'],
-                isClinicalPriority: true
-            });
-        });
-
-        // Mapear Meriendas
-        lMeriendas.forEach((item: string) => {
-            foods.push({
-                id: `s_${idCounter++}`,
-                name: item,
-                category: 'Neutros',
-                mealTypes: ['SNACK']
-            });
-        });
-
-        // Mapear Ensaladas Libres como Neutras
-        DEFAULTS_COMUNES.ensaladasLibres.forEach(item => {
-            foods.push({
-                id: `sl_${idCounter++}`,
-                name: item,
-                category: 'Neutros',
-                mealTypes: ['LUNCH', 'DINNER']
-            });
-        });
-
-        const dietTypes: DietType[] = [];
-        if (alimentacion.tipoMetabolica) dietTypes.push('METABOLIC');
-        if (alimentacion.tipoRenal) dietTypes.push('RENAL');
-        if (alimentacion.tipoNino) dietTypes.push('STANDARD');
-        // si no hay dietas específicas, asignar STANDARD al menos
-        if (dietTypes.length === 0) dietTypes.push('STANDARD');
-
-        // Extraer forbidden list desde defaults comunes
-        const forbiddenItems = [...DEFAULTS_COMUNES.alimentosEvitar];
-
-        return {
-            bloodType: bloodGrpGroup === 'O_B' ? 'O' : 'A', // Mostrar representativo
-            dietTypes: dietTypes,
-            forbidden: forbiddenItems,
-            foods: foods,
-            updatedAt: alimentacion.enviadaAt || alimentacion.updatedAt || new Date().toISOString()
-        };
+    if (!plan) {
+      throw new Error(
+        'No hay un plan de nutrición nutrigenómica configurado por el médico.',
+      );
     }
+
+    return plan;
+  },
 };
