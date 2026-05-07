@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* Identidad Corporativa Doctor Antivejez */
+        --primary-cyan: #23bcef;
+        --dark-navy: #293b64;
+        --background: #F8FAFC;
+        --surface: #FFFFFF;
+        --surface-secondary: #F0F4F8;
+        --text-primary: #1A253C;
+        --text-secondary: #5A6A8A;
+        --border: rgba(0, 0, 0, 0.06);
+
+        /* Soporte para Mobile PWA Safe Areas */
+        --sat: env(safe-area-inset-top);
+        --sar: env(safe-area-inset-right);
+        --sab: env(safe-area-inset-bottom);
+        --sal: env(safe-area-inset-left);
+    }
+
+    /* ── Dark Mode Palette (explicit class override) ────────────────────────── */
+    html.dark-mode {
+        --background: #0F1623;
+        --surface: #1A2538;
+        --surface-secondary: #222E44;
+        --text-primary: #E8EDF5;
+        --text-secondary: #8A9BB3;
+        --border: rgba(255, 255, 255, 0.08);
+    }
+
+    html {
+        -webkit-tap-highlight-color: transparent;
+        scroll-behavior: smooth;
+        /* Evita el rebote elástico molesto en iOS */
+        overflow: hidden;
+        height: 100%;
+    }
+
+    body {
+        @apply bg-[var(--background)] text-[var(--text-primary)] antialiased;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        /* Previene scroll no deseado en el body */
+    }
+
+    #root {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+/* ── Dark Mode Palette (System Preference) ────────────────────────────────────
+   This runs outside @layer where @media is always safe, and only applies 
+   if the user HAS NOT set an explicit light-mode override.
+───────────────────────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode):not(.dark-mode) {
+        --background: #0F1623;
+        --surface: #1A2538;
+        --surface-secondary: #222E44;
+        --text-primary: #E8EDF5;
+        --text-secondary: #8A9BB3;
+        --border: rgba(255, 255, 255, 0.08);
+    }
+}
+
+@layer components {
+
+    /* Clases de utilidad para el App.tsx */
+    .pt-safe-top {
+        padding-top: max(1rem, var(--sat));
+    }
+
+    .pb-safe-bottom {
+        padding-bottom: max(1rem, var(--sab));
+    }
+
+    .bg-darkBlue {
+        background-color: var(--dark-navy);
+    }
+
+    .bg-primary {
+        background-color: var(--primary-cyan);
+    }
+
+    .text-primary {
+        color: var(--primary-cyan);
+    }
+
+    /* Ocultar scrollbars sin perder funcionalidad */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+
+/* Animaciones de transición de página médicas */
+.page-transition {
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

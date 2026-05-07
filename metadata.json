@@ -1,0 +1,8 @@
+{
+  "name": "Rejuvenate App",
+  "description": "A comprehensive Anti-Aging Medicine application for health management, featuring 5A Keys, 4R Therapies, and an AI VCoach powered by Gemini.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}

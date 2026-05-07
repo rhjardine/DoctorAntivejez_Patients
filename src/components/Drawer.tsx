@@ -1,0 +1,189 @@
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { X, Info, LogOut, User, AlertCircle, Activity, Bell, Zap, FileClock, QrCode, Settings, MessageSquare } from 'lucide-react';
+import { useAuthStore } from '../store/useAuthStore';
+import { useUIStore } from '../store/useUIStore';
+import { useLocale } from '../hooks/useLocale';
+
+interface DrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  notificationControls: {
+    notificationsEnabled: boolean;
+    enableNotifications: () => void;
+    disableNotifications: () => void;
+    sendTestNotification: () => void;
+    permission: NotificationPermission;
+  };
+}
+
+const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }) => {
+  const navigate = useNavigate();
+  const { logout, session } = useAuthStore();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const { notificationsEnabled, enableNotifications, disableNotifications } = notificationControls;
+  const { t } = useLocale();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    onClose();
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    onClose();
+  };
+
+  const toggleNotifications = () => {
+    if (notificationsEnabled) {
+      disableNotifications();
+    } else {
+      enableNotifications();
+    }
+  };
+
+  return (
+    <>
+      <div
+        className={`fixed inset-0 bg-darkBlue/60 backdrop-blur-[4px] z-40 transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+        onClick={onClose}
+      />
+
+      <div
+        className={`fixed top-0 left-0 h-full w-[300px] bg-white z-50 shadow-2xl transform transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+      >
+        <div className="bg-darkBlue p-6 pt-14 text-white relative overflow-hidden">
+          {/* Decorative background circles */}
+          <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-primary/10 pointer-events-none" />
+          <div className="absolute top-10 -right-2 w-14 h-14 rounded-full bg-primary/15 pointer-events-none" />
+
+          <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white z-10"><X size={28} /></button>
+
+          {/* Welcome card */}
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white shadow-xl border-2 border-white/10 shrink-0">
+              <User size={32} />
+            </div>
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/80">Bienvenido</span>
+              <h2 className="font-black text-lg leading-tight tracking-tight truncate max-w-[185px] text-white">
+                {session?.name || 'Paciente'}
+              </h2>
+              <div className="flex items-center gap-1.5 mt-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Sesión activa</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Decorative motivational strip */}
+          <div className="mt-4 bg-white/5 rounded-xl px-3 py-2 border border-white/10">
+            <p className="text-[10px] font-bold text-white/60 italic leading-snug">
+              "Cada día es una oportunidad para rejuvenecer a nivel celular."
+            </p>
+          </div>
+        </div>
+
+        <div className="py-6 flex flex-col h-full overflow-y-auto no-scrollbar">
+
+          <button
+            onClick={() => handleNavigation('/biometrics')}
+            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group"
+          >
+            <Activity size={22} className="text-textMedium group-hover:text-primary" />
+            <span className="font-black text-[13px] uppercase tracking-widest">Mis Biométricos</span>
+          </button>
+
+          <button
+            onClick={() => handleNavigation('/history')}
+            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group"
+          >
+            <FileClock size={22} className="text-textMedium group-hover:text-primary" />
+            <span className="font-black text-[13px] uppercase tracking-widest">Historial Médico</span>
+          </button>
+
+          <button
+            onClick={() => handleNavigation('/biopase')}
+            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group"
+          >
+            <QrCode size={22} className="text-textMedium group-hover:text-primary" />
+            <span className="font-black text-[13px] uppercase tracking-widest">Bio-Pase (Check-in)</span>
+          </button>
+
+
+          <div className="px-6 py-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Bell size={22} className={notificationsEnabled ? 'text-primary' : 'text-textMedium'} />
+                <span className="font-black text-[13px] text-darkBlue uppercase tracking-widest">Avisos</span>
+              </div>
+              <div
+                onClick={toggleNotifications}
+                className={`w-14 h-8 rounded-full p-1 cursor-pointer transition-colors ${notificationsEnabled ? 'bg-primary' : 'bg-gray-300'}`}
+              >
+                <div className={`bg-white w-6 h-6 rounded-full shadow-md transform transition-transform ${notificationsEnabled ? 'translate-x-6' : 'translate-x-0'}`}></div>
+              </div>
+            </div>
+          </div>
+
+          <button onClick={() => handleNavigation('/settings')} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group">
+            <Settings size={22} className="text-textMedium group-hover:text-primary" />
+            <span className="font-black text-[13px] uppercase tracking-widest">{t('nav.settings') || 'Configuración'}</span>
+          </button>
+
+          <div className="h-px bg-gray-100 mx-6 my-3"></div>
+
+          <button onClick={() => handleNavigation('/about')} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group">
+            <span className="flex items-center gap-4">
+              <Info size={22} className="text-textMedium group-hover:text-primary" />
+              <span className="font-black text-[13px] uppercase tracking-widest">Sobre la App</span>
+            </span>
+          </button>
+
+          <a
+            href={`mailto:soporte@doctorantivejez.com?subject=Reporte%20de%20Error%20PWA&body=Paciente%3A%20${encodeURIComponent(session?.name || '')}%0AFecha%3A%20${encodeURIComponent(new Date().toLocaleString('es-VE'))}%0A%0ADescripci%C3%B3n%20del%20problema%3A%0A`}
+            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-amber-50 transition-all text-amber-600 group"
+          >
+            <MessageSquare size={22} className="text-amber-400 group-hover:text-amber-600" />
+            <span className="font-black text-[13px] uppercase tracking-widest">
+              Reportar Problema
+            </span>
+          </a>
+
+          <button onClick={() => setShowLogoutConfirm(true)} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-red-50 transition-all text-accentRed group">
+            <LogOut size={22} className="group-hover:text-red-600" />
+            <span className="font-black text-[13px] uppercase tracking-widest">Cerrar Sesión</span>
+          </button>
+
+          <div className="mt-auto mb-10 px-8 text-center">
+            <p className="text-[10px] font-black text-gray-300 tracking-[0.3em] uppercase">Rejuvenate v2.0</p>
+          </div>
+
+          {showLogoutConfirm && (
+            <div className="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-8 animate-in fade-in">
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-red-50 p-6 rounded-[2rem] mb-6">
+                  <AlertCircle size={48} className="text-accentRed" />
+                </div>
+                <h3 className="text-2xl font-black text-darkBlue uppercase tracking-tighter">¿Cerrar Sesión?</h3>
+                <p className="text-sm text-textMedium mt-3 font-bold">Perderás la conexión con tu doctor hasta que vuelvas a ingresar.</p>
+
+                <div className="flex flex-col w-full gap-3 mt-8">
+                  <button onClick={() => setShowLogoutConfirm(false)} className="py-4 rounded-2xl bg-darkBlue text-white text-sm font-black uppercase tracking-widest">Volver</button>
+                  <button onClick={handleLogout} className="py-4 rounded-2xl border-2 border-accentRed text-accentRed text-sm font-black uppercase tracking-widest">Salir</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Drawer;
+

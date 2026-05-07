@@ -1,0 +1,42 @@
+name: CI — Doctor Antivejez PWA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-validate:
+    name: Build & Security Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js v20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type-check
+        run: npx tsc --noEmit
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://placeholder.onrender.com' }}
+          VITE_ENCRYPTION_SEED: ${{ secrets.VITE_ENCRYPTION_SEED || 'ci-build-seed-not-for-production' }}
+
+      - name: Security audit (high severity)
+        run: npm audit --audit-level=high
+        # Allow CI to pass even if audit finds issues (advisory only — fix separately)
+        continue-on-error: true
