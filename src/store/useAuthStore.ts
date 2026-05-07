@@ -1,89 +1,65 @@
 import { create } from 'zustand';
-import { UserSession } from '../types';
-import { authService } from '../services/authService';
-import { ProtocolService } from '../services/protocolService';
-import { tokenStore } from '../services/authService';
-import apiClient from '../services/apiClient';
-
-// ✅ SECURITY: Sin persist() — la sesión de un paciente NO debe sobrevivir
-// al cierre de la pestaña. authService ya persiste en localStorage con
-// la clave 'rejuvenate_session_v1'. checkSession() la recupera al montar.
-//
-// Eliminamos el persist de Zustand para evitar:
-//   1. PHI (datos clínicos) almacenados en localStorage entre sesiones
-//   2. Dos fuentes de verdad (Zustand localStorage vs authService sessionStorage)
-//   3. logout() borrando preferencias UI al llamar localStorage.clear()
+import { persist, createJSONStorage } from 'zustand/middleware';
+// Importamos el store del perfil para poder limpiarlo al hacer logout
+import { useProfileStore } from './useProfileStore';
 
 interface AuthState {
-  session: UserSession | null;
-  isLoading: boolean;
-  login: (identification: string, password?: string) => Promise<void>;
+  token: string | null;
+  isAuthenticated: boolean;
+  user: {
+    id: string;
+    role: string;
+    name?: string;
+  } | null;
+  login: (token: string, userData: any) => void;
   logout: () => void;
-  checkSession: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => {
-  // Inicialización sincrónica para evitar flashes de "sin sesión" en F5
-  const initialSession = authService.getCurrentUser();
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      token: null,
+      isAuthenticated: false,
+      user: null,
 
-  return {
-    session: initialSession,
-    isLoading: false,
+      login: (token, userData) => {
+        set({
+          token,
+          isAuthenticated: true,
+          user: {
+            id: userData.id,
+            role: userData.role || 'PATIENT',
+            name: userData.name,
+          },
+        });
+      },
 
-    /**
-     * Login del paciente.
-     * Delega completamente a authService (única fuente de verdad).
-     */
-    login: async (identification: string, password?: string) => {
-      set({ isLoading: true });
-      try {
-        const session = await authService.login(identification, password);
-        set({ session, isLoading: false });
-      } catch (error) {
-        set({ isLoading: false });
-        throw error;
-      }
-    },
+      logout: () => {
+        // 1. Limpiamos el estado de Auth
+        set({ token: null, isAuthenticated: false, user: null });
 
-    /**
-     * Logout del paciente.
-     * ✅ FIX: Ya no llama localStorage.clear() (borraba preferencias UI).
-     */
-    logout: () => {
-      authService.logout();          // limpia tokens y sesión
-      ProtocolService.clearCache();  // limpia caché de protocolo
-      set({ session: null });
-    },
-
-    /**
-     * Recupera la sesión al montar la app (F5 / reopen tab mismo browser).
-     * Lee desde storage via authService. Si hay sesión persistida pero NO hay token en memoria,
-     * ejecuta un refresh silencioso antes de marcar la sesión como lista.
-     */
-    checkSession: async () => {
-      const session = authService.getCurrentUser();
-
-      if (session && !tokenStore.getAccessToken()) {
-        const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
-        if (refreshToken) {
-          try {
-            const { data } = await apiClient.post('/auth/refresh',
-              { refreshToken }
-            );
-            tokenStore.setAccessToken(data.accessToken);
-            if (data.refreshToken) {
-              localStorage.setItem('refresh_token', data.refreshToken);
-            }
-          } catch (error) {
-            console.warn('[F5 Recovery] Refresh failed, forcing relogin.');
-            authService.logout();
-            set({ session: null });
-            return;
-          }
+        // 2. Limpiamos otros stores sensibles para evitar fugas de datos
+        // Asegúrate de que useProfileStore tenga una acción clearProfile()
+        const clearProfile = useProfileStore.getState().clearProfile;
+        if (clearProfile) {
+          clearProfile();
         }
-      }
 
-      set({ session });
-    },
-  };
-});
+        // 3. Purga adicional de localStorage por seguridad
+        // (Opcional, pero recomendado si tienes datos cacheados manualmente)
+        localStorage.removeItem('vytalix-funnel-v2');
+        sessionStorage.clear();
+      },
+    }),
+    {
+      name: 'auth-storage', // Clave en localStorage
+      storage: createJSONStorage(() => localStorage),
+      // Solo persistimos los datos no sensibles estrictamente necesarios
+      partialize: (state) => ({
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
+        user: state.user
+      }),
+    }
+  )
+);

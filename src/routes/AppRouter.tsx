@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useUIStore } from '../store/useUIStore';
 import { useAuthStore } from '../store/useAuthStore';
 
-// Lazy-loaded public pages (growth engine — no auth required)
+// ----------------------------------------------------------------------
+// 1. RUTAS PÚBLICAS (Lazy Loaded - Landing y Funnel de Ventas)
+// ----------------------------------------------------------------------
 const LandingPublica = React.lazy(() => import('../pages/public/LandingPublicaPage'));
 const TestAntivejez = React.lazy(() => import('../pages/public/TestAntivejezPage'));
 const AgeBotFacial = React.lazy(() => import('../pages/public/AgeBotFacialPage'));
@@ -13,7 +15,9 @@ const MedicalNetwork = React.lazy(() => import('../pages/public/MedicalNetworkPa
 const TestsSelector = React.lazy(() => import('../pages/public/TestsSelectorPage'));
 const UniversalEntry = React.lazy(() => import('../pages/public/UniversalEntry'));
 
-// Private pages
+// ----------------------------------------------------------------------
+// 2. RUTAS PRIVADAS (Pacientes Registrados)
+// ----------------------------------------------------------------------
 import LoginPage from '../pages/LoginPage';
 import HomePage from '../pages/HomePage';
 const PatientGuidePage = React.lazy(() => import('../pages/PatientGuidePage'));
@@ -24,7 +28,9 @@ const SettingsPage = React.lazy(() => import('../pages/SettingsPage'));
 const BiometricsPage = React.lazy(() => import('../pages/BiometricsPage'));
 const BiomicsPage = React.lazy(() => import('../pages/BiomicsPage'));
 
-// Private component views
+// ----------------------------------------------------------------------
+// 3. VISTAS DE DETALLE (Componentes Privados)
+// ----------------------------------------------------------------------
 const NutritionView = React.lazy(() => import('../components/NutritionView'));
 const DoctorNutritionPlanView = React.lazy(() => import('../components/DoctorNutritionPlanView'));
 const AttitudeView = React.lazy(() => import('../components/AttitudeView'));
@@ -38,58 +44,87 @@ const UsageGuideView = React.lazy(() => import('../components/UsageGuideView'));
 const ConsultationHistoryView = React.lazy(() => import('../components/ConsultationHistoryView'));
 const BioPaseView = React.lazy(() => import('../components/BioPaseView'));
 
+// ----------------------------------------------------------------------
+// MIDDLEWARE DE SEGURIDAD
+// ----------------------------------------------------------------------
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { session } = useAuthStore();
-    if (!session) return <Navigate to="/acceso" replace />;
+    const { session, isAuthenticated } = useAuthStore();
+
+    // Validación estricta: Si no hay sesión, expulsa al usuario al login
+    if (!session && !isAuthenticated) {
+        return <Navigate to="/acceso" replace />;
+    }
+
     return <>{children}</>;
 };
 
+// ----------------------------------------------------------------------
+// INDICADOR DE CARGA (Para evitar la pantalla en blanco de React.lazy)
+// ----------------------------------------------------------------------
+const RouteLoader = () => (
+    <div className="flex h-screen w-full items-center justify-center bg-clinical-bg">
+        <div className="flex flex-col items-center gap-4">
+            {/* Usamos el color cyan del tema clínico para coherencia visual */}
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-clinical-cyan"></div>
+            <p className="text-sm font-medium text-clinical-slate animate-pulse">Cargando...</p>
+        </div>
+    </div>
+);
+
+// ----------------------------------------------------------------------
+// ENRUTADOR PRINCIPAL
+// ----------------------------------------------------------------------
 const AppRouter: React.FC = () => {
     const navigate = useNavigate();
     const { session } = useAuthStore();
     const { toggleClinicalInfo } = useUIStore();
 
     return (
-        <Routes>
-            <Route path="/login" element={<LoginPage />} />
+        /* El Suspense es CRÍTICO. Sin él, React 19 crasheará al usar lazy() */
+        <Suspense fallback={<RouteLoader />}>
+            <Routes>
+                {/* Autenticación */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/acceso" element={<UniversalEntry />} />
 
-            {/* Protected private app routes */}
-            <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-            <Route path="/guide" element={<ProtectedRoute><PatientGuidePage /></ProtectedRoute>} />
-            <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-            <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
-            <Route path="/store" element={<ProtectedRoute><StorePage /></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-            <Route path="/biomics" element={<ProtectedRoute><BiomicsPage /></ProtectedRoute>} />
-            <Route path="/biometrics" element={<ProtectedRoute><BiometricsPage /></ProtectedRoute>} />
+                {/* Rutas Públicas (Marketing / Funnel) */}
+                <Route path="/longevidad" element={<LandingPublica />} />
+                <Route path="/longevidad-tests" element={<TestsSelector />} />
+                <Route path="/welcome" element={<Navigate to="/acceso" replace />} />
+                <Route path="/test" element={<TestAntivejez />} />
+                <Route path="/agebot" element={<AgeBotFacial />} />
+                <Route path="/resultado" element={<ResultadoScore />} />
+                <Route path="/consulta" element={<ConsultaExploratoria />} />
+                <Route path="/medicos" element={<MedicalNetwork />} />
 
-            {/* Detail views */}
-            <Route path="/nutrition" element={<ProtectedRoute><NutritionView /></ProtectedRoute>} />
-            <Route path="/mi-guia/alimentacion" element={<ProtectedRoute><DoctorNutritionPlanView onBack={() => navigate(-1)} /></ProtectedRoute>} />
-            <Route path="/attitude" element={<ProtectedRoute><AttitudeView /></ProtectedRoute>} />
-            <Route path="/activity" element={<ProtectedRoute><ActivityView /></ProtectedRoute>} />
-            <Route path="/environment" element={<ProtectedRoute><EnvironmentView /></ProtectedRoute>} />
-            <Route path="/rest" element={<ProtectedRoute><RestView /></ProtectedRoute>} />
-            <Route path="/restoration" element={<ProtectedRoute><RestorationView onBack={() => navigate(-1)} /></ProtectedRoute>} />
-            <Route path="/about" element={<ProtectedRoute><AboutView onNavigateToTeam={() => navigate('/team')} onNavigateToGuide={() => navigate('/usage-guide')} /></ProtectedRoute>} />
-            <Route path="/team" element={<ProtectedRoute><MedicalTeamView /></ProtectedRoute>} />
-            <Route path="/usage-guide" element={<ProtectedRoute><UsageGuideView /></ProtectedRoute>} />
-            <Route path="/history" element={<ProtectedRoute><ConsultationHistoryView onBack={() => navigate(-1)} onInfoPress={() => toggleClinicalInfo(true)} /></ProtectedRoute>} />
-            <Route path="/biopase" element={<ProtectedRoute><BioPaseView patientId={session?.id || ''} onRefresh={async () => { }} onBack={() => navigate(-1)} /></ProtectedRoute>} />
+                {/* Rutas Privadas Principales */}
+                <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+                <Route path="/guide" element={<ProtectedRoute><PatientGuidePage /></ProtectedRoute>} />
+                <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+                <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
+                <Route path="/store" element={<ProtectedRoute><StorePage /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+                <Route path="/biomics" element={<ProtectedRoute><BiomicsPage /></ProtectedRoute>} />
+                <Route path="/biometrics" element={<ProtectedRoute><BiometricsPage /></ProtectedRoute>} />
 
-            {/* Public entry + growth engine routes — no auth required */}
-            <Route path="/acceso" element={<UniversalEntry />} />
-            <Route path="/longevidad" element={<LandingPublica />} />
-            <Route path="/longevidad-tests" element={<TestsSelector />} />
-            <Route path="/welcome" element={<Navigate to="/acceso" replace />} />
-            <Route path="/test" element={<TestAntivejez />} />
-            <Route path="/agebot" element={<AgeBotFacial />} />
-            <Route path="/resultado" element={<ResultadoScore />} />
-            <Route path="/consulta" element={<ConsultaExploratoria />} />
-            <Route path="/medicos" element={<MedicalNetwork />} />
+                {/* Rutas Privadas de Detalle */}
+                <Route path="/nutrition" element={<ProtectedRoute><NutritionView /></ProtectedRoute>} />
+                <Route path="/mi-guia/alimentacion" element={<ProtectedRoute><DoctorNutritionPlanView onBack={() => navigate(-1)} /></ProtectedRoute>} />
+                <Route path="/attitude" element={<ProtectedRoute><AttitudeView /></ProtectedRoute>} />
+                <Route path="/activity" element={<ProtectedRoute><ActivityView /></ProtectedRoute>} />
+                <Route path="/environment" element={<ProtectedRoute><EnvironmentView /></ProtectedRoute>} />
+                <Route path="/rest" element={<ProtectedRoute><RestView /></ProtectedRoute>} />
+                <Route path="/restoration" element={<ProtectedRoute><RestorationView onBack={() => navigate(-1)} /></ProtectedRoute>} />
+                <Route path="/about" element={<ProtectedRoute><AboutView onNavigateToTeam={() => navigate('/team')} onNavigateToGuide={() => navigate('/usage-guide')} /></ProtectedRoute>} />
+                <Route path="/team" element={<ProtectedRoute><MedicalTeamView /></ProtectedRoute>} />
+                <Route path="/usage-guide" element={<ProtectedRoute><UsageGuideView /></ProtectedRoute>} />
+                <Route path="/history" element={<ProtectedRoute><ConsultationHistoryView onBack={() => navigate(-1)} onInfoPress={() => toggleClinicalInfo(true)} /></ProtectedRoute>} />
+                <Route path="/biopase" element={<ProtectedRoute><BioPaseView patientId={session?.id || ''} onRefresh={async () => { }} onBack={() => navigate(-1)} /></ProtectedRoute>} />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+                {/* Fallback 404 */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </Suspense>
     );
 };
 

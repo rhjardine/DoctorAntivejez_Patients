@@ -1,86 +1,62 @@
 ﻿import axios from 'axios';
-import { useProfileStore } from '../store/useProfileStore';
-import { logger } from '../utils/logger';
-import { tokenStore } from './authService';
+import { useAuthStore } from '../store/useAuthStore';
 
-// ✅ SECURITY: Strictly relies on VITE_API_URL — no hardcoded fallback in production
-// In development, the Vite proxy (/api-render) routes to the backend.
-if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
-    console.error('[apiClient] CRITICAL: VITE_API_URL is not set in production. All API calls will fail.');
-}
+// URL base de tu backend en Render
+const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com';
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-const apiClient = axios.create({
-    baseURL: import.meta.env.DEV ? '/api-render/api' : `${API_URL}/api`,
-    headers: { 'Content-Type': 'application/json' }
+export const apiClient = axios.create({
+    baseURL: API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    // timeout: 10000, // Opcional: configurar un timeout si lo deseas
 });
 
-// Interceptor para inyectar el Token en cada llamada médica
-apiClient.interceptors.request.use((config) => {
-    // Preferencia a memoria (donde ahora vive de forma segura)
-    const token = tokenStore.getAccessToken();
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+// Interceptor de Peticiones (Request Interceptor)
+apiClient.interceptors.request.use(
+    (config) => {
+        // Obtener el token directamente del estado de Zustand en cada request
+        const token = useAuthStore.getState().token;
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    // ✅ SECURITY: Never log request data (may contain PHI)
-    logger.audit('api_request', { method: config.method || 'unknown', url: config.url || 'unknown' });
-    return config;
-});
+);
 
-// Interceptor para manejar expulsión por token expirado
+// Interceptor de Respuestas (Response Interceptor)
 apiClient.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        return response;
+    },
     async (error) => {
         const originalRequest = error.config;
 
-        // Si es 401 y no hemos intentado refresh
+        // Si recibimos un 401 (No Autorizado) y no es un intento de login/refresh
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
             try {
-                const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
-                if (!refreshToken) throw new Error('No refresh token');
+                // Opcional: Lógica para refrescar el token si tu backend lo soporta
+                // const newToken = await refreshTheToken();
+                // useAuthStore.getState().setToken(newToken);
+                // originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                // return apiClient(originalRequest);
 
-                // Llamar endpoint de refresh (backend debe implementarlo)
-                const { data } = await axios.post(
-                    `${originalRequest.baseURL}/auth/refresh`,
-                    { refreshToken }
-                );
-
-                // Actualizar tokens en memoria y localStorage
-                tokenStore.setAccessToken(data.accessToken);
-                if (data.refreshToken) {
-                    localStorage.setItem('refresh_token', data.refreshToken);
-                }
-
-                // Reintentar request original
-                originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-                logger.audit('token_refreshed');
-                return apiClient(originalRequest);
+                // Si no hay refresh token, o falla, cerramos la sesión por seguridad
+                useAuthStore.getState().logout();
 
             } catch (refreshError) {
-                // NUCLEAR RESET: Limpieza selectiva y segura via authService
-                logger.warn('Session expired, forcing logout');
-                const { authService } = await import('./authService');
-                authService.logout();
-                window.location.href = '/login';
+                useAuthStore.getState().logout();
                 return Promise.reject(refreshError);
             }
         }
 
-        logger.error('API request failed', {
-            status: error.response?.status,
-            url: originalRequest?.url,
-            // ✅ SECURITY: Never log the response body (may contain PHI)
-        });
-
-        // Standardized error object — never exposes raw server error to the UI
-        const standardError = new Error(
-            error.response?.data?.error || 'Error de conexión con el servidor médico.'
-        );
-        return Promise.reject(standardError);
+        return Promise.reject(error);
     }
 );
-
-export default apiClient;
