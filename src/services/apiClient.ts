@@ -1,5 +1,4 @@
 ﻿import axios from 'axios';
-import { useAuthStore } from '../store/useAuthStore';
 import { logger } from '../utils/logger';
 
 // Garantía de conexión directa a Render
@@ -10,20 +9,25 @@ export const apiClient = axios.create({
     headers: { 'Content-Type': 'application/json' }
 });
 
-// Interceptor para inyectar el Token (Extraído directamente de Zustand)
+// Interceptor de peticiones
 apiClient.interceptors.request.use((config) => {
-    // ROMPEMOS EL BUCLE: No usamos authService, leemos el estado directamente
-    const token = useAuthStore.getState().token;
-
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    // 🚀 CIRUGÍA: Leemos el token directamente del disco duro del navegador.
+    // Al no importar "useAuthStore", rompemos el bucle infinito de dependencias.
+    try {
+        const authStorage = JSON.parse(localStorage.getItem('auth-storage') || '{}');
+        const token = authStorage?.state?.token;
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+    } catch (e) {
+        // Ignoramos errores si el almacenamiento está vacío
     }
 
     logger.audit('api_request', { method: config.method || 'unknown', url: config.url || 'unknown' });
     return config;
 });
 
-// Interceptor para manejar tokens expirados
+// Interceptor de respuestas
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -41,7 +45,6 @@ apiClient.interceptors.response.use(
                     { refreshToken }
                 );
 
-                // Actualizamos el token directamente en localStorage y recargamos
                 localStorage.setItem('refresh_token', data.refreshToken);
                 originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
                 return apiClient(originalRequest);
@@ -49,8 +52,9 @@ apiClient.interceptors.response.use(
             } catch (refreshError) {
                 logger.warn('Session expired, forcing logout');
 
-                // ROMPEMOS EL BUCLE: Hacemos logout desde Zustand directamente
-                useAuthStore.getState().logout();
+                // 🚀 CIRUGÍA: Hacemos el logout manualmente, sin importar "authService".
+                localStorage.clear();
+                sessionStorage.clear();
                 window.location.href = '/acceso';
                 return Promise.reject(refreshError);
             }
