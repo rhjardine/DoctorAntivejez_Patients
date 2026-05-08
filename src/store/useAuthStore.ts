@@ -1,54 +1,69 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { authService } from '../services/authService';
+import { UserSession } from '../types';
 
-// 🚀 CIRUGÍA: Eliminamos la importación de useProfileStore para romper el bucle infinito.
+// ✅ CONTRATO CORRECTO: Compatible con Drawer, MainLayout, AppRouter, LoginPage
+// 🚀 SIN importar useProfileStore (dependencia circular eliminada)
+// 🔐 Limpia profile-storage directamente desde localStorage en logout()
 
 interface AuthState {
-  token: string | null;
+  session: UserSession | null;
   isAuthenticated: boolean;
-  user: {
-    id: string;
-    role: string;
-    name?: string;
-    tenantId?: string;
-  } | null;
-  login: (token: string, userData: any) => void;
+  isLoading: boolean;
+  token: string | null;
+
+  login: (identification: string, password: string) => Promise<void>;
   logout: () => void;
+  checkSession: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      token: null,
+      session: null,
       isAuthenticated: false,
-      user: null,
+      isLoading: false,
+      token: null,
 
-      login: (token, userData) => {
-        set({
-          token,
-          isAuthenticated: true,
-          user: {
-            id: userData.id || userData.uid,
-            role: userData.role || 'PATIENT',
-            name: userData.name,
-            tenantId: userData.tenantId || 'default-tenant',
-          },
-        });
+      login: async (identification: string, password: string) => {
+        set({ isLoading: true });
+        try {
+          const session = await authService.login(identification, password);
+          set({
+            session,
+            isAuthenticated: true,
+            isLoading: false,
+            token: null, // el token vive en memoria (tokenStore), no aquí
+          });
+        } catch (error) {
+          set({ isLoading: false });
+          throw error;
+        }
       },
 
       logout: () => {
-        // 1. Limpiamos el estado de Auth
-        set({ token: null, isAuthenticated: false, user: null });
+        authService.logout();
 
-        // 2. Limpieza directa de caché
-        // Como ya no importamos useProfileStore, limpiamos su persistencia a mano.
+        // Limpiar stores de perfil DIRECTAMENTE sin importarlos
+        localStorage.removeItem('rejuvenate_profile_v1');
         localStorage.removeItem('profile-storage');
         localStorage.removeItem('vytalix-funnel-v2');
         sessionStorage.clear();
 
-        // 3. Redirección forzada
-        if (typeof window !== 'undefined') {
-          window.location.href = '/acceso';
+        set({
+          session: null,
+          isAuthenticated: false,
+          token: null,
+        });
+      },
+
+      checkSession: () => {
+        const currentSession = authService.getCurrentUser();
+        if (currentSession) {
+          set({ session: currentSession, isAuthenticated: true });
+        } else {
+          set({ session: null, isAuthenticated: false });
         }
       },
     }),
@@ -56,9 +71,9 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        token: state.token,
+        session: state.session,
         isAuthenticated: state.isAuthenticated,
-        user: state.user
+        token: state.token,
       }),
     }
   )
