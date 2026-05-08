@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-// Importamos el store del perfil para poder limpiarlo al hacer logout
-import { useProfileStore } from './useProfileStore';
+
+// 🚀 CIRUGÍA: Eliminamos la importación de useProfileStore para romper el bucle infinito.
 
 interface AuthState {
   token: string | null;
@@ -10,6 +10,7 @@ interface AuthState {
     id: string;
     role: string;
     name?: string;
+    tenantId?: string;
   } | null;
   login: (token: string, userData: any) => void;
   logout: () => void;
@@ -27,9 +28,10 @@ export const useAuthStore = create<AuthState>()(
           token,
           isAuthenticated: true,
           user: {
-            id: userData.id,
+            id: userData.id || userData.uid,
             role: userData.role || 'PATIENT',
             name: userData.name,
+            tenantId: userData.tenantId || 'default-tenant',
           },
         });
       },
@@ -38,23 +40,21 @@ export const useAuthStore = create<AuthState>()(
         // 1. Limpiamos el estado de Auth
         set({ token: null, isAuthenticated: false, user: null });
 
-        // 2. Limpiamos otros stores sensibles para evitar fugas de datos
-        // Asegúrate de que useProfileStore tenga una acción clearProfile()
-        const clearProfile = useProfileStore.getState().clearProfile;
-        if (clearProfile) {
-          clearProfile();
-        }
-
-        // 3. Purga adicional de localStorage por seguridad
-        // (Opcional, pero recomendado si tienes datos cacheados manualmente)
+        // 2. Limpieza directa de caché
+        // Como ya no importamos useProfileStore, limpiamos su persistencia a mano.
+        localStorage.removeItem('profile-storage');
         localStorage.removeItem('vytalix-funnel-v2');
         sessionStorage.clear();
+
+        // 3. Redirección forzada
+        if (typeof window !== 'undefined') {
+          window.location.href = '/acceso';
+        }
       },
     }),
     {
-      name: 'auth-storage', // Clave en localStorage
+      name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
-      // Solo persistimos los datos no sensibles estrictamente necesarios
       partialize: (state) => ({
         token: state.token,
         isAuthenticated: state.isAuthenticated,
