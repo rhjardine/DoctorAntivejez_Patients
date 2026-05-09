@@ -60,7 +60,7 @@ export const authService = {
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         const response = await axios.post(
-          `${baseUrl}/api/mobile-auth-v1`,
+          `${baseUrl}/mobile-auth-v1`, // ✅ Ruta original autorizada por CORS en tu Next.js
           { identification, password },
           { timeout: TIMEOUT_MS }
         );
