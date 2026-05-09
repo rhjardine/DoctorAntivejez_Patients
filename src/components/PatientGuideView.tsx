@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { PatientProtocol, TimeSlot, ProtocolCategory, COLORS } from '../types';
 import {
   Sun,
@@ -12,7 +13,7 @@ import {
   Trash2,
   RefreshCw,
   Flame,
-  Sparkles,
+  Sparkles as SparklesIcon,
   Leaf,
   Droplet,
   Stethoscope,
@@ -27,6 +28,7 @@ import {
   Info,
   Bell,
   X,
+  HeartPulse // Añadido para el Hero Section
 } from 'lucide-react';
 import { useProfileStore } from '../store/useProfileStore';
 import { normalizePatientProtocol } from '../services/clinicalPayloadNormalizer';
@@ -60,6 +62,28 @@ const CATEGORY_LABELS: Record<string, string> = {
   THERAPY_CONTROL: 'Control de Terapia',
 };
 
+// Componente Sparkles SVG para la animación de edad biológica menor (Efecto Wow)
+const Sparkles = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+    <path d="M5 3v4" /><path d="M19 17v4" /><path d="M3 5h4" /><path d="M17 19h4" />
+  </svg>
+);
+
+// Variantes de animación para Framer Motion (Efecto Cascada)
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
+
 const PatientGuideView: React.FC<PatientGuideViewProps> = ({
   items,
   loading,
@@ -76,6 +100,11 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
   const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNewGuideBanner, setShowNewGuideBanner] = useState(false);
+
+  // Extracción de Edades para el Hero Section
+  const bioAge = profileData?.biologicalAge || 0;
+  const chronoAge = profileData?.chronologicalAge || 0;
+  const isYounger = bioAge > 0 && bioAge < chronoAge;
 
   // Check if a newer guide is available vs last seen
   useEffect(() => {
@@ -166,7 +195,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
       case 'METABOLIC_ACTIVATOR':
         return <Flame size={14} />;
       case 'COSMECEUTICALS':
-        return <Sparkles size={14} />;
+        return <SparklesIcon size={14} />;
       case 'NATURAL_FORMULAS':
         return <Leaf size={14} />;
       case 'ANTI_AGING_SERUMS':
@@ -193,8 +222,11 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     }
   };
 
+  // Skeleton Mejorado (Efecto Wow)
   const renderSkeleton = () => (
     <div className="flex flex-col gap-4 p-4">
+      {/* Skeleton del Hero Section */}
+      <div className="bg-gradient-to-br from-[#293B64] to-slate-800 rounded-3xl p-6 shadow-lg animate-pulse h-48 w-full mb-2"></div>
       {[1, 2, 3].map((i) => (
         <div
           key={i}
@@ -217,29 +249,25 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     const isCompleted = item.status === 'completed';
     const hasNotes = !!item.observations && item.observations.trim().length > 0;
     const isNoteExpanded = expandedNotes.has(item.id);
-    const isUrgent =
-      (item.observations || '').toLowerCase().includes('importante') ||
-      (item.observations || '').toLowerCase().includes('atención');
 
     return (
-      <div
+      <motion.div
+        variants={itemVariants}
         key={item.id}
-        className={`group relative flex flex-col bg-white rounded-[2rem] shadow-sm transition-all duration-300 border-2 overflow-hidden ${
-          isCompleted
+        className={`group relative flex flex-col bg-white rounded-[2rem] shadow-sm transition-all duration-300 border-2 overflow-hidden ${isCompleted
             ? 'bg-emerald-50/30 border-emerald-100 opacity-80'
             : 'border-white hover:border-sky-100 shadow-md shadow-slate-200/50'
-        }`}
+          }`}
       >
         <div
           onClick={() => onToggleItem(item.id)}
           className="flex items-center gap-5 p-5 cursor-pointer"
         >
           <div
-            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-inner shrink-0 ${
-              isCompleted
+            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-inner shrink-0 ${isCompleted
                 ? 'bg-emerald-500 text-white rotate-[360deg]'
                 : 'bg-slate-50 border border-slate-200 text-transparent group-hover:border-primary'
-            }`}
+              }`}
           >
             <Check
               size={24}
@@ -252,9 +280,8 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
 
           <div className="flex-1 min-w-0">
             <h3
-              className={`font-black text-base leading-tight transition-all truncate ${
-                isCompleted ? 'text-slate-400 line-through' : 'text-[#293B64]'
-              }`}
+              className={`font-black text-base leading-tight transition-all truncate ${isCompleted ? 'text-slate-400 line-through' : 'text-[#293B64]'
+                }`}
             >
               {item.itemName}
             </h3>
@@ -262,11 +289,10 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
             <div className="flex flex-col gap-1.5 mt-2.5">
               <div className="flex items-center gap-2">
                 <div
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-tighter ${
-                    isCompleted
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-tighter ${isCompleted
                       ? 'bg-slate-100 text-slate-400'
                       : 'bg-sky-50 text-primary'
-                  }`}
+                    }`}
                 >
                   {getIconByType(item.category)}
                   <span>Dosis: {item.dose}</span>
@@ -284,11 +310,10 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
           {hasNotes && (
             <button
               onClick={(e) => toggleNote(item.id, e)}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0 ${
-                isNoteExpanded
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0 ${isNoteExpanded
                   ? 'bg-primary text-white shadow-lg'
                   : 'bg-slate-50 text-slate-300'
-              }`}
+                }`}
             >
               <ChevronDown
                 size={20}
@@ -316,7 +341,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
     );
   };
 
@@ -327,7 +352,12 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     });
 
     return (
-      <div className="flex flex-col flex-1 animate-in fade-in duration-300 bg-[#F8FAFC]">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="flex flex-col flex-1 bg-[#F8FAFC]"
+      >
         <div className="px-6 py-3 bg-white border-b border-slate-100 shadow-sm">
           <div className="flex justify-between items-center mb-2.5">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -375,17 +405,17 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
 
         <div className="flex-1 px-4 py-4 space-y-4 overflow-y-auto no-scrollbar pb-10">
           {filteredItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center opacity-30">
+            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center py-20 text-center opacity-30">
               <ClipboardList size={54} className="mb-4 text-slate-300" />
               <p className="text-sm font-black text-slate-400 uppercase tracking-widest">
                 Sin tareas en este bloque
               </p>
-            </div>
+            </motion.div>
           ) : (
             filteredItems.map((item) => renderItemCard(item))
           )}
           {/* Rigor Clínico Persistent Access */}
-          <div className="pt-6 pb-24 text-center">
+          <motion.div variants={itemVariants} className="pt-6 pb-24 text-center">
             <button
               onClick={onInfoPress}
               className="inline-flex items-center gap-2 px-6 py-3 bg-white/50 rounded-full border border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-primary hover:bg-white transition-all shadow-sm"
@@ -393,21 +423,63 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
               <Info size={14} />
               Rigor Clínico y Biomarcadores
             </button>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     );
   };
 
   const renderPlanMode = () => {
     return (
-      <div className="flex-1 bg-[#F8FAFC] px-4 py-3 space-y-4 overflow-y-auto no-scrollbar animate-in slide-in-from-right duration-300 pb-32">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="flex-1 bg-[#F8FAFC] px-4 py-3 space-y-4 overflow-y-auto no-scrollbar pb-32"
+      >
+        {/* HERO SECTION: EDAD BIOLÓGICA (Efecto Wow) */}
+        <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-[#293B64] to-slate-900 rounded-3xl p-6 text-white shadow-xl mb-4">
+          <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+            <HeartPulse className="w-32 h-32" />
+          </div>
+
+          <div className="relative z-10">
+            <h2 className="text-primary/90 text-sm font-bold uppercase tracking-wider mb-1">
+              Mi Perfil de Longevidad
+            </h2>
+            <p className="text-slate-300 text-[11px] mb-6">Basado en tus últimos biomarcadores clínicos</p>
+
+            <div className="flex items-end gap-6">
+              <div>
+                <p className="text-slate-400 text-[10px] uppercase font-semibold mb-1 tracking-widest">Edad Celular</p>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-5xl font-black text-white">{bioAge || '--'}</span>
+                  <span className="text-primary text-lg font-medium">años</span>
+                </div>
+              </div>
+
+              <div className="pb-1 border-l border-slate-700 pl-6">
+                <p className="text-slate-400 text-[10px] uppercase font-semibold mb-1 tracking-widest">Edad Cronológica</p>
+                <p className="text-xl font-medium text-slate-300">{chronoAge || '--'} años</p>
+              </div>
+            </div>
+
+            {isYounger && (
+              <div className="mt-6 inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full text-xs font-black tracking-wide border border-primary/30 backdrop-blur-sm">
+                <Sparkles className="w-4 h-4" />
+                ¡Felicidades! Tu edad celular es {chronoAge - bioAge} años menor.
+              </div>
+            )}
+          </div>
+        </motion.div>
+
         {sortedActiveCategoryTypes.map((catType) => {
           const categoryItems = activeCategories[catType];
           const isExpanded = expandedCategories[catType] ?? true;
 
           return (
-            <div
+            <motion.div
+              variants={itemVariants}
               key={catType}
               className="rounded-[1.5rem] overflow-hidden shadow-lg border border-slate-100"
             >
@@ -480,10 +552,10 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     );
   };
 
@@ -565,17 +637,17 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
                 <Stethoscope size={48} className="animate-pulse" />
               </div>
               <div className="space-y-2">
-                <h3 className="text-xl font-black text-darkBlue uppercase tracking-tighter">
+                <h3 className="text-xl font-black text-[#293B64] uppercase tracking-tighter">
                   Preparando tu Protocolo
                 </h3>
-                <p className="text-sm font-bold text-textMedium leading-relaxed max-w-xs italic">
+                <p className="text-sm font-bold text-slate-500 leading-relaxed max-w-xs italic">
                   "Tu doctor está preparando tu protocolo personalizado. Pronto
                   recibirás tus indicaciones basadas en tu ciencia biológica."
                 </p>
               </div>
               <button
                 onClick={handleManualRefresh}
-                className="bg-darkBlue text-white px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 active:scale-95 transition-all"
+                className="bg-[#293B64] text-white px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 active:scale-95 transition-all"
               >
                 <RefreshCw
                   size={14}

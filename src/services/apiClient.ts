@@ -1,7 +1,5 @@
 ﻿import axios from 'axios';
-
-// 🚀 ARQUITECTURA LIMPIA: Cero importaciones de Zustand, Stores o Servicios locales.
-// Esto erradica por completo la Dependencia Circular que causa "x is not a function".
+import { tokenStore } from './authService'; // ✅ Inyectado para prioridad 1
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com';
 
@@ -13,8 +11,14 @@ export const apiClient = axios.create({
 // INTERCEPTOR DE PETICIONES
 apiClient.interceptors.request.use((config) => {
     try {
-        // Leemos el token directamente del disco (Zustand persist storage)
-        // Evitando importar el hook useAuthStore y rompiendo el bucle.
+        // ✅ PRIORIDAD 1: Token en memoria (Síncrono, fresco tras el login)
+        const memoryToken = tokenStore.getAccessToken();
+        if (memoryToken) {
+            config.headers.Authorization = `Bearer ${memoryToken}`;
+            return config;
+        }
+
+        // ✅ PRIORIDAD 2: Fallback a disco (para cuando el usuario recarga la página F5)
         const authStorageStr = localStorage.getItem('auth-storage');
         if (authStorageStr) {
             const parsed = JSON.parse(authStorageStr);
@@ -36,7 +40,6 @@ apiClient.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // Manejo de Token Expirado
         if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
             originalRequest._retry = true;
 
@@ -46,11 +49,14 @@ apiClient.interceptors.response.use(
 
                 const { data } = await axios.post(`${API_URL}/api/auth/refresh`, { refreshToken });
 
-                // Guardamos los nuevos tokens directamente en el disco
+                // Actualizar disco
                 localStorage.setItem('refresh_token', data.refreshToken);
+
+                // ✅ Actualizar memoria
+                tokenStore.setAccessToken(data.accessToken);
                 originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
 
-                // Inyectamos el nuevo token en el estado de Zustand manualmente
+                // Sincronizar Zustand storage por si acaso
                 const authStorageStr = localStorage.getItem('auth-storage');
                 if (authStorageStr) {
                     const parsed = JSON.parse(authStorageStr);
@@ -62,7 +68,6 @@ apiClient.interceptors.response.use(
 
                 return apiClient(originalRequest);
             } catch (refreshError) {
-                // Logout forzado sin importar authService
                 localStorage.clear();
                 sessionStorage.clear();
                 window.location.href = '/acceso';
@@ -70,9 +75,7 @@ apiClient.interceptors.response.use(
             }
         }
 
-        // 🛡️ BLINDAJE PARA WORKBOX (Evita el "Cannot read property 'payload'")
-        // Devolvemos un Error nativo de JS en lugar del objeto gigante de Axios
-        // para que la cola offline de la PWA no se asfixie al parsearlo.
+        // Blindaje Workbox (evita el error 'payload')
         const safeErrorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Error de red clínico';
         const safeError = new Error(safeErrorMessage);
         (safeError as any).status = error.response?.status;
