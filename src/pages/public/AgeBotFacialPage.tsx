@@ -1,11 +1,10 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle, BrainCircuit } from 'lucide-react';
+import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle, BrainCircuit, ChevronLeft } from 'lucide-react';
 import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 import { usePublicFunnelStore } from '../../store/usePublicFunnelStore';
-import { ChevronLeft } from 'lucide-react';
 
 type Phase = 'capture' | 'analyzing' | 'result' | 'error';
 
@@ -18,16 +17,25 @@ interface FacialResult {
 // TODO: conectar endpoint /api/vision-v1 cuando esté disponible en el backend
 async function analyzeFacialAge(imageBase64: string): Promise<FacialResult> {
     try {
+        // FIX 1: AbortController para prevenir el Loop Infinito si Render está dormido
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos máximo
+
         const response = await fetch('/api-render/api/vision-v1', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ imageBase64, analysisType: 'AGE_FACIAL' }),
+            signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
+
         if (response.ok) return await response.json();
         throw new Error('API not available');
-    } catch {
+    } catch (error) {
+        console.warn('[AgeBot] API timeout o error, usando mock simulado:', error);
         // Mock result while backend endpoint is implemented
-        await new Promise(r => setTimeout(r, 2500)); // Simulate processing time
+        await new Promise(r => setTimeout(r, 1500)); // Simulate processing time
         return {
             estimatedAge: Math.floor(35 + Math.random() * 25),
             confidence: 0.72 + Math.random() * 0.2,
@@ -101,7 +109,7 @@ const AgeBotFacialPage: React.FC = () => {
     const [retrying, setRetrying] = useState(false);
     const [showDiagnostics, setShowDiagnostics] = useState(false);
 
-    /* ─── FIX 1: WebRTC — Robust camera initialization ──────────────────── */
+    /* ─── FIX 2: WebRTC — Robust camera initialization para Redmi ──────────────────── */
     const startCamera = useCallback(async () => {
         if (streamRef.current) return;
         setIsCameraLoading(true);
@@ -125,11 +133,13 @@ const AgeBotFacialPage: React.FC = () => {
 
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
-                // Atributos de seguridad vitales para Redmi/Xiaomi
+                // Atributos de seguridad vitales para Redmi/Xiaomi/iOS
                 videoRef.current.setAttribute('playsinline', 'true');
                 videoRef.current.muted = true;
+                videoRef.current.defaultMuted = true;
+                videoRef.current.autoplay = true;
 
-                videoRef.current.onloadedmetadata = async () => {
+                const attemptPlay = async () => {
                     try {
                         await videoRef.current!.play();
                         setIsCameraLoading(false);
@@ -137,8 +147,12 @@ const AgeBotFacialPage: React.FC = () => {
                     } catch (playErr) {
                         console.error('[AgeBot] play() failed:', playErr);
                         setIsCameraLoading(false);
+                        setCameraActive(true); // Fallback visual
                     }
                 };
+
+                videoRef.current.onloadedmetadata = attemptPlay;
+                attemptPlay(); // Llamada redundante de seguridad
             }
         } catch (err: any) {
             console.error('[AgeBot] Camera access FAILED:', err);
@@ -163,13 +177,17 @@ const AgeBotFacialPage: React.FC = () => {
         };
     }, [phase]);
 
-    /* ─── FIX 2: Capture with Anti-False-Positive guard ─────────────────── */
+    /* ─── FIX 3: Capture with Relaxed ReadyState para Redmi ─────────────────── */
     const capturePhoto = () => {
         const video = videoRef.current;
         const canvas = canvasRef.current;
         if (!video || !canvas) return;
 
-        if (video.readyState < 4) return;
+        // Redmi puede reportar 2 (HAVE_CURRENT_DATA) en vez de 4. Relajamos la restricción.
+        if (video.readyState < 2) {
+            console.warn("[AgeBot] Video not ready yet (readyState:", video.readyState, ")");
+            return;
+        }
 
         const width = video.videoWidth || 640;
         const height = video.videoHeight || 640;
@@ -247,7 +265,6 @@ const AgeBotFacialPage: React.FC = () => {
         setRetrying(false);
     };
 
-    /* ─── FIX 3: Correct final CTA — save to store then navigate ─────────── */
     const handleFinalCTA = () => {
         if (result) {
             setAgeBotResult(result.estimatedAge);
