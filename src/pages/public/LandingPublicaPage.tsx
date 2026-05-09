@@ -1,160 +1,114 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
-/**
- * LandingPublicaPage (Vytalix Premium Redesign - H29)
- * 
- * High-rigor public entry for the longevity funnel.
- * Features: Titanium palette, Inter typography, Turquoise-Tech highlights, and trust indicators.
- */
-
-const BG = '#F8FAFC'; // Titanium White/Gray
-const PRIMARY_BLUE = '#23BCEF'; // Turquoise Blue
-const TEXT_DARK = '#0F172A'; // Slate-900 (Authority)
-const TEXT_GRAY = '#64748B'; // Slate-500
+import { ChevronLeft, BrainCircuit, Activity, LineChart, ShieldCheck } from 'lucide-react';
 
 const LandingPublicaPage: React.FC = () => {
     const navigate = useNavigate();
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: { opacity: 1, transition: { staggerChildren: 0.15 } }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    };
+
     return (
-        <div style={{
-            minHeight: '100dvh',
-            background: BG,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            overflowX: 'hidden',
-            fontFamily: "'Inter', sans-serif",
-        }}>
-            <div style={{ width: '100%', maxWidth: 440, padding: '0 28px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className="min-h-screen bg-[#F8FAFC] pb-24 font-sans">
 
-                {/* ── SECCIÓN HERO ── */}
-                <div style={{ paddingTop: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-
-                    {/* Logotipo VYTALIX */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.7 }}
-                        style={{ textAlign: 'center', marginBottom: 40 }}
-                    >
-                        <div style={{
-                            fontSize: 22, fontWeight: 900, letterSpacing: 5,
-                            color: TEXT_DARK, fontFamily: "'Plus Jakarta Sans', sans-serif"
-                        }}>
-                            VYTALIX
-                        </div>
-                        <div style={{
-                            fontSize: 14, fontWeight: 700, letterSpacing: 1, color: PRIMARY_BLUE,
-                            textTransform: 'uppercase', marginTop: 8
-                        }}>
-                            por especialistas en longevidad
-                        </div>
-                    </motion.div>
-
-                    {/* Headline */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.7, delay: 0.1 }}
-                        style={{ textAlign: 'center', marginBottom: 20 }}
-                    >
-                        <div style={{ fontSize: 36, fontWeight: 400, color: TEXT_DARK, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-                            Descubre tu
-                        </div>
-                        <div style={{ fontSize: 42, fontWeight: 900, color: PRIMARY_BLUE, lineHeight: 1.05, letterSpacing: '-0.04em' }}>
-                            Edad Celular
-                        </div>
-                    </motion.div>
-
-                    {/* Pill científico */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.25 }}
-                        style={{
-                            background: 'rgba(35,188,239,0.08)',
-                            border: '1px solid rgba(35,188,239,0.2)',
-                            borderRadius: 16, padding: '8px 20px',
-                            fontSize: 13, fontWeight: 500, color: '#334155',
-                            textAlign: 'center', marginBottom: 44
-                        }}
-                    >
-                        Basado en indicadores de edad biológica y epigenética
-                    </motion.div>
-
-                    {/* CTA Primario */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.35 }}
-                        style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-                    >
-                        <motion.button
-                            whileHover={{ scale: 1.02, boxShadow: '0 20px 25px -5px rgb(35 188 239 / 0.3)' }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => navigate('/longevidad-tests')}
-                            style={{
-                                width: '100%', background: PRIMARY_BLUE, color: 'white',
-                                border: 'none', borderRadius: 20, padding: '20px 0',
-                                fontSize: 18, fontWeight: 800, fontFamily: "'Inter', sans-serif",
-                                cursor: 'pointer', letterSpacing: 0.5, marginBottom: 16,
-                                boxShadow: '0 10px 15px -3px rgb(35 188 239 / 0.25)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10
-                            }}
-                        >
-                            Comenzar ahora
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                        </motion.button>
-
-                        {/* Micro-Trust Indicator (H29) */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: TEXT_GRAY, marginBottom: 40 }}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.2 }}>Análisis anónimo y cifrado localmente</span>
-                        </div>
-                    </motion.div>
-
-                    {/* LA PREGUNTA */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.45 }}
-                        style={{ textAlign: 'center', marginBottom: 12 }}
-                    >
-                        <p style={{
-                            fontSize: 17, fontStyle: 'italic', color: TEXT_DARK,
-                            lineHeight: 1.5, fontWeight: 400
-                        }}>
-                            "¿A qué velocidad están envejeciendo tus células hoy?"
-                        </p>
-                    </motion.div>
-
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                        style={{
-                            fontSize: 16, color: TEXT_GRAY, textAlign: 'center',
-                            lineHeight: 1.6, marginBottom: 60, fontWeight: 500,
-                            padding: '0 10px'
-                        }}
-                    >
-                        El envejecimiento ya no es un destino inevitable,
-                        es una <span style={{ color: TEXT_DARK, fontWeight: 700 }}>decisión de estilo de vida</span>.
-                    </motion.p>
-                </div>
-
-                {/* ── FOOTER ── */}
-                <div style={{
-                    textAlign: 'center', paddingBottom: 40, opacity: 0.5
-                }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, color: TEXT_DARK, textTransform: 'uppercase' }}>
-                        Creado por <span style={{ color: PRIMARY_BLUE }}>Vytalix.io</span>
-                    </p>
-                </div>
-
+            {/* Botón Volver */}
+            <div className="pt-6 px-6 relative z-20">
+                <button
+                    onClick={() => navigate('/acceso')}
+                    className="w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm border border-slate-100 text-slate-500 hover:text-[#293B64] transition-colors"
+                >
+                    <ChevronLeft size={24} />
+                </button>
             </div>
+
+            <motion.div
+                className="px-4 md:px-6 pt-6 max-w-2xl mx-auto space-y-6"
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+            >
+
+                {/* HERO SECTION CLÍNICO */}
+                <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-[#293B64] to-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-blue-900/20 text-center">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                        <Activity className="w-48 h-48" />
+                    </div>
+
+                    <div className="relative z-10 flex flex-col items-center">
+                        <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/20 mb-6">
+                            <ShieldCheck className="w-8 h-8 text-sky-300" />
+                        </div>
+                        <h2 className="text-3xl font-black text-white leading-tight mb-3">
+                            Descubre tu<br /><span className="text-sky-400">Edad Biológica</span>
+                        </h2>
+                        <p className="text-sm font-medium text-slate-300 leading-relaxed max-w-xs mx-auto">
+                            La ciencia de la longevidad a tu alcance. Evalúa tus biomarcadores y descubre cómo revertir tu reloj celular.
+                        </p>
+                    </div>
+                </motion.div>
+
+                {/* OPCIONES DE EVALUACIÓN */}
+                <motion.div variants={itemVariants} className="pt-4">
+                    <h3 className="text-sm font-black text-[#293B64] uppercase tracking-widest px-2 mb-4">
+                        Herramientas Diagnósticas
+                    </h3>
+
+                    <div className="grid gap-4">
+                        {/* Opción 1: Test de Hábitos */}
+                        <button
+                            onClick={() => navigate('/longevidad-tests')}
+                            className="w-full bg-white rounded-3xl p-6 shadow-md shadow-slate-200/50 border border-slate-100 flex flex-col items-start gap-4 transition-transform active:scale-[0.98] hover:border-sky-200 relative overflow-hidden group"
+                        >
+                            <div className="absolute right-0 top-0 h-full w-2 bg-sky-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div className="flex items-center gap-4 w-full">
+                                <div className="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center shrink-0">
+                                    <LineChart className="w-7 h-7 text-sky-600" />
+                                </div>
+                                <div className="flex-1 text-left">
+                                    <h4 className="text-lg font-black text-[#293B64] leading-none mb-1">Cuestionario Clínico</h4>
+                                    <p className="text-xs font-medium text-slate-500">Test integral de hábitos y estilo de vida</p>
+                                </div>
+                            </div>
+                        </button>
+
+                        {/* Opción 2: AgeBot IA */}
+                        <button
+                            onClick={() => navigate('/agebot')}
+                            className="w-full bg-white rounded-3xl p-6 shadow-md shadow-slate-200/50 border border-slate-100 flex flex-col items-start gap-4 transition-transform active:scale-[0.98] hover:border-purple-200 relative overflow-hidden group"
+                        >
+                            <div className="absolute right-0 top-0 h-full w-2 bg-purple-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div className="flex items-center gap-4 w-full">
+                                <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center shrink-0">
+                                    <BrainCircuit className="w-7 h-7 text-purple-600" />
+                                </div>
+                                <div className="flex-1 text-left">
+                                    <h4 className="text-lg font-black text-[#293B64] leading-none mb-1">Análisis Facial IA</h4>
+                                    <p className="text-xs font-medium text-slate-500">Evaluación fotográfica por inteligencia artificial</p>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </motion.div>
+
+                {/* Enlace Médico */}
+                <motion.div variants={itemVariants} className="pt-8 text-center">
+                    <p className="text-sm text-slate-500 font-medium">
+                        ¿Ya tienes tus resultados?{' '}
+                        <button onClick={() => navigate('/medicos')} className="text-sky-600 font-bold hover:underline">
+                            Contacta a un especialista
+                        </button>
+                    </p>
+                </motion.div>
+
+            </motion.div>
         </div>
     );
 };

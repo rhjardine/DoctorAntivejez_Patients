@@ -1,111 +1,113 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Stethoscope, UserRound, ArrowRight, ShieldCheck } from 'lucide-react';
-
-/**
- * UniversalEntry.tsx (H29 - Longevidad Orgánica)
- * 
- * Design Persona: Organic Longevity (Sand/Terracotta).
- * Strategy: Hierarchy-focused '3 Doors' implementation.
- */
+import { User, ShieldPlus, Stethoscope, ChevronRight, Activity } from 'lucide-react';
 
 const UniversalEntry: React.FC = () => {
     const navigate = useNavigate();
 
+    // Variantes de animación para Framer Motion
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: { staggerChildren: 0.15 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    };
+
     return (
-        <div className="min-h-screen w-full bg-vytalix-sand flex flex-col items-center px-6 py-12 font-sans overflow-x-hidden">
+        <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-6 relative overflow-hidden">
 
-            {/* Brand Header */}
+            {/* Elementos Decorativos de Fondo */}
+            <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-sky-50 to-transparent pointer-events-none"></div>
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-sky-100 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+
             <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-12 text-center"
+                className="w-full max-w-sm z-10 space-y-8"
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
             >
-                <div className="flex items-center justify-center gap-2 mb-4">
-                    <ShieldCheck className="text-vytalix-terracotta" size={20} />
-                    <span className="text-[11px] font-black uppercase tracking-[0.3em] text-vytalix-graphite/60">
-                        Vytalix Longevity
-                    </span>
-                </div>
-                <h1 className="text-[34px] font-black leading-tight text-vytalix-graphite tracking-tight mb-4">
-                    ¿Cómo deseas ingresar?
-                </h1>
-                <p className="text-[16px] text-vytalix-graphite/70 font-medium max-w-[280px] mx-auto">
-                    Seleccion tu perfil para optimizar tu experiencia de salud.
-                </p>
-            </motion.div>
-
-            {/* Primary Actions (Patient & Guest) */}
-            <div className="w-full max-w-sm flex flex-col gap-5">
-
-                {/* DOOR 1: SOY PACIENTE (PRIMARY) */}
-                <motion.button
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.02, boxShadow: '0 20px 25px -5px rgba(179, 84, 70, 0.25)' }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => navigate('/login')}
-                    style={{ backgroundColor: '#B35446' }} // vytalix-terracotta
-                    className="w-full text-left rounded-[2.5rem] p-8 text-white transition-all relative overflow-hidden flex flex-col"
-                >
-                    {/* Decorative glow */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl -mr-16 -mt-16" />
-
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center">
-                            <Stethoscope size={28} strokeWidth={2.5} />
-                        </div>
-                        <ArrowRight size={22} strokeWidth={3} className="opacity-80" />
+                {/* Logo / Header */}
+                <motion.div variants={itemVariants} className="text-center space-y-3 mb-10">
+                    <div className="w-20 h-20 bg-white rounded-[2rem] shadow-xl shadow-sky-100/50 flex items-center justify-center mx-auto border border-sky-50">
+                        <Activity className="w-10 h-10 text-[#293B64]" strokeWidth={2.5} />
                     </div>
-
-                    <h2 className="text-[24px] font-black mb-2">Soy paciente</h2>
-                    <p className="text-[14px] text-white/80 leading-relaxed font-medium">
-                        Accede a tu plan de longevidad personalizado y seguimiento clínico.
+                    <h1 className="text-2xl font-black text-[#293B64] tracking-tight uppercase">
+                        Dr. Antivejez
+                    </h1>
+                    <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
+                        Portal de Longevidad
                     </p>
-                </motion.button>
+                </motion.div>
 
-                {/* DOOR 2: SOY INVITADO (SECONDARY) */}
-                <motion.button
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    whileHover={{ backgroundColor: 'rgba(179, 84, 70, 0.04)' }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => navigate('/longevidad')}
-                    className="w-full text-left rounded-[2.5rem] p-7 border-2 border-vytalix-terracotta/30 bg-transparent transition-all flex items-center gap-5"
-                >
-                    <div className="w-12 h-12 rounded-2xl bg-vytalix-terracotta/10 flex items-center justify-center text-vytalix-terracotta">
-                        <UserRound size={24} />
-                    </div>
-                    <div className="flex-1">
-                        <h2 className="text-[18px] font-extrabold text-vytalix-graphite">Soy invitado</h2>
-                        <p className="text-[12px] text-vytalix-graphite/60 font-semibold tracking-wide">TEST DE LONGEVIDAD GRATUITO</p>
-                    </div>
-                    <ArrowRight size={18} className="text-vytalix-terracotta/40" />
-                </motion.button>
+                {/* Opciones Equilibradas */}
+                <div className="space-y-4">
 
-            </div>
+                    {/* Tarjeta 1: Soy Paciente (Prioridad por Color, no por tamaño) */}
+                    <motion.button
+                        variants={itemVariants}
+                        onClick={() => navigate('/login')}
+                        className="w-full group relative bg-gradient-to-r from-[#293B64] to-[#1A253C] rounded-3xl p-5 shadow-xl shadow-blue-900/20 flex items-center gap-5 overflow-hidden transition-transform active:scale-[0.98]"
+                    >
+                        <div className="absolute right-0 top-0 bottom-0 w-32 bg-white/5 skew-x-12 translate-x-16 group-hover:translate-x-8 transition-transform"></div>
+                        <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 backdrop-blur-sm">
+                            <User className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="flex-1 text-left">
+                            <h3 className="text-lg font-black text-white leading-none mb-1">Soy Paciente</h3>
+                            <p className="text-xs font-medium text-sky-200">Acceder a mi protocolo médico</p>
+                        </div>
+                        <ChevronRight className="w-6 h-6 text-white/50 group-hover:text-white transition-colors" />
+                    </motion.button>
 
-            {/* DOOR 3: SOY PROFESIONAL (TERTIARY / GHOST) */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="mt-auto pt-16 flex flex-col items-center gap-4"
-            >
-                <button
-                    onClick={() => navigate('/medicos')}
-                    className="px-6 py-3 text-[13px] font-bold uppercase tracking-[0.2em] text-clinical-navy/50 hover:text-clinical-navy transition-colors"
-                >
-                    ¿Eres profesional de salud? <span className="underline decoration-vytalix-terracotta/30 ml-1">Ver red médica</span>
-                </button>
+                    {/* Tarjeta 2: Soy Invitado (Secundario, Fondo Blanco) */}
+                    <motion.button
+                        variants={itemVariants}
+                        onClick={() => navigate('/longevidad')}
+                        className="w-full group bg-white rounded-3xl p-5 shadow-md shadow-slate-200/50 border border-slate-100 flex items-center gap-5 transition-transform active:scale-[0.98] hover:border-sky-200"
+                    >
+                        <div className="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center shrink-0">
+                            <ShieldPlus className="w-7 h-7 text-sky-600" />
+                        </div>
+                        <div className="flex-1 text-left">
+                            <h3 className="text-lg font-black text-[#293B64] leading-none mb-1">Soy Invitado</h3>
+                            <p className="text-xs font-medium text-slate-500">Calcula tu Edad Biológica</p>
+                        </div>
+                        <ChevronRight className="w-6 h-6 text-slate-300 group-hover:text-sky-600 transition-colors" />
+                    </motion.button>
 
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-vytalix-graphite/30">
-                    Vytalix Longevity Systems
-                </p>
+                    {/* Tarjeta 3: Soy Médico (Terciario, Fondo Blanco) */}
+                    <motion.button
+                        variants={itemVariants}
+                        onClick={() => navigate('/login?role=medical')}
+                        className="w-full group bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex items-center gap-5 transition-transform active:scale-[0.98] hover:border-slate-300"
+                    >
+                        <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0">
+                            <Stethoscope className="w-7 h-7 text-slate-500" />
+                        </div>
+                        <div className="flex-1 text-left">
+                            <h3 className="text-lg font-black text-slate-700 leading-none mb-1">Soy Médico</h3>
+                            <p className="text-xs font-medium text-slate-400">Portal de especialistas</p>
+                        </div>
+                        <ChevronRight className="w-6 h-6 text-slate-200 group-hover:text-slate-400 transition-colors" />
+                    </motion.button>
+
+                </div>
+
+                {/* Footer Seguro */}
+                <motion.div variants={itemVariants} className="pt-8 text-center opacity-60">
+                    <p className="text-[10px] font-bold text-[#293B64] uppercase tracking-widest">
+                        Vytalix Clinical Platform © {new Date().getFullYear()}
+                    </p>
+                </motion.div>
+
             </motion.div>
-
         </div>
     );
 };
