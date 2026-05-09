@@ -19,10 +19,10 @@ const LandingPublicaPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#FAF7F2] pb-24 font-sans relative overflow-hidden">
 
-            {/* Botón Volver */}
+            {/* Botón Volver - Optimizado con replace para no acumular historial fantasma */}
             <div className="pt-6 px-6 relative z-20">
                 <button
-                    onClick={() => navigate('/acceso')}
+                    onClick={() => navigate('/acceso', { replace: true })}
                     className="w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-[#E8DFD5] text-[#8A796F] hover:text-[#9E5B4B] transition-colors"
                 >
                     <ChevronLeft size={24} />
@@ -62,7 +62,7 @@ const LandingPublicaPage: React.FC = () => {
                     </h3>
 
                     <div className="grid gap-4">
-                        {/* Opción 1: Test Directo (Adiós pantalla redundante) */}
+                        {/* Opción 1: Test Directo */}
                         <button
                             onClick={() => navigate('/test')}
                             className="w-full bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-md shadow-[#D6B5A7]/20 border border-[#E8DFD5] flex flex-col items-start gap-4 transition-transform active:scale-[0.98] hover:border-[#D6B5A7] relative overflow-hidden group"
