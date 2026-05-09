@@ -55,16 +55,16 @@ const LandingPublicaPage: React.FC = () => {
                     </div>
                 </motion.div>
 
-                {/* OPCIONES DE EVALUACIÓN */}
+                {/* OPCIONES DE EVALUACIÓN DIRECTAS */}
                 <motion.div variants={itemVariants} className="pt-4">
                     <h3 className="text-sm font-black text-[#4A3B32] uppercase tracking-widest px-2 mb-4">
                         Herramientas Diagnósticas
                     </h3>
 
                     <div className="grid gap-4">
-                        {/* Opción 1: Test de Hábitos */}
+                        {/* Opción 1: Test Directo (Adiós pantalla redundante) */}
                         <button
-                            onClick={() => navigate('/longevidad-tests')}
+                            onClick={() => navigate('/test')}
                             className="w-full bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-md shadow-[#D6B5A7]/20 border border-[#E8DFD5] flex flex-col items-start gap-4 transition-transform active:scale-[0.98] hover:border-[#D6B5A7] relative overflow-hidden group"
                         >
                             <div className="absolute right-0 top-0 h-full w-2 bg-[#9E5B4B] opacity-0 group-hover:opacity-100 transition-opacity"></div>

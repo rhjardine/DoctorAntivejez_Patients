@@ -1,588 +1,201 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle, Info } from 'lucide-react';
-import PublicHeader from '../../components/public/PublicHeader';
-import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
-import { VITALITY_LABELS } from '../../utils/vitalityLabels';
-import { usePublicFunnelStore } from '../../store/usePublicFunnelStore';
+import { ChevronLeft, Camera, RefreshCw, Sparkles, AlertTriangle, BrainCircuit } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-type Phase = 'capture' | 'analyzing' | 'result' | 'error';
-
-interface FacialResult {
-    estimatedAge: number;
-    confidence: number;
-    analysisPoints: number;
-}
-
-// TODO: conectar endpoint /api/vision-v1 cuando esté disponible en el backend
-async function analyzeFacialAge(imageBase64: string): Promise<FacialResult> {
-    try {
-        const response = await fetch('/api-render/api/vision-v1', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ imageBase64, analysisType: 'AGE_FACIAL' }),
-        });
-        if (response.ok) return await response.json();
-        throw new Error('API not available');
-    } catch {
-        // Mock result while backend endpoint is implemented
-        await new Promise(r => setTimeout(r, 2500)); // Simulate processing time
-        return {
-            estimatedAge: Math.floor(35 + Math.random() * 25),
-            confidence: 0.72 + Math.random() * 0.2,
-            analysisPoints: 22 + Math.floor(Math.random() * 8),
-        };
-    }
-}
-
-/* ─── Facial dots overlay SVG ──────────────────────────────────────────── */
-const FacialOverlay: React.FC<{ size: number }> = ({ size }) => {
-    // Landmark points for facial age analysis visualization
-    const points = [
-        [0.5, 0.15], // top head
-        [0.35, 0.25], [0.65, 0.25], // temples
-        [0.28, 0.38], [0.72, 0.38], // outer eyebrows
-        [0.38, 0.4], [0.62, 0.4],   // inner eyebrows
-        [0.33, 0.45], [0.67, 0.45], // outer eyes
-        [0.40, 0.44], [0.60, 0.44], // inner eyes
-        [0.5, 0.5],                  // nose bridge
-        [0.43, 0.57], [0.57, 0.57], // nostrils
-        [0.5, 0.63],                 // upper lip
-        [0.38, 0.68], [0.62, 0.68], // corners of mouth
-        [0.5, 0.73],                 // chin center
-        [0.32, 0.72], [0.68, 0.72], // jaw
-        [0.24, 0.55], [0.76, 0.55], // cheeks
-    ].map(([x, y]) => ({ x: x * size, y: y * size }));
-
-    const connections = [
-        [0, 1], [0, 2], [1, 3], [2, 4], [3, 5], [4, 6], [7, 8], [9, 10],
-        [11, 12], [11, 13], [14, 15], [14, 16], [17, 18], [17, 19], [7, 20], [8, 21],
-    ];
-
-    return (
-        <svg width={size} height={size} className="absolute inset-0" style={{ pointerEvents: 'none' }}>
-            {connections.map(([a, b], i) => (
-                <motion.line
-                    key={i}
-                    x1={points[a].x} y1={points[a].y}
-                    x2={points[b].x} y2={points[b].y}
-                    stroke="#5A7163" // vytalix-sage
-                    strokeWidth="1" opacity="0.5"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 0.5 }}
-                    transition={{ delay: i * 0.04, duration: 0.5 }}
-                />
-            ))}
-            {points.map((p, i) => (
-                <motion.circle
-                    key={i}
-                    cx={p.x} cy={p.y} r="2.5"
-                    fill="#5A7163" // vytalix-sage
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 0.9 }}
-                    transition={{ delay: i * 0.03, type: 'spring' }}
-                />
-            ))}
-        </svg>
-    );
-};
-
-/* ─── Main Component ─────────────────────────────────────────────────────── */
 const AgeBotFacialPage: React.FC = () => {
     const navigate = useNavigate();
-    const { setAgeBotResult, setCurrentStep } = usePublicFunnelStore();
-
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const streamRef = useRef<MediaStream | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const [phase, setPhase] = useState<Phase>('capture');
-    const [capturedImage, setCapturedImage] = useState<string | null>(null);
-    const [result, setResult] = useState<FacialResult | null>(null);
-    const [errorMsg, setErrorMsg] = useState<string>('');
-    const [cameraError, setCameraError] = useState(false);
-    const [isCameraLoading, setIsCameraLoading] = useState(false);
-    const [cameraActive, setCameraActive] = useState(false); // ✅ true once video is live
-    const [cameraRequested, setCameraRequested] = useState(false);
-    const [retryCount, setRetryCount] = useState(0); // ✅ Handle re-initialization explicitly
-    const [retrying, setRetrying] = useState(false); // ✅ Visual feedback for retry action
-    const [showDiagnostics, setShowDiagnostics] = useState(false);
+    const [stream, setStream] = useState<MediaStream | null>(null);
+    const [photo, setPhoto] = useState<string | null>(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [cameraError, setCameraError] = useState<string | null>(null);
 
-    /* ─── FIX 1: WebRTC — Robust camera initialization ──────────────────── */
-    const startCamera = useCallback(async () => {
-        if (streamRef.current) {
-            // already running — do not double-init
-            return;
-        }
-        setIsCameraLoading(true);
-        setCameraActive(false);
-
+    // Inicialización ultra-segura de la cámara (Compatible con Redmi/Xiaomi/iOS)
+    const startCamera = async () => {
+        setCameraError(null);
         try {
-            let mediaStream: MediaStream;
-            try {
-                // Preferred: front-facing (selfie) with ideal constraint for compatibility
-                mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: { ideal: 'user' },
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    audio: false,
-                });
-            } catch (prefErr) {
-                console.warn('[AgeBot] Ideal front-facing failed, falling back to any camera:', prefErr);
-                // Fallback: any camera
-                mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: false,
-                });
-            }
+            const mediaStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                audio: false
+            });
 
-            streamRef.current = mediaStream;
+            setStream(mediaStream);
 
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
-                // ✅ CRITICAL for iOS/Safari: must call .play() after setting srcObject
-                videoRef.current.onloadedmetadata = async () => {
-                    try {
-                        await videoRef.current!.play();
-                        setIsCameraLoading(false);
-                        setCameraActive(true);
-                    } catch (playErr) {
-                        console.error('[AgeBot] play() failed:', playErr);
-                        setIsCameraLoading(false);
-                    }
-                };
+                // ATRIBUTOS CRÍTICOS PARA REDMI/XIAOMI
+                videoRef.current.setAttribute('playsinline', 'true');
+                videoRef.current.muted = true;
+
+                // Promesa controlada para evitar bloqueos
+                await videoRef.current.play().catch(e => {
+                    console.error("Error reproduciendo video:", e);
+                });
             }
         } catch (err: any) {
-            console.error('[AgeBot] Camera access FAILED:', err);
-            const errorName: string = (err as { name?: string }).name || 'UnknownError';
-            let msg = 'No se pudo acceder a la cámara.';
-            if (errorName === 'NotAllowedError') msg = 'Permiso denegado. Activa la cámara en los ajustes del navegador.';
-            else if (errorName === 'NotFoundError') msg = 'No se encontró ninguna cámara disponible en este dispositivo.';
-            else if (errorName === 'NotReadableError') msg = 'La cámara está siendo usada por otra aplicación.';
-
-            setErrorMsg(msg);
-            setCameraError(true);
-            setIsCameraLoading(false);
+            console.error("Error accediendo a la cámara:", err);
+            setCameraError('No pudimos acceder a tu cámara. Por favor verifica los permisos de tu navegador.');
         }
+    };
+
+    useEffect(() => {
+        startCamera();
+        return () => {
+            // Limpieza segura del stream al salir de la vista
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Trigger camera only after explicit user action (required by mobile browsers)
-    useEffect(() => {
-        if (phase !== 'capture') return;
-
-        return () => {
-            // Cleanup: stop all tracks when leaving the capture phase
-            streamRef.current?.getTracks().forEach(t => t.stop());
-            streamRef.current = null;
-            setCameraActive(false);
-        };
-    }, [phase]);
-
-    /* ─── FIX 2: Capture with Anti-False-Positive guard ─────────────────── */
-    const capturePhoto = () => {
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-        if (!video || !canvas) return;
-
-        // ✅ GUARD: Only capture when video has enough data (readyState === 4)
-        if (video.readyState < 4) {
-            console.warn('[AgeBot] Capture aborted — video not ready');
-            return;
-        }
-
-        const width = video.videoWidth || 640;
-        const height = video.videoHeight || 640;
-
-        // ✅ GUARD: Reject a black/empty canvas (dimensions 0×0)
-        if (width === 0 || height === 0) {
-            console.warn('[AgeBot] Capture aborted — invalid video dimensions');
-            return;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        // Mirror for front camera (selfie)
-        ctx.save();
-        ctx.scale(-1, 1);
-        ctx.drawImage(video, -width, 0, width, height);
-        ctx.restore();
-
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-
-        // Stop camera after capture
-        streamRef.current?.getTracks().forEach(t => t.stop());
-        streamRef.current = null;
-        setCameraActive(false);
-
-        processImage(dataUrl);
-    };
-
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            streamRef.current?.getTracks().forEach(t => t.stop());
-            streamRef.current = null;
-            processImage(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const processImage = async (base64: string) => {
-        setCapturedImage(base64);
-        setPhase('analyzing');
-        try {
-            const r = await analyzeFacialAge(base64);
-            setResult(r);
-            setPhase('result');
-        } catch {
-            setErrorMsg('No se pudo analizar la imagen. Asegúrate de que tu rostro sea visible.');
-            setPhase('error');
+    const takePhoto = () => {
+        if (videoRef.current && canvasRef.current) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = canvas.toDataURL('image/jpeg');
+                setPhoto(imageData);
+            }
         }
     };
 
-    const reset = () => {
-        setCapturedImage(null);
-        setResult(null);
-        setErrorMsg('');
-        setCameraError(false);
-        setCameraActive(false);
-        setCameraRequested(false);
-        streamRef.current?.getTracks().forEach(t => t.stop());
-        streamRef.current = null;
-        setPhase('capture');
+    const retakePhoto = () => {
+        setPhoto(null);
     };
 
-    const handleActivateCamera = async () => {
-        setCameraRequested(true);
-        await startCamera();
-    };
-
-    const handleSkipToUpload = () => {
-        setCameraRequested(true);
-        fileInputRef.current?.click();
-    };
-
-    const handleRetry = async () => {
-        setRetrying(true);
-        setCameraError(false);
-        setErrorMsg('');
-        // Brief delay to allow React to clear the error state UI
-        await new Promise(r => setTimeout(r, 400));
-        setRetryCount(prev => prev + 1);
-        await startCamera(); // ✅ Direct call after user interaction
-        setRetrying(false);
-    };
-
-    /* ─── FIX 3: Correct final CTA — save to store then navigate ─────────── */
-    const handleFinalCTA = () => {
-        if (result) {
-            // 1. Sync to Zustand store (existing)
-            setAgeBotResult(result.estimatedAge);
-            setCurrentStep('RESULTADO');
-
-            // 2. Sync to sessionStorage for ResultadoScorePage (bridge)
-            sessionStorage.setItem('da_agebot_result', JSON.stringify({
-                estimatedAge: result.estimatedAge,
-                confidence: result.confidence,
-                analysisPoints: result.analysisPoints,
-                source: 'agebot',
-                timestamp: Date.now()
-            }));
-            sessionStorage.setItem('da_result_source', 'agebot');
-        }
-        navigate('/resultado');
+    const analyzePhoto = () => {
+        setIsAnalyzing(true);
+        // Simulación de análisis con IA para redireccionar luego a los resultados
+        setTimeout(() => {
+            setIsAnalyzing(false);
+            // Apagamos la cámara antes de navegar
+            if (stream) stream.getTracks().forEach(track => track.stop());
+            navigate('/resultado');
+        }, 3000);
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-vytalix-sand">
-            <PublicHeader
-                theme="wellness"
-                title={capturedImage ? "Análisis Facial" : "AgeBot Facial"}
-                showBack={true}
-                onBack={() => navigate('/longevidad-tests')}
-            />
+        <div className="min-h-screen bg-[#FAF7F2] flex flex-col font-sans">
+            {/* HEADER */}
+            <div className="bg-white/80 backdrop-blur-md px-4 py-4 flex items-center gap-4 border-b border-[#E8DFD5] z-10 sticky top-0">
+                <button
+                    onClick={() => {
+                        if (stream) stream.getTracks().forEach(track => track.stop());
+                        navigate('/longevidad');
+                    }}
+                    className="w-10 h-10 flex items-center justify-center bg-[#F4EBE6] rounded-xl text-[#9E5B4B] active:scale-95 transition-transform"
+                >
+                    <ChevronLeft size={24} />
+                </button>
+                <div>
+                    <h2 className="text-lg font-black text-[#4A3B32] uppercase tracking-tight">AgeBot IA</h2>
+                    <p className="text-[10px] font-bold text-[#8A796F] uppercase tracking-widest">Análisis Epigenético Facial</p>
+                </div>
+            </div>
 
-            {/* Hidden canvas for capture */}
-            <canvas ref={canvasRef} className="hidden" />
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+            <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
+                {/* ELEMENTOS DECORATIVOS NUDE/TERRACOTA */}
+                <div className="absolute top-10 left-10 w-48 h-48 bg-[#E8DFD5] rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+                <div className="absolute bottom-10 right-10 w-48 h-48 bg-[#D6B5A7] rounded-full blur-3xl opacity-30 pointer-events-none"></div>
 
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <AnimatePresence mode="wait">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="w-full max-w-sm flex flex-col items-center z-10"
+                >
+                    {cameraError ? (
+                        <div className="bg-rose-50 border-2 border-rose-200 rounded-[2rem] p-6 text-center shadow-lg w-full mb-6">
+                            <AlertTriangle className="w-12 h-12 text-rose-500 mx-auto mb-3" />
+                            <h3 className="text-lg font-black text-rose-800 mb-2">Cámara Bloqueada</h3>
+                            <p className="text-sm text-rose-600 mb-4">{cameraError}</p>
+                            <button onClick={startCamera} className="bg-rose-500 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest shadow-md">
+                                Reintentar
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="relative w-full aspect-[3/4] rounded-[2.5rem] overflow-hidden shadow-2xl shadow-[#7D4638]/20 border-[6px] border-white bg-[#E8DFD5] mb-8">
 
-                    {/* ── CAPTURE ── */}
-                    {phase === 'capture' && (
-                        <motion.div key="capture" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            className="flex-1 flex flex-col p-4 sm:p-6">
-
-                            {/* ── Tarea 4: Card-wrapped viewfinder ── */}
-                            <div className="relative flex-1 bg-white rounded-[2rem] p-2 sm:p-3 shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-gray-100 flex items-center justify-center overflow-hidden">
-                                {!cameraError ? (
-                                    <>
-                                        {cameraRequested ? (
-                                            <>
-                                                <video
-                                                    ref={videoRef}
-                                                    autoPlay
-                                                    playsInline
-                                                    muted
-                                                    className="w-full h-full object-cover rounded-[1.5rem]"
-                                                    style={{ transform: 'scaleX(-1)' }}
-                                                />
-
-                                                {isCameraLoading && (
-                                                    <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[1.5rem] z-30 bg-vytalix-sand/85 backdrop-blur-sm">
-                                                        <Loader2 size={40} className="animate-spin mb-3 text-vytalix-terracotta" />
-                                                        <p className="text-xs font-bold tracking-widest uppercase text-vytalix-graphite/60 text-center px-4">Iniciando cámara...</p>
-                                                    </div>
-                                                )}
-
-                                                {/* HUD overlay — only show when camera is live */}
-                                                {cameraActive && !isCameraLoading && (
-                                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                                        <div className="relative">
-                                                            {/* Scanning bar */}
-                                                            <motion.div
-                                                                className="absolute left-0 right-0 h-0.5 z-20 bg-vytalix-sage/50 shadow-[0_0_12px_rgba(90,113,99,0.5)]"
-                                                                animate={{ top: ['15%', '85%', '15%'] }}
-                                                                transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                                                            />
-                                                            <div className="w-56 h-72 rounded-[40%] border-2 border-vytalix-sage/50 shadow-[0_0_0_4000px_rgba(0,0,0,0.35)]">
-                                                                {/* HUD corners */}
-                                                                <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-vytalix-sage" />
-                                                                <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-vytalix-sage" />
-                                                                <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-vytalix-sage" />
-                                                                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-vytalix-sage" />
-                                                            </div>
-                                                            <div className="absolute -bottom-12 left-0 right-0 flex flex-col items-center gap-1">
-                                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-vytalix-sage">
-                                                                    Calibración Óptica Activa
-                                                                </p>
-                                                                <p className="text-[13px] font-medium text-white/90">
-                                                                    Centra tu rostro para análisis vital
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </>
-                                        ) : (
-                                            /* ── Tarea 4: Primary CTA = Activar Cámara ── */
-                                            <div className="flex flex-col items-center justify-center text-center px-6 h-full z-10">
-                                                <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-vytalix-sage/10">
-                                                    <Camera size={40} className="text-vytalix-sage" />
-                                                </div>
-                                                <p className="font-black text-xl mb-3 text-vytalix-graphite uppercase tracking-tight">Análisis Facial AgeBot</p>
-                                                {/* ── Tarea 5: font-medium subtítulo ── */}
-                                                <p className="font-medium text-sm mb-10 leading-relaxed max-w-[260px] text-gray-500">
-                                                    AgeBot necesita acceso a tu cámara para analizar tus biomarcadores faciales en tiempo real.
-                                                </p>
-
-                                                {/* PRIMARY CTA */}
-                                                <button
-                                                    onClick={handleActivateCamera}
-                                                    className="w-full py-4 bg-vytalix-terracotta text-white font-bold rounded-xl shadow-lg shadow-vytalix-terracotta/30 transform active:scale-95 transition-all text-sm pointer-events-auto">
-                                                    Activar Cámara
-                                                </button>
-
-                                                {/* SECONDARY: subtle text link — Gallery */}
-                                                <button
-                                                    onClick={() => fileInputRef.current?.click()}
-                                                    className="mt-5 text-sm underline decoration-gray-300 pointer-events-auto text-vytalix-graphite/40 hover:text-vytalix-graphite/60 transition-colors">
-                                                    Subir foto desde galería
-                                                </button>
-                                            </div>
-                                        )}
-                                    </>
-                                ) : (
-                                    /* Camera unavailable */
-                                    <div className="flex flex-col items-center justify-center text-center px-8 z-10 p-6 h-full">
-                                        <AlertTriangle size={48} className="mb-4 text-amber-500" />
-                                        <p className="font-bold text-lg mb-2 text-vytalix-graphite">Cámara no disponible</p>
-                                        <p className="text-sm mb-8 font-medium leading-relaxed text-gray-500">
-                                            {errorMsg || 'Permiso de cámara denegado o no disponible en este navegador. Actívalo en los ajustes del navegador, o sube una foto.'}
-                                        </p>
-                                        <div className="flex flex-col w-full gap-3 max-w-[240px]">
-                                            <button
-                                                onClick={handleRetry}
-                                                disabled={retrying}
-                                                className="w-full py-4 rounded-xl font-bold text-sm transition-all active:scale-95 bg-white border border-gray-200 shadow-sm pointer-events-auto disabled:opacity-50 disabled:cursor-not-allowed text-vytalix-graphite">
-                                                {retrying ? 'Reintentando...' : 'Reintentar cámara'}
-                                            </button>
-                                            <button onClick={() => fileInputRef.current?.click()}
-                                                className="mt-2 text-sm underline decoration-gray-300 pointer-events-auto text-vytalix-graphite/40 hover:text-vytalix-graphite/60 transition-colors">
-                                                Subir foto manual
-                                            </button>
-
-                                            <button
-                                                onClick={() => setShowDiagnostics(!showDiagnostics)}
-                                                className="mt-8 text-[10px] uppercase tracking-widest text-vytalix-graphite/40 hover:text-vytalix-graphite/70 transition-opacity">
-                                                {showDiagnostics ? 'Ocultar diagnóstico' : 'Ver diagnóstico técnico'}
-                                            </button>
-
-                                            {showDiagnostics && (
-                                                <div className="mt-4 p-3 rounded-lg bg-black/5 text-[10px] text-left font-mono break-all text-vytalix-graphite/60">
-                                                    <p>Secure Context: {window.isSecureContext ? 'YES' : 'NO'}</p>
-                                                    <p>MediaDevices: {navigator.mediaDevices ? 'YES' : 'NO'}</p>
-                                                    <p>UserAgent: {navigator.userAgent}</p>
-                                                    <p>Error: {errorMsg}</p>
-                                                </div>
-                                            )}
+                            {!photo ? (
+                                // MODO CÁMARA (Atributos autoPlay, playsInline y muted son obligatorios en Redmi)
+                                <video
+                                    ref={videoRef}
+                                    autoPlay
+                                    playsInline
+                                    muted
+                                    className="w-full h-full object-cover transform scale-x-[-1]"
+                                />
+                            ) : (
+                                // MODO FOTO CAPTURADA
+                                <div className="relative w-full h-full">
+                                    <img src={photo} alt="Rostro capturado" className="w-full h-full object-cover transform scale-x-[-1]" />
+                                    {isAnalyzing && (
+                                        <div className="absolute inset-0 bg-[#4A3B32]/70 backdrop-blur-sm flex flex-col items-center justify-center text-white">
+                                            <BrainCircuit className="w-16 h-16 text-[#E8C5B8] animate-pulse mb-4" />
+                                            <h3 className="text-lg font-black uppercase tracking-widest">Escaneando...</h3>
+                                            <p className="text-xs font-medium text-[#D6B5A7]">Evaluando marcadores de estrés oxidativo</p>
                                         </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* ── Shutter controls — FIX 2: disabled until readyState = 4 ── */}
-                            {!cameraError && cameraRequested && (
-                                <div className="py-8 flex items-center justify-around px-8 mt-2">
-                                    {/* Secondary: upload icon (Gallery) */}
-                                    <button
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="w-14 h-14 rounded-full flex items-center justify-center transition-all hover:bg-black/5 active:scale-90 border border-vytalix-graphite/10">
-                                        <ImageIcon size={22} className="text-vytalix-graphite/60" />
-                                    </button>
-                                    {/* Shutter button — disabled until video is live */}
-                                    <button
-                                        onClick={capturePhoto}
-                                        disabled={!cameraActive}
-                                        className="w-20 h-20 rounded-full border-4 border-vytalix-terracotta flex items-center justify-center active:scale-90 transition-all shadow-xl disabled:opacity-30 disabled:cursor-not-allowed">
-                                        <div className="w-16 h-16 rounded-full bg-vytalix-terracotta" />
-                                    </button>
-                                    <div className="w-14 h-14" /> {/* spacer */}
+                                    )}
                                 </div>
                             )}
 
-                            {/* ── Tarea 5: Styled disclaimer ── */}
-                            <div className="mt-2">
-                                <WellnessDisclaimer text="AgeBot analiza marcadores faciales de vitalidad. No sustituye un diagnóstico médico clínico." />
-                            </div>
-                        </motion.div>
+                            {/* Marco de Escaneo (Overlay decorativo) */}
+                            {!photo && (
+                                <div className="absolute inset-0 border-2 border-[#9E5B4B]/30 m-4 rounded-[2rem] pointer-events-none">
+                                    <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-[#9E5B4B] rounded-tl-[1.5rem]"></div>
+                                    <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-[#9E5B4B] rounded-tr-[1.5rem]"></div>
+                                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-[#9E5B4B] rounded-bl-[1.5rem]"></div>
+                                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-[#9E5B4B] rounded-br-[1.5rem]"></div>
+                                </div>
+                            )}
+
+                            <canvas ref={canvasRef} className="hidden" />
+                        </div>
                     )}
 
-                    {/* ── ANALYZING ── */}
-                    {phase === 'analyzing' && (
-                        <motion.div key="analyzing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                            className="flex-1 flex flex-col items-center justify-center px-8 text-center uppercase tracking-tight">
-                            <div className="relative mb-8">
-                                {capturedImage && (
-                                    <img src={capturedImage} alt="Foto capturada"
-                                        className="w-40 h-40 object-cover rounded-full opacity-40 border-2 border-vytalix-terracotta" />
-                                )}
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <Loader2 size={52} className="text-vytalix-terracotta animate-spin" />
-                                </div>
-                            </div>
-                            <p className="text-lg font-black mb-2 text-vytalix-graphite uppercase">
-                                Analizando tu vitalidad facial con IA...
-                            </p>
-                            <p className="text-sm font-medium text-vytalix-graphite/60">
-                                Detectando {24} puntos de referencia facial
-                            </p>
-                        </motion.div>
-                    )}
-
-                    {/* ── RESULT ── */}
-                    {phase === 'result' && result && (
-                        <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                            className="flex-1 overflow-y-auto px-5 py-6 flex flex-col items-center">
-
-                            {/* Photo with overlay */}
-                            <div className="relative w-52 h-52 mb-6">
-                                {capturedImage && (
-                                    <img src={capturedImage} alt="Analysis"
-                                        className="w-full h-full object-cover rounded-3xl border-2 border-vytalix-sage/30 shadow-[0_8px_32px_rgba(0,0,0,0.08)]" />
-                                )}
-                                <FacialOverlay size={208} />
-                                {/* Badge */}
-                                <motion.div
-                                    initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5, type: 'spring' }}
-                                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#10B981] whitespace-nowrap shadow-lg">
-                                    <CheckCircle size={14} className="text-white" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-white leading-none">ANÁLISIS COMPLETADO</span>
-                                </motion.div>
-                            </div>
-
-                            {/* Age result */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                                className="w-full max-w-sm rounded-[2.5rem] p-8 mb-6 text-center bg-white border border-vytalix-graphite/5 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
-                                <p className="text-[11px] uppercase tracking-[0.2em] font-black mb-3 text-vytalix-graphite/40">
-                                    Tu {VITALITY_LABELS.age_result}
-                                </p>
-                                <p className="text-7xl font-black mb-2 text-vytalix-graphite tracking-tighter">
-                                    {result.estimatedAge}
-                                    <span className="text-2xl ml-1 text-vytalix-graphite/40">años</span>
-                                </p>
-                                <div className="inline-block mt-2 mb-6 rounded-full px-4 py-1.5 bg-vytalix-sage/10">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-vytalix-sage">ANÁLISIS DE VITALIDAD IA</p>
-                                </div>
-                                <div className="flex items-center justify-center gap-8 mt-2">
-                                    <div className="text-center">
-                                        <p className="text-[10px] uppercase font-black tracking-widest mb-1 text-vytalix-graphite/30">Confianza</p>
-                                        <p className="text-base font-black text-vytalix-graphite tracking-tight">
-                                            {Math.round(result.confidence * 100)}%
-                                        </p>
-                                    </div>
-                                    <div className="w-px h-8 bg-vytalix-graphite/10" />
-                                    <div className="text-center">
-                                        <p className="text-[10px] uppercase font-black tracking-widest mb-1 text-vytalix-graphite/30">Marcadores</p>
-                                        <p className="text-base font-black text-vytalix-graphite tracking-tight">{result.analysisPoints}</p>
-                                    </div>
-                                </div>
-                            </motion.div>
-
-                            {/* ── Tarea 5: Styled disclaimer ── */}
-                            <motion.div
-                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-                                className="w-full max-w-sm mb-8">
-                                <WellnessDisclaimer text="Este análisis visual es un indicador preliminar del ritmo de envejecimiento. Tu Edad Celular completa requiere la integración de todos tus marcadores de vitalidad." />
-                            </motion.div>
-
-                            {/* ── FIX 3: Correct CTA — saves to store then navigates ── */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-                                className="w-full max-w-sm flex flex-col gap-3">
+                    {/* CONTROLES */}
+                    {!cameraError && (
+                        <div className="w-full">
+                            {!photo ? (
                                 <button
-                                    onClick={handleFinalCTA}
-                                    className="w-full py-5 bg-vytalix-terracotta text-white font-black text-[15px] flex items-center justify-center gap-2 rounded-full shadow-xl shadow-vytalix-terracotta/20 transform active:scale-95 transition-all uppercase tracking-widest">
-                                    Descubrir mi Edad Celular <ArrowRight size={18} strokeWidth={3} />
+                                    onClick={takePhoto}
+                                    className="w-full bg-gradient-to-r from-[#9E5B4B] to-[#7D4638] text-white py-5 rounded-[2rem] shadow-xl shadow-[#7D4638]/30 flex items-center justify-center gap-3 active:scale-95 transition-transform"
+                                >
+                                    <Camera className="w-6 h-6" />
+                                    <span className="text-sm font-black uppercase tracking-widest">Capturar Rostro</span>
                                 </button>
-                                <button onClick={() => navigate('/test')}
-                                    className="w-full font-bold text-xs py-3 text-vytalix-graphite/50 hover:text-vytalix-graphite transition-all uppercase tracking-widest">
-                                    Test de Vitalidad Completo →
-                                </button>
-                                <button onClick={reset}
-                                    className="w-full font-bold text-[10px] py-2 flex items-center justify-center gap-2 text-vytalix-graphite/30 hover:text-vytalix-graphite/50 transition-all mt-6 uppercase tracking-widest">
-                                    <RefreshCw size={12} /> Analizar otra foto
-                                </button>
-                            </motion.div>
-                        </motion.div>
+                            ) : (
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={retakePhoto}
+                                        disabled={isAnalyzing}
+                                        className="flex-1 bg-white text-[#8A796F] py-4 rounded-2xl border border-[#E8DFD5] shadow-sm flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+                                    >
+                                        <RefreshCw className="w-5 h-5" />
+                                        <span className="text-xs font-bold uppercase tracking-widest">Retomar</span>
+                                    </button>
+                                    <button
+                                        onClick={analyzePhoto}
+                                        disabled={isAnalyzing}
+                                        className="flex-1 bg-[#4A3B32] text-white py-4 rounded-2xl shadow-xl shadow-[#4A3B32]/20 flex items-center justify-center gap-2 active:scale-95 transition-transform disabled:opacity-50"
+                                    >
+                                        <Sparkles className={`w-5 h-5 ${isAnalyzing ? 'animate-spin' : ''}`} />
+                                        <span className="text-xs font-black uppercase tracking-widest">
+                                            {isAnalyzing ? 'Procesando' : 'Analizar IA'}
+                                        </span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     )}
-
-                    {/* ── ERROR ── */}
-                    {phase === 'error' && (
-                        <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                            className="flex-1 flex flex-col items-center justify-center px-8 text-center bg-vytalix-sand">
-                            <AlertTriangle size={48} className="mb-4 text-vytalix-terracotta" />
-                            <p className="text-xl font-black mb-2 text-vytalix-graphite uppercase">Error de análisis</p>
-                            <p className="text-sm mb-8 font-medium text-vytalix-graphite/60 leading-relaxed">{errorMsg}</p>
-                            <button onClick={reset}
-                                className="px-10 py-4 bg-vytalix-terracotta text-white rounded-full font-black uppercase tracking-widest text-sm shadow-xl shadow-vytalix-terracotta/20 active:scale-95 transition-all">
-                                Intentar de nuevo
-                            </button>
-                        </motion.div>
-                    )}
-
-                </AnimatePresence>
+                </motion.div>
             </div>
         </div>
     );
