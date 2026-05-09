@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
@@ -140,9 +140,11 @@ const TestAntivejezPage: React.FC = () => {
 
     const totalAnswered = Object.keys(answers).length;
     const hasProgress = totalAnswered > 0;
+
+    // 👇 FIX APLICADO AQUÍ: exitTo ahora apunta directo a '/longevidad'
     const { handleBack, showConfirm, confirmExit, cancelExit } = useExitConfirmation({
         hasProgress,
-        exitTo: '/longevidad-tests',
+        exitTo: '/longevidad', // Antes decía: '/longevidad-tests'
         message: `Has respondido ${totalAnswered} de 45 preguntas. ¿Seguro que quieres salir?`
     });
 
