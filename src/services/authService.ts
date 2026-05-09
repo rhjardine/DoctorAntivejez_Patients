@@ -60,7 +60,7 @@ export const authService = {
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         const response = await axios.post(
-          `${baseUrl}/mobile-auth-v1`,
+          `${baseUrl}/api/mobile-auth-v1`,
           { identification, password },
           { timeout: TIMEOUT_MS }
         );
@@ -70,14 +70,16 @@ export const authService = {
           throw new Error('Respuesta del servidor incompleta: faltan token o datos de paciente.');
         }
 
-        // Guardar access token EN MEMORIA (Seguridad)
+        // ✅ CRÍTICO: Guardar token EN MEMORIA PRIMERO, antes de cualquier otra llamada de red.
+        // Esto soluciona la Race Condition y el error 401.
         tokenStore.setAccessToken(token);
 
-        // Guardar refresh token en disco (puede persistir sin riesgo directo)
+        // ✅ SEGUNDO: Guardar refresh token en disco (puede persistir sin riesgo directo)
         if (refreshToken) {
           storage.setItem('refresh_token', refreshToken);
         }
 
+        // ✅ TERCERO: Ahora sí buscar el perfil (el interceptor interceptará el token en memoria sin fallar)
         try {
           const fullProfile = await ProtocolService.getMyProfile();
           if (fullProfile) {
