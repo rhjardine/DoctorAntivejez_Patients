@@ -11,12 +11,10 @@ export const useSyncQueue = () => {
 
                 console.log(`[SyncQueue] Drain triggered. Found ${pending.length} pending items.`);
 
-                // Force access token into headers just in case memory was flushed but localStorage syncs logic fires
-                const currentToken = tokenStore.getAccessToken();
-
                 for (const item of pending) {
                     try {
-                        // Apply fresh token to avoid sending expired tokens stored offline
+                        // Apply fresh token in real-time to avoid sending expired tokens stored offline
+                        const currentToken = tokenStore.getAccessToken();
                         const headers = { ...item.headers };
                         if (currentToken) {
                             headers['Authorization'] = `Bearer ${currentToken}`;

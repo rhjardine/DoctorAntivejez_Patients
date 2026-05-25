@@ -1,8 +1,9 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 import { UserSession } from '../types';
 import { useProfileStore } from '../store/useProfileStore';
 import { logger } from '../utils/logger';
 import { ProtocolService } from './protocolService';
+import { tokenStore } from './tokenStore';
 
 // ✅ SECURITY: URL centralizada via variable de entorno
 const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com';
@@ -16,13 +17,7 @@ const SESSION_KEY = 'rejuvenate_session_v1';
 const storage = localStorage;
 
 // Module-level in-memory store (survives navigation, not page reload)
-let _accessToken: string | null = null;
 
-export const tokenStore = {
-  setAccessToken: (t: string) => { _accessToken = t; },
-  getAccessToken: () => _accessToken,
-  clearAccessToken: () => { _accessToken = null; },
-};
 
 /**
  * Servicio de Autenticación para la PWA Rejuvenate.

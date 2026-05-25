@@ -38,8 +38,14 @@ class OfflineQueue {
             const transaction = db.transaction(STORE_NAME, 'readwrite');
             const store = transaction.objectStore(STORE_NAME);
 
+            // Cierre de Brecha de Seguridad Offline: No guardar Authorization header en IndexedDB
+            const safeHeaders = { ...write.headers };
+            delete safeHeaders['Authorization'];
+            delete safeHeaders['authorization'];
+
             const fullWrite: QueuedWrite = {
                 ...write,
+                headers: safeHeaders,
                 timestamp: Date.now(),
                 retryCount: 0,
             };

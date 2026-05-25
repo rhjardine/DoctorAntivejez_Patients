@@ -128,9 +128,19 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
   };
 
   // Data Binding Fix: normalize the latest Next/webapp payload shape and fall back to props.
-  const effectiveItems = useMemo(() => {
-    const normalizedItems = normalizePatientProtocol(profileData);
-    return normalizedItems.length > 0 ? normalizedItems : items;
+  const { effectiveItems, parseError } = useMemo(() => {
+    try {
+      const normalizedItems = normalizePatientProtocol(profileData);
+      return { 
+        effectiveItems: normalizedItems.length > 0 ? normalizedItems : items, 
+        parseError: false 
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message === "CLINICAL_PARSE_FAILED") {
+        return { effectiveItems: [], parseError: true };
+      }
+      throw error;
+    }
   }, [profileData, items]);
 
   // Group items by category dynamically
@@ -629,7 +639,31 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
         </div>
 
         <div className="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
-          {loading ? (
+          {parseError ? (
+            <div className="flex flex-col items-center justify-center h-full p-10 text-center space-y-6 animate-in fade-in duration-700">
+              <div className="w-24 h-24 bg-red-50 rounded-[2.5rem] flex items-center justify-center text-red-500 shadow-inner border border-red-100">
+                <AlertTriangle size={48} className="animate-pulse" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-red-600 uppercase tracking-tighter">
+                  Error de Sincronización
+                </h3>
+                <p className="text-sm font-bold text-red-500 leading-relaxed max-w-xs italic">
+                  Error sincronizando tu guía médica. El formato recibido no es compatible. Por favor contacta soporte.
+                </p>
+              </div>
+              <button
+                onClick={handleManualRefresh}
+                className="bg-darkBlue text-white px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 active:scale-95 transition-all"
+              >
+                <RefreshCw
+                  size={14}
+                  className={isRefreshing ? 'animate-spin' : ''}
+                />
+                Reintentar
+              </button>
+            </div>
+          ) : loading ? (
             renderSkeleton()
           ) : effectiveItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-10 text-center space-y-6 animate-in fade-in duration-700">

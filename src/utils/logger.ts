@@ -18,6 +18,10 @@ const PHI_FIELDS = [
     'token',
     'password',
     'refreshToken',
+    'alimentacion',
+    'diet',
+    'nutritionPlan',
+    'protocol',
 ];
 
 /**
@@ -56,7 +60,11 @@ export const logger = {
     },
 
     error: (msg: string, context?: unknown) => {
-        console.error(`[ERROR] ${msg}`, context ? sanitizePHI(context) : '');
+        try {
+            console.error(`[ERROR] ${msg}`, context ? sanitizePHI(context) : '');
+        } catch (err) {
+            console.error(`[ERROR] ${msg}`, '[REDACTED: PHI SANITIZATION FAILED]');
+        }
     },
 
     /** Log an event that is safe to send to external services (no PHI).

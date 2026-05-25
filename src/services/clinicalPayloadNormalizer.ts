@@ -311,17 +311,40 @@ export const normalizePatientProtocol = (
   const profileRecord = asRecord(profile);
   if (!profileRecord) return [];
 
+  // Check if it has direct protocol fields
+  const hasDirectFields = Boolean(
+    profileRecord.protocol ||
+    profileRecord.items ||
+    profileRecord.treatmentItems ||
+    profileRecord.treatments ||
+    profileRecord.indicaciones ||
+    profileRecord.protocolItems ||
+    profileRecord.selections ||
+    profileRecord.categories ||
+    profileRecord.categorias ||
+    profileRecord.protocolByCategory ||
+    profileRecord.byCategory
+  );
+
   const direct = collectProtocolItems(profileRecord, profileRecord);
   if (direct.length > 0) return direct;
+  
+  if (hasDirectFields && direct.length === 0) {
+    throw new Error("CLINICAL_PARSE_FAILED");
+  }
 
   const guides = asArray<RawRecord>(
     profileRecord.guides ??
       profileRecord.patientGuides ??
       profileRecord.medicalGuides,
   );
-  for (const guide of sortByRecency(guides.filter(Boolean))) {
-    const items = collectProtocolItems(guide, guide);
-    if (items.length > 0) return items;
+  
+  if (guides.length > 0) {
+    for (const guide of sortByRecency(guides.filter(Boolean))) {
+      const items = collectProtocolItems(guide, guide);
+      if (items.length > 0) return items;
+    }
+    throw new Error("CLINICAL_PARSE_FAILED");
   }
 
   return [];

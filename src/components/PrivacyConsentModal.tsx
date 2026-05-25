@@ -1,6 +1,8 @@
-
-import React from 'react';
-import { ShieldCheck, Lock, CheckCircle, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldCheck, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
+import apiClient from '../services/apiClient';
+import { offlineQueue } from '../services/offlineQueue';
+import { tokenStore } from '../services/authService';
 
 interface PrivacyConsentModalProps {
   isOpen: boolean;
@@ -8,7 +10,41 @@ interface PrivacyConsentModalProps {
 }
 
 const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({ isOpen, onAccept }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   if (!isOpen) return null;
+
+  const handleAccept = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    
+    const payload = {
+      accepted: true,
+      timestamp: new Date().toISOString(),
+      version: "1.0"
+    };
+
+    try {
+      await apiClient.post('/mobile-profile-v1/consent', payload);
+    } catch (error) {
+      console.warn("Consentimiento fallido en red, encolando offline", error);
+      const baseUrl = apiClient.defaults.baseURL || '';
+      const fullUrl = baseUrl.endsWith('/') ? `${baseUrl}mobile-profile-v1/consent` : `${baseUrl}/mobile-profile-v1/consent`;
+
+      await offlineQueue.enqueue({
+        url: fullUrl,
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenStore.getAccessToken() || ''}`,
+        },
+      });
+    } finally {
+      setIsSubmitting(false);
+      await onAccept();
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 animate-in fade-in duration-500">
@@ -47,11 +83,18 @@ const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({ isOpen, onAcc
         </div>
 
         <button
-          onClick={onAccept}
-          className="w-full bg-darkBlue text-white py-6 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-darkBlue/20 mt-10 active:scale-95 transition-all flex items-center justify-center gap-3"
+          onClick={handleAccept}
+          disabled={isSubmitting}
+          className="w-full bg-darkBlue text-white py-6 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-darkBlue/20 mt-10 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:scale-100"
         >
-          <span>Acepto y Continuar</span>
-          <ArrowRight size={20} />
+          {isSubmitting ? (
+            <Loader2 size={20} className="animate-spin text-white" />
+          ) : (
+            <>
+              <span>Acepto y Continuar</span>
+              <ArrowRight size={20} />
+            </>
+          )}
         </button>
 
         <p className="mt-6 text-[9px] font-black text-textLight uppercase tracking-widest">

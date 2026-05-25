@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useUIStore } from '../store/useUIStore';
 import { useAuthStore } from '../store/useAuthStore';
+import { AlertCircle } from 'lucide-react';
 
 // ----------------------------------------------------------------------
 // 1. RUTAS PÚBLICAS (Lazy Loaded - Landing y Funnel de Ventas)
@@ -48,11 +49,31 @@ const BioPaseView = React.lazy(() => import('../components/BioPaseView'));
 // MIDDLEWARE DE SEGURIDAD
 // ----------------------------------------------------------------------
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { session, isAuthenticated } = useAuthStore();
+    const { session, isAuthenticated, logout } = useAuthStore();
 
-    // Validación estricta: Si no hay sesión, expulsa al usuario al login
+    // Validación estricta: Si no hay sesión ni autenticación, expulsa al usuario al login
     if (!session && !isAuthenticated) {
         return <Navigate to="/acceso" replace />;
+    }
+
+    if (session && session.role && session.role !== 'PATIENT') {
+        return (
+            <div className="flex flex-col h-screen w-full items-center justify-center bg-[rgb(41,59,100)] px-6">
+                <div className="bg-white/10 p-6 rounded-2xl text-center space-y-4 max-w-sm border border-red-500/30">
+                    <AlertCircle size={48} className="text-red-400 mx-auto" />
+                    <h2 className="text-xl font-bold text-white">Acceso Denegado</h2>
+                    <p className="text-cyan-100 text-sm">
+                        Acceso denegado. Utilice el portal médico web.
+                    </p>
+                    <button 
+                        onClick={() => logout()}
+                        className="mt-4 w-full bg-cyan-500 text-[#0f172a] py-3 rounded-xl font-bold active:scale-95 transition-all"
+                    >
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     return <>{children}</>;

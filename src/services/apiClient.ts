@@ -1,5 +1,6 @@
-﻿import axios from 'axios';
-import { tokenStore } from './authService'; // ✅ Inyectado para prioridad 1
+import axios from 'axios';
+import { tokenStore } from './tokenStore';
+import { logger } from '../utils/logger';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com';
 
@@ -15,6 +16,7 @@ apiClient.interceptors.request.use((config) => {
         const memoryToken = tokenStore.getAccessToken();
         if (memoryToken) {
             config.headers.Authorization = `Bearer ${memoryToken}`;
+            logger.audit('api_request', { method: config.method || 'unknown', url: config.url || 'unknown' });
             return config;
         }
 
@@ -31,6 +33,7 @@ apiClient.interceptors.request.use((config) => {
         console.error("[API Client] Error leyendo storage:", error);
     }
 
+    logger.audit('api_request', { method: config.method || 'unknown', url: config.url || 'unknown' });
     return config;
 });
 
@@ -68,12 +71,18 @@ apiClient.interceptors.response.use(
 
                 return apiClient(originalRequest);
             } catch (refreshError) {
+                logger.warn('Session expired, forcing logout');
                 localStorage.clear();
                 sessionStorage.clear();
                 window.location.href = '/acceso';
                 return Promise.reject(refreshError);
             }
         }
+
+        logger.error('API request failed', {
+            status: error.response?.status,
+            url: originalRequest?.url,
+        });
 
         // Blindaje Workbox (evita el error 'payload')
         const safeErrorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Error de red clínico';
