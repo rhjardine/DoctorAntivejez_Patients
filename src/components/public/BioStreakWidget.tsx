@@ -22,11 +22,11 @@ export default function BioStreakWidget({ compact = false }: Props) {
 
     if (compact) {
         return (
-            <div className="inline-flex items-center gap-2 bg-[#293B64] border border-[#23BCEF]/30 shadow-lg shadow-[#293B64]/10 rounded-full px-3.5 py-1.5 flex-wrap">
+            <div className="inline-flex items-center gap-2 bg-[#293B64] border border-[#14b8a6]/30 shadow-lg shadow-[#293B64]/10 rounded-full px-3.5 py-1.5 flex-wrap">
                 <span className="text-lg">🔥</span>
                 <span className="text-white font-black text-sm whitespace-nowrap">{streak.currentStreak} días</span>
                 <span className="text-white/40 text-[10px] sm:text-xs">·</span>
-                <span className="text-[#23BCEF] font-medium text-[10px] sm:text-xs truncate max-w-[100px] sm:max-w-[140px]">{message}</span>
+                <span className="text-[#14b8a6] font-medium text-[10px] sm:text-xs truncate max-w-[100px] sm:max-w-[140px]">{message}</span>
             </div>
         );
     }
@@ -41,17 +41,17 @@ export default function BioStreakWidget({ compact = false }: Props) {
     });
 
     return (
-        <div className="bg-white rounded-[20px] border border-gray-100 shadow-sm p-5 w-full relative overflow-hidden">
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.02)] p-5 w-full relative overflow-hidden">
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
                 <div>
-                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
+                    <h3 className="text-sm font-bold text-[#293b64] uppercase tracking-wide flex items-center gap-1.5">
                         <span className="text-lg">🔥</span> Racha Activa
                     </h3>
                     <p className="text-gray-400 text-[11px] mt-0.5">Activando tu vitalidad consecutivamente</p>
                 </div>
-                <div className="text-[32px] font-black text-[#23BCEF] leading-none shrink-0 drop-shadow-sm">
-                    {streak.currentStreak} <span className="text-sm text-[#23BCEF]/60">d</span>
+                <div className="text-[32px] font-black text-[#14b8a6] leading-none shrink-0 drop-shadow-sm">
+                    {streak.currentStreak} <span className="text-sm text-[#14b8a6]/60">d</span>
                 </div>
             </div>
 
@@ -66,7 +66,7 @@ export default function BioStreakWidget({ compact = false }: Props) {
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(100, Math.max(5, (streak.currentStreak / (streak.currentStreak + days)) * 100))}%` }}
                         transition={{ duration: 1, ease: 'easeOut' }}
-                        className="h-full bg-gradient-to-r from-cyan-400 to-[#23BCEF] rounded-full"
+                        className="h-full bg-[#14b8a6] rounded-full"
                     />
                 </div>
             </div>

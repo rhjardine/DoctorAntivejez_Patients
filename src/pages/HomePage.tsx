@@ -202,7 +202,7 @@ const HomePage: React.FC = () => {
                             {currentMainTab === MainTab.CHALLENGE ? (
                                 <div className="flex flex-col items-center w-full px-6 py-4">
                                     <div className="w-full bg-white/70 backdrop-blur-sm rounded-3xl p-4 mb-3 border border-white/50 text-center shadow-sm">
-                                        <p className="text-[11px] font-bold text-darkBlue italic">"La consistencia es la clave de la regeneración celular."</p>
+                                        <p className="text-[11px] font-bold text-[#293b64] italic">"La consistencia es la clave de la regeneración celular."</p>
                                     </div>
 
                                     {/* Componentes Anti-Churn */}
@@ -217,9 +217,9 @@ const HomePage: React.FC = () => {
 
                                     <div onClick={() => navigate('/guide')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-4 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
                                         <div className="flex items-center gap-4">
-                                            <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><ClipboardCheck size={28} /></div>
+                                            <div className="bg-sky-50 p-3.5 rounded-2xl text-[#14b8a6]"><ClipboardCheck size={28} /></div>
                                             <div>
-                                                <h3 className="font-black text-darkBlue text-lg">Guía del Paciente</h3>
+                                                <h3 className="font-black text-[#293b64] text-lg">Guía del Paciente</h3>
                                                 <p className="text-[10px] font-bold text-textMedium uppercase">Misión Diaria</p>
                                             </div>
                                         </div>
@@ -229,23 +229,23 @@ const HomePage: React.FC = () => {
                                     </div>
                                     <div onClick={() => navigate('/mi-guia/alimentacion')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-6 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
                                         <div className="flex items-center gap-4">
-                                            <div className="bg-sky-50 p-3.5 rounded-2xl text-primary"><Dna size={28} /></div>
+                                            <div className="bg-sky-50 p-3.5 rounded-2xl text-[#14b8a6]"><Dna size={28} /></div>
                                             <div>
-                                                <h3 className="font-black text-darkBlue text-lg leading-tight">Alimentación Sana</h3>
+                                                <h3 className="font-black text-[#293b64] text-lg leading-tight">Alimentación Sana</h3>
                                                 <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#23bcef' }}>Antienvejecimiento</p>
                                             </div>
                                         </div>
-                                        <div className="text-primary pr-2">
+                                        <div className="text-[#14b8a6] pr-2">
                                             <ChevronRight size={24} />
                                         </div>
                                     </div>
                                     <div className="w-full bg-white rounded-[2rem] p-5 shadow-sm border border-gray-50 mb-6">
                                         <div className="flex justify-between items-center mb-3">
-                                            <span className="text-xs font-black text-darkBlue uppercase">Progreso Hoy</span>
-                                            <span className="text-xs font-black text-primary">{adherence}%</span>
+                                            <span className="text-xs font-black text-[#293b64] uppercase">Progreso Hoy</span>
+                                            <span className="text-xs font-black text-[#14b8a6]">{adherence}%</span>
                                         </div>
                                         <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
-                                            <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${adherence}%` }}></div>
+                                            <div className="h-full bg-[#14b8a6] rounded-full transition-all duration-500" style={{ width: `${adherence}%` }}></div>
                                         </div>
                                     </div>
                                 </div>

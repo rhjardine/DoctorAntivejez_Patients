@@ -229,18 +229,18 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </AnimatePresence>
 
             {showHeaderFooter && (
-                <footer className="fixed bottom-0 left-0 right-0 z-40 bg-[var(--dark-navy)] border-t border-white/5 pb-safe-bottom shrink-0">
+                <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 pb-safe-bottom shrink-0">
                     <div className="flex justify-around items-center py-3.5 px-4">
-                        <button onClick={() => { navigate('/'); setMainTab(MainTab.KEYS_5A); toggleDrawer(false); }} className={`flex flex-col items-center gap-1 transition-all ${isHome ? 'text-white scale-110' : 'text-white/40'}`}>
+                        <button onClick={() => { navigate('/'); setMainTab(MainTab.KEYS_5A); toggleDrawer(false); }} className={`flex flex-col items-center gap-1 transition-all ${isHome ? 'text-[#293b64] scale-110' : 'text-slate-400'}`}>
                             <LayoutDashboard size={24} strokeWidth={isHome ? 2.5 : 2} /><span className="text-[9px] font-black uppercase tracking-widest">Inicio</span>
                         </button>
-                        <button onClick={() => navigate('/achievements')} className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/achievements' ? 'text-white scale-110' : 'text-white/40'}`}>
+                        <button onClick={() => navigate('/achievements')} className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/achievements' ? 'text-[#293b64] scale-110' : 'text-slate-400'}`}>
                             <Trophy size={24} strokeWidth={location.pathname === '/achievements' ? 2.5 : 2} /><span className="text-[9px] font-black uppercase tracking-widest">Logros</span>
                         </button>
-                        <button onClick={() => navigate('/biomics')} className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/biomics' ? 'text-white scale-110' : 'text-white/40'}`}>
+                        <button onClick={() => navigate('/biomics')} className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/biomics' ? 'text-[#293b64] scale-110' : 'text-slate-400'}`}>
                             <Dna size={24} strokeWidth={location.pathname === '/biomics' ? 2.5 : 2} /><span className="text-[9px] font-black uppercase tracking-widest">Biomics</span>
                         </button>
-                        <button onClick={() => navigate('/store')} className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/store' ? 'text-white scale-110' : 'text-white/40'}`}>
+                        <button onClick={() => navigate('/store')} className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/store' ? 'text-[#293b64] scale-110' : 'text-slate-400'}`}>
                             <Store size={24} strokeWidth={location.pathname === '/store' ? 2.5 : 2} /><span className="text-[9px] font-black uppercase tracking-widest">Tienda</span>
                         </button>
                     </div>

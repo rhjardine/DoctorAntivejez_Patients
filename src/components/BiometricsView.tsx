@@ -105,7 +105,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
               {icon}
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-darkBlue dark:text-white">{title}</h3>
+              <h3 className="text-sm font-semibold text-[#293b64] dark:text-white">{title}</h3>
               <span className="text-[10px] text-textLight dark:text-slate-400">Último: {latest ? latest.timestamp.toLocaleDateString() : '--'}</span>
             </div>
           </div>
@@ -125,7 +125,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
 
         <div className="z-10 mb-2">
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-bold text-darkBlue dark:text-slate-200">{latest ? latest.value : '--'}</span>
+            <span className="text-2xl font-bold text-[#293b64] dark:text-slate-200">{latest ? latest.value : '--'}</span>
             <span className="text-xs text-textMedium dark:text-slate-400 font-medium">{unit}</span>
           </div>
         </div>
@@ -265,7 +265,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
 
       {/* Header Summary */}
       <div className="bg-gradient-to-r from-blue-50 to-white dark:from-slate-800 dark:to-slate-900 p-4 rounded-xl border border-blue-100 dark:border-slate-700 mb-2 transition-colors duration-300">
-        <h2 className="text-darkBlue dark:text-white font-bold text-lg">Tu Salud en Cifras</h2>
+        <h2 className="text-[#293b64] dark:text-white font-bold text-lg">Tu Salud en Cifras</h2>
         <p className="text-xs text-textMedium dark:text-slate-400 leading-relaxed mt-1">
           El monitoreo constante de biomarcadores es clave para detectar el envejecimiento acelerado.
         </p>
@@ -322,7 +322,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
       <div className="fixed bottom-24 right-4 z-30">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="w-14 h-14 bg-primary rounded-full shadow-lg flex items-center justify-center text-white hover:bg-darkBlue transition-colors transform hover:scale-105"
+          className="w-14 h-14 bg-[#14b8a6] hover:bg-[#0d9488] transition-all rounded-full shadow-lg flex items-center justify-center text-white transform hover:scale-105"
         >
           <Plus size={28} />
         </button>
@@ -333,7 +333,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl transform scale-100 animate-in zoom-in-95 duration-200 border border-transparent dark:border-slate-700 max-h-[90vh] overflow-y-auto no-scrollbar">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-xl text-darkBlue dark:text-white">Nuevo Registro</h3>
+              <h3 className="font-bold text-xl text-[#293b64] dark:text-white">Nuevo Registro</h3>
               <button onClick={() => !isSubmitting && setIsModalOpen(false)} className="p-1 bg-gray-100 dark:bg-slate-700 rounded-full hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
                 <X size={20} className="text-gray-500 dark:text-slate-400" />
               </button>
@@ -381,7 +381,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
                     if (validationError) setValidationError(null);
                   }}
                   placeholder={newType === 'BLOOD_PRESSURE' ? "Ej: 120/80" : "0.0"}
-                  className={`w-full text-2xl font-bold p-4 bg-gray-50 dark:bg-slate-700 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-darkBlue dark:text-white transition-all disabled:opacity-50 ${validationError ? 'border-red-500 focus:ring-red-500/50' : 'border-gray-200 dark:border-slate-600'
+                  className={`w-full text-2xl font-bold p-4 bg-gray-50 dark:bg-slate-700 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-[#293b64] dark:text-white transition-all disabled:opacity-50 ${validationError ? 'border-red-500 focus:ring-red-500/50' : 'border-gray-200 dark:border-slate-600'
                     }`}
                   autoFocus
                 />
@@ -405,7 +405,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
                     value={recordDate}
                     disabled={isSubmitting}
                     onChange={(e) => setRecordDate(e.target.value)}
-                    className="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl text-sm text-darkBlue dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
+                    className="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl text-sm text-[#293b64] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
                   />
                 </div>
                 <div className="space-y-1">
@@ -417,7 +417,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
                     value={recordTime}
                     disabled={isSubmitting}
                     onChange={(e) => setRecordTime(e.target.value)}
-                    className="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl text-sm text-darkBlue dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
+                    className="w-full p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl text-sm text-[#293b64] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -425,7 +425,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
               <button
                 type="submit"
                 disabled={!newValue || isSubmitting}
-                className="w-full bg-primary text-white py-4 rounded-xl font-bold shadow-md hover:bg-blue-500 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2"
+                className="w-full bg-[#14b8a6] hover:bg-[#0d9488] text-white py-4 rounded-xl font-bold shadow-md active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -449,7 +449,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
               <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-full mb-4 shadow-sm">
                 <AlertCircle size={32} className="text-red-500" />
               </div>
-              <h3 className="text-lg font-bold text-darkBlue dark:text-white">¿Eliminar Registro?</h3>
+              <h3 className="text-lg font-bold text-[#293b64] dark:text-white">¿Eliminar Registro?</h3>
               <p className="text-sm text-textMedium dark:text-slate-400 mt-2 leading-relaxed">
                 Estás a punto de eliminar el último registro de <strong>{deleteConfirm.type}</strong>. Esta acción no se puede deshacer.
               </p>
