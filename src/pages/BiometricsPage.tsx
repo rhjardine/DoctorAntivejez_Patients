@@ -4,7 +4,7 @@ import { ProtocolService } from '../services/protocolService';
 import { BiometricData } from '../types';
 import apiClient from '../services/apiClient';
 import { offlineQueue } from '../services/offlineQueue';
-import { tokenStore } from '../services/authService';
+import { tokenStore } from '../services/tokenStore';
 
 const BiometricsPage: React.FC = () => {
     const [entries, setEntries] = useState<BiometricData[]>([]);

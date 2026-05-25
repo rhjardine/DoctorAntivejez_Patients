@@ -4,7 +4,7 @@ import { Plus, Activity, Heart, Scale, Droplet, X, TrendingUp, TrendingDown, Cal
 import { BiometricData, BiometricType, COLORS } from '../types';
 import apiClient from '../services/apiClient';
 import { offlineQueue } from '../services/offlineQueue';
-import { tokenStore } from '../services/authService';
+import { tokenStore } from '../services/tokenStore';
 
 interface BiometricsViewProps {
   entries: BiometricData[];

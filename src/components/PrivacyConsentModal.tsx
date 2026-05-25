@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 import apiClient from '../services/apiClient';
 import { offlineQueue } from '../services/offlineQueue';
-import { tokenStore } from '../services/authService';
+import { tokenStore } from '../services/tokenStore';
 
 interface PrivacyConsentModalProps {
   isOpen: boolean;

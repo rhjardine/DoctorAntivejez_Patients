@@ -2,7 +2,7 @@ import React from 'react';
 import { Activity, Dumbbell, HeartPulse, Gauge, Move, ChevronRight, Check, CheckCircle2 } from 'lucide-react';
 import apiClient from '../services/apiClient';
 import { offlineQueue } from '../services/offlineQueue';
-import { tokenStore } from '../services/authService';
+import { tokenStore } from '../services/tokenStore';
 
 const ActivityView: React.FC = () => {
   const [completedActivities, setCompletedActivities] = React.useState<Record<string, boolean>>({});

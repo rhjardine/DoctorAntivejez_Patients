@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { offlineQueue } from '../services/offlineQueue';
-import { tokenStore } from '../services/authService';
+import { tokenStore } from '../services/tokenStore';
 
 export const useSyncQueue = () => {
     useEffect(() => {

@@ -1,5 +1,5 @@
 import { PatientProtocol, NutrigenomicPlan } from '../types';
-import { tokenStore } from './authService';
+import { tokenStore } from './tokenStore';
 import apiClient from './apiClient';
 import { offlineQueue } from './offlineQueue';
 import { useProfileStore } from '../store/useProfileStore';

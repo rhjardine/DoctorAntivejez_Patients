@@ -3,7 +3,7 @@ import { COLORS } from '../types';
 import { Book, Smile, Brain, Users, Star, ChevronRight, X, Loader2, CheckCircle, Save } from 'lucide-react';
 import apiClient from '../services/apiClient';
 import { offlineQueue } from '../services/offlineQueue';
-import { tokenStore } from '../services/authService';
+import { tokenStore } from '../services/tokenStore';
 
 const AttitudeView: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
