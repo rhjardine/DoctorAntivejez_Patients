@@ -121,6 +121,8 @@ const stableId = (category: string, index: number, item: RawRecord): string => {
     item.treatmentId,
   );
   if (explicit) return String(explicit);
+  // SOLO usar hash como último fallback, y marcarlo como inestable
+  console.warn('[normalizer] Item sin ID explícito del backend, usando hash inestable:', item);
   const seed = `${category}:${index}:${pickFirst(item.itemName, item.name, item.nombre, item.producto, item.title, '')}`;
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1)

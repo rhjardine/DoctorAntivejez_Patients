@@ -131,6 +131,9 @@ export const ProtocolService = {
         body: JSON.stringify({ status }),
         headers: {
           'Content-Type': 'application/json',
+          // NOTA: offlineQueue elimina este header inmediatamente por seguridad para no guardarlo en IndexedDB.
+          // Se pasa aquí para mantener la firma completa de la petición. Cuando useSyncQueue hace el replay, 
+          // inyecta un token fresco desde tokenStore/localStorage justo antes de enviar la petición.
           Authorization: `Bearer ${tokenStore.getAccessToken() || ''}`,
         },
       });
