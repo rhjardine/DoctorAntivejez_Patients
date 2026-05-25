@@ -65,7 +65,7 @@ export const EvaluacionInicial: React.FC<EvaluacionInicialProps> = ({ branding }
     ];
 
     return (
-        <div className="min-h-screen bg-[#F9F6F0] text-[#3B3631] font-sans flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#f8fafc] text-[#293b64] font-sans flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
             {/* Header section */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -74,12 +74,12 @@ export const EvaluacionInicial: React.FC<EvaluacionInicialProps> = ({ branding }
                 className="w-full max-w-2xl text-center mb-10"
             >
                 <div className="inline-flex items-center justify-center p-3 bg-white/60 rounded-full mb-4 shadow-sm">
-                    <Activity className="w-6 h-6 text-[#B35446]" />
+                    <Activity className="w-6 h-6 text-[#14b8a6]" />
                 </div>
-                <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-[#3B3631] mb-2">
+                <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-[#293b64] mb-2">
                     Su Hub de Diagnóstico
                 </h1>
-                <p className="text-[#3B3631]/70 text-lg max-w-lg mx-auto">
+                <p className="text-slate-500 text-lg max-w-lg mx-auto">
                     Complete su perfil biológico de precisión con {appName}.
                 </p>
             </motion.div>
@@ -96,31 +96,31 @@ export const EvaluacionInicial: React.FC<EvaluacionInicialProps> = ({ branding }
                         key={step.id}
                         variants={itemVariants}
                         whileTap={{ scale: 0.95 }}
-                        className="w-full text-left group bg-white/70 backdrop-blur-sm rounded-2xl p-5 shadow-sm transition-all hover:bg-white/90 hover:shadow-md flex items-center justify-between border border-transparent hover:border-[#B35446]/20 focus:outline-none focus:ring-2 focus:ring-[#B35446] focus:border-transparent min-h-[5rem]"
+                        className="w-full text-left group bg-white/70 backdrop-blur-sm rounded-2xl p-5 shadow-sm transition-all hover:bg-white/90 hover:shadow-md flex items-center justify-between border border-transparent hover:border-[#14b8a6]/20 focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent min-h-[5rem]"
                     >
                         <div className="flex items-center space-x-5">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#F9F6F0] text-[#B35446] flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-slate-50 text-[#14b8a6] flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
                                 <step.icon className="w-6 h-6" />
                             </div>
 
                             <div className="flex flex-col justify-center">
                                 <div className="flex items-center gap-2">
-                                    <h3 className="text-lg font-medium text-[#3B3631] leading-tight">
+                                    <h3 className="text-lg font-medium text-[#293b64] leading-tight">
                                         {step.title}
                                     </h3>
                                     {step.badge && (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-[#B35446]/10 text-[#B35446]">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-[#14b8a6]/10 text-[#14b8a6]">
                                             {step.badge}
                                         </span>
                                     )}
                                 </div>
-                                <p className="text-sm text-[#3B3631]/70 mt-1 align-middle line-clamp-2">
+                                <p className="text-sm text-slate-500 mt-1 align-middle line-clamp-2">
                                     {step.description}
                                 </p>
                             </div>
                         </div>
 
-                        <div className="flex-shrink-0 text-[#B35446]/40 group-hover:text-[#B35446] transition-colors">
+                        <div className="flex-shrink-0 text-[#14b8a6]/40 group-hover:text-[#14b8a6] transition-colors">
                             <ChevronRight className="w-6 h-6" />
                         </div>
                     </motion.button>
@@ -134,7 +134,7 @@ export const EvaluacionInicial: React.FC<EvaluacionInicialProps> = ({ branding }
                 transition={{ delay: 0.8, duration: 0.5 }}
                 className="mt-auto pt-12 pb-6 text-center"
             >
-                <p className="text-xs font-medium text-[#3B3631]/40 uppercase tracking-wider">
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Powered by VYTALIX
                 </p>
             </motion.div>

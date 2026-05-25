@@ -28,32 +28,32 @@ const CAT: Record<
   { color: string; bg: string; border: string; label: string; text: string }
 > = {
   EXCELENTE: {
-    color: '#5A7163',
-    bg: 'rgba(90,113,99,0.1)',
-    border: 'rgba(90,113,99,0.3)',
+    color: '#14b8a6',
+    bg: 'rgba(20,184,166,0.1)',
+    border: 'rgba(20,184,166,0.3)',
     label: 'Excelente Vitalidad',
-    text: 'text-vytalix-sage',
+    text: 'text-[#14b8a6]',
   },
   BUENO: {
-    color: '#5A7163',
-    bg: 'rgba(90,113,99,0.1)',
-    border: 'rgba(90,113,99,0.3)',
+    color: '#14b8a6',
+    bg: 'rgba(20,184,166,0.1)',
+    border: 'rgba(20,184,166,0.3)',
     label: 'Buena Condición',
-    text: 'text-vytalix-sage',
+    text: 'text-[#14b8a6]',
   },
   REGULAR: {
-    color: '#B35446',
-    bg: 'rgba(179,84,70,0.1)',
-    border: 'rgba(179,84,70,0.3)',
+    color: '#293b64',
+    bg: 'rgba(41,59,100,0.1)',
+    border: 'rgba(41,59,100,0.3)',
     label: 'Área de Oportunidad',
-    text: 'text-vytalix-terracotta',
+    text: 'text-[#293b64]',
   },
   CRITICO: {
-    color: '#B35446',
-    bg: 'rgba(179,84,70,0.1)',
-    border: 'rgba(179,84,70,0.3)',
+    color: '#293b64',
+    bg: 'rgba(41,59,100,0.1)',
+    border: 'rgba(41,59,100,0.3)',
     label: 'Atención Prioritaria',
-    text: 'text-vytalix-terracotta',
+    text: 'text-[#293b64]',
   },
 };
 
@@ -104,8 +104,8 @@ const SemiGauge: React.FC<{ score: number; color: string }> = ({
 
 /* ─── Dimension bar color ───────────────────────────────────────────── */
 function barColor(v: number) {
-  if (v >= 60) return '#5A7163'; // vytalix-sage
-  return '#B35446'; // vytalix-terracotta
+  if (v >= 60) return '#14b8a6'; // Teal
+  return '#293b64'; // Navy
 }
 
 const ResultadoScorePage: React.FC = () => {
@@ -178,7 +178,7 @@ const ResultadoScorePage: React.FC = () => {
   const hookConfig =
     score < 50
       ? {
-          color: '#B35446',
+          color: '#293b64',
           icon: <AlertTriangle size={20} />,
           title: 'Tu score indica áreas de atención prioritaria',
           rangeBadge: 'Optimización Activa',
@@ -188,7 +188,7 @@ const ResultadoScorePage: React.FC = () => {
             'Una evaluación clínica puede identificar exactamente cuáles son tus prioridades de mayor impacto vital.',
         }
       : {
-          color: '#5A7163',
+          color: '#14b8a6',
           icon: <ShieldCheck size={20} />,
           title: 'Tu score refleja una base sólida de vitalidad',
           rangeBadge: 'Rango de Excelencia',
@@ -241,7 +241,7 @@ const ResultadoScorePage: React.FC = () => {
           <div className="relative flex flex-col items-center mb-4">
             <SemiGauge
               score={score}
-              color={score >= 60 ? '#5A7163' : '#B35446'}
+              color={score >= 60 ? '#14b8a6' : '#293b64'}
             />
             <div className="absolute inset-x-0 bottom-2 flex flex-col items-center">
               <motion.span

@@ -21,10 +21,10 @@ export default {
 
                 // Longevidad Orgánica (Organics & Earth)
                 vytalix: {
-                    sand: '#F9F6F0',
-                    terracotta: '#B35446',
-                    sage: '#5A7163',
-                    graphite: '#3B3631',
+                    sand: '#F8FAFC',
+                    terracotta: '#14B8A6',
+                    sage: '#14B8A6',
+                    graphite: '#293B64',
                 },
 
                 // Precisión Clínica (Scientific & Corporate)

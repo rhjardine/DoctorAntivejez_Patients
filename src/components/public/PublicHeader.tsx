@@ -24,7 +24,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     // Vytalix (Organic/Wellness) vs Clinical (Professional)
     const bgColor = isWellness ? 'bg-vytalix-graphite' : 'bg-clinical-navy';
     const accentColorClass = isWellness ? 'bg-vytalix-sage' : 'bg-clinical-cyan';
-    const accentColorHex = isWellness ? '#5A7163' : '#06B6D4';
+    const accentColorHex = isWellness ? '#14b8a6' : '#14b8a6';
     const textColor = isWellness ? 'text-vytalix-sand' : 'text-white';
 
     return (

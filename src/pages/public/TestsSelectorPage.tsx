@@ -4,14 +4,14 @@ import { ClipboardList, Camera } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PublicHeader from '../../components/public/PublicHeader';
 
-const BG = '#F5F0E8';
-const BG_CARD = '#FDFAF4';
-const EARTH = '#8B7355';
-const EARTH_DK = '#5C4A32';
-const SAGE = '#7C9A7E';
-const TERRA = '#C4714A';
-const TXT_PRI = '#3D2B1F';
-const TXT_SEC = '#7A6555';
+const BG = '#f8fafc';
+const BG_CARD = '#ffffff';
+const EARTH = '#14b8a6';
+const EARTH_DK = '#293b64';
+const SAGE = '#14b8a6';
+const TERRA = '#14b8a6';
+const TXT_PRI = '#293b64';
+const TXT_SEC = '#64748b';
 
 const TestsSelectorPage: React.FC = () => {
     const navigate = useNavigate();
@@ -54,7 +54,7 @@ const TestsSelectorPage: React.FC = () => {
                     onClick={() => navigate('/test')}
                     style={{
                         width: '100%', background: BG_CARD,
-                        border: '1px solid rgba(139,115,85,0.2)',
+                        border: '1px solid rgba(41,59,100,0.1)',
                         borderRadius: 20, padding: '24px 20px',
                         marginBottom: 14, cursor: 'pointer',
                         transition: 'transform 0.15s ease, box-shadow 0.15s ease'
@@ -99,7 +99,7 @@ const TestsSelectorPage: React.FC = () => {
                     onClick={() => navigate('/agebot')}
                     style={{
                         width: '100%', background: BG_CARD,
-                        border: '1px solid rgba(139,115,85,0.2)',
+                        border: '1px solid rgba(41,59,100,0.1)',
                         borderRadius: 20, padding: '24px 20px',
                         marginBottom: 28, cursor: 'pointer'
                     }}

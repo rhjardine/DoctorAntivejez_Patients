@@ -66,7 +66,7 @@ const FacialOverlay: React.FC<{ size: number }> = ({ size }) => {
                     key={i}
                     x1={points[a].x} y1={points[a].y}
                     x2={points[b].x} y2={points[b].y}
-                    stroke="#9E5B4B" // Terracota
+                    stroke="#14b8a6" // Teal
                     strokeWidth="1.5" opacity="0.5"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{ pathLength: 1, opacity: 0.5 }}
@@ -77,7 +77,7 @@ const FacialOverlay: React.FC<{ size: number }> = ({ size }) => {
                 <motion.circle
                     key={i}
                     cx={p.x} cy={p.y} r="2.5"
-                    fill="#9E5B4B" // Terracota
+                    fill="#14b8a6" // Teal
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 0.9 }}
                     transition={{ delay: i * 0.03, type: 'spring' }}
@@ -282,28 +282,28 @@ const AgeBotFacialPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-[#FAF7F2] font-sans relative overflow-hidden">
+        <div className="min-h-screen flex flex-col bg-[#f8fafc] font-sans relative overflow-hidden">
 
-            {/* ELEMENTOS DECORATIVOS NUDE/TERRACOTA */}
-            <div className="absolute top-10 left-10 w-48 h-48 bg-[#E8DFD5] rounded-full blur-3xl opacity-50 pointer-events-none z-0"></div>
-            <div className="absolute bottom-10 right-10 w-48 h-48 bg-[#D6B5A7] rounded-full blur-3xl opacity-30 pointer-events-none z-0"></div>
+            {/* ELEMENTOS DECORATIVOS CLÍNICOS */}
+            <div className="absolute top-10 left-10 w-48 h-48 bg-[#14b8a6]/5 rounded-full blur-3xl opacity-50 pointer-events-none z-0"></div>
+            <div className="absolute bottom-10 right-10 w-48 h-48 bg-[#293b64]/5 rounded-full blur-3xl opacity-30 pointer-events-none z-0"></div>
 
             {/* HEADER PREMIUM DE CRISTAL */}
-            <div className="bg-white/80 backdrop-blur-md px-4 py-4 flex items-center gap-4 border-b border-[#E8DFD5] z-20 sticky top-0 shadow-sm">
+            <div className="bg-white/80 backdrop-blur-md px-4 py-4 flex items-center gap-4 border-b border-slate-100 z-20 sticky top-0 shadow-sm">
                 <button
                     onClick={() => {
                         if (streamRef.current) streamRef.current.getTracks().forEach(track => track.stop());
                         navigate('/longevidad'); // Regresa limpio a la landing
                     }}
-                    className="w-10 h-10 flex items-center justify-center bg-[#F4EBE6] rounded-xl text-[#9E5B4B] active:scale-95 transition-transform"
+                    className="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-xl text-[#293b64] active:scale-95 transition-transform"
                 >
                     <ChevronLeft size={24} />
                 </button>
                 <div>
-                    <h2 className="text-lg font-black text-[#4A3B32] uppercase tracking-tight">
+                    <h2 className="text-lg font-black text-[#293b64] uppercase tracking-tight">
                         {capturedImage ? "Análisis Facial" : "AgeBot Facial"}
                     </h2>
-                    <p className="text-[10px] font-bold text-[#8A796F] uppercase tracking-widest">Inteligencia Artificial</p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Inteligencia Artificial</p>
                 </div>
             </div>
 
@@ -320,7 +320,7 @@ const AgeBotFacialPage: React.FC = () => {
                             className="flex-1 flex flex-col p-4 sm:p-6">
 
                             {/* Viewfinder Enmarcado Premium */}
-                            <div className="relative flex-1 bg-white/60 backdrop-blur-sm rounded-[2.5rem] p-2 sm:p-3 shadow-xl shadow-[#D6B5A7]/20 border border-[#E8DFD5] flex items-center justify-center overflow-hidden">
+                            <div className="relative flex-1 bg-white/60 backdrop-blur-sm rounded-[2.5rem] p-2 sm:p-3 shadow-xl shadow-slate-200/50 border border-slate-200 flex items-center justify-center overflow-hidden">
                                 {!cameraError ? (
                                     <>
                                         {cameraRequested ? (
@@ -335,9 +335,9 @@ const AgeBotFacialPage: React.FC = () => {
                                                 />
 
                                                 {isCameraLoading && (
-                                                    <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[2rem] z-30 bg-[#FAF7F2]/80 backdrop-blur-sm m-2">
-                                                        <Loader2 size={40} className="animate-spin mb-3 text-[#9E5B4B]" />
-                                                        <p className="text-xs font-bold tracking-widest uppercase text-[#8A796F] text-center px-4">Iniciando cámara...</p>
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[2rem] z-30 bg-[#f8fafc]/80 backdrop-blur-sm m-2">
+                                                        <Loader2 size={40} className="animate-spin mb-3 text-[#14b8a6]" />
+                                                        <p className="text-xs font-bold tracking-widest uppercase text-slate-500 text-center px-4">Iniciando cámara...</p>
                                                     </div>
                                                 )}
 
@@ -347,19 +347,19 @@ const AgeBotFacialPage: React.FC = () => {
                                                         <div className="relative">
                                                             {/* Scanning bar */}
                                                             <motion.div
-                                                                className="absolute left-0 right-0 h-0.5 z-20 bg-[#9E5B4B]/50 shadow-[0_0_12px_rgba(158,91,75,0.8)]"
+                                                                className="absolute left-0 right-0 h-0.5 z-20 bg-[#14b8a6]/50 shadow-[0_0_12px_rgba(20,184,166,0.8)]"
                                                                 animate={{ top: ['15%', '85%', '15%'] }}
                                                                 transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
                                                             />
-                                                            <div className="w-56 h-72 rounded-[40%] border-2 border-[#9E5B4B]/50 shadow-[0_0_0_4000px_rgba(0,0,0,0.4)]">
+                                                            <div className="w-56 h-72 rounded-[40%] border-2 border-[#14b8a6]/50 shadow-[0_0_0_4000px_rgba(0,0,0,0.4)]">
                                                                 {/* HUD corners */}
-                                                                <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-[#9E5B4B]" />
-                                                                <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-[#9E5B4B]" />
-                                                                <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-[#9E5B4B]" />
-                                                                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-[#9E5B4B]" />
+                                                                <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-[#14b8a6]" />
+                                                                <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-[#14b8a6]" />
+                                                                <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-[#14b8a6]" />
+                                                                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-[#14b8a6]" />
                                                             </div>
                                                             <div className="absolute -bottom-12 left-0 right-0 flex flex-col items-center gap-1">
-                                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#9E5B4B]">
+                                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#14b8a6]">
                                                                     Calibración Óptica
                                                                 </p>
                                                                 <p className="text-[13px] font-medium text-white/90">
@@ -373,23 +373,23 @@ const AgeBotFacialPage: React.FC = () => {
                                         ) : (
                                             /* Primary CTA = Activar Cámara */
                                             <div className="flex flex-col items-center justify-center text-center px-6 h-full z-10">
-                                                <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-[#F4EBE6]">
-                                                    <Camera size={40} className="text-[#9E5B4B]" />
+                                                <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-slate-100">
+                                                    <Camera size={40} className="text-[#14b8a6]" />
                                                 </div>
-                                                <p className="font-black text-xl mb-3 text-[#4A3B32] uppercase tracking-tight">Análisis Facial AgeBot</p>
-                                                <p className="font-medium text-sm mb-10 leading-relaxed max-w-[260px] text-[#8A796F]">
+                                                <p className="font-black text-xl mb-3 text-[#293b64] uppercase tracking-tight">Análisis Facial AgeBot</p>
+                                                <p className="font-medium text-sm mb-10 leading-relaxed max-w-[260px] text-slate-500">
                                                     AgeBot necesita acceso a tu cámara para analizar tus biomarcadores faciales en tiempo real.
                                                 </p>
 
                                                 <button
                                                     onClick={handleActivateCamera}
-                                                    className="w-full py-4 bg-gradient-to-r from-[#9E5B4B] to-[#7D4638] text-white font-bold rounded-2xl shadow-xl shadow-[#7D4638]/20 transform active:scale-95 transition-all text-sm pointer-events-auto uppercase tracking-widest">
+                                                    className="w-full py-4 bg-gradient-to-r from-[#293b64] to-[#14b8a6] text-white font-bold rounded-2xl shadow-xl shadow-[#293b64]/20 transform active:scale-95 transition-all text-sm pointer-events-auto uppercase tracking-widest">
                                                     Activar Cámara
                                                 </button>
 
                                                 <button
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className="mt-5 text-sm underline decoration-[#C4B2AA] pointer-events-auto text-[#8A796F] hover:text-[#4A3B32] transition-colors">
+                                                    className="mt-5 text-sm underline decoration-slate-200 pointer-events-auto text-slate-500 hover:text-[#14b8a6] transition-colors">
                                                     Subir foto desde galería
                                                 </button>
                                             </div>
@@ -398,31 +398,31 @@ const AgeBotFacialPage: React.FC = () => {
                                 ) : (
                                     /* Camera unavailable */
                                     <div className="flex flex-col items-center justify-center text-center px-8 z-10 p-6 h-full">
-                                        <AlertTriangle size={48} className="mb-4 text-[#9E5B4B]" />
-                                        <p className="font-bold text-lg mb-2 text-[#4A3B32]">Cámara no disponible</p>
-                                        <p className="text-sm mb-8 font-medium leading-relaxed text-[#8A796F]">
+                                        <AlertTriangle size={48} className="mb-4 text-[#293b64]" />
+                                        <p className="font-bold text-lg mb-2 text-[#293b64]">Cámara no disponible</p>
+                                        <p className="text-sm mb-8 font-medium leading-relaxed text-slate-500">
                                             {errorMsg || 'Permiso de cámara denegado. Actívalo en los ajustes, o sube una foto.'}
                                         </p>
                                         <div className="flex flex-col w-full gap-3 max-w-[240px]">
                                             <button
                                                 onClick={handleRetry}
                                                 disabled={retrying}
-                                                className="w-full py-4 rounded-xl font-bold text-sm transition-all active:scale-95 bg-white border border-[#E8DFD5] shadow-sm pointer-events-auto disabled:opacity-50 text-[#4A3B32]">
+                                                className="w-full py-4 rounded-xl font-bold text-sm transition-all active:scale-95 bg-white border border-slate-200 shadow-sm pointer-events-auto disabled:opacity-50 text-[#293b64]">
                                                 {retrying ? 'Reintentando...' : 'Reintentar cámara'}
                                             </button>
                                             <button onClick={() => fileInputRef.current?.click()}
-                                                className="mt-2 text-sm underline decoration-[#C4B2AA] pointer-events-auto text-[#8A796F] hover:text-[#4A3B32] transition-colors">
+                                                className="mt-2 text-sm underline decoration-slate-200 pointer-events-auto text-slate-500 hover:text-[#14b8a6] transition-colors">
                                                 Subir foto manual
                                             </button>
 
                                             <button
                                                 onClick={() => setShowDiagnostics(!showDiagnostics)}
-                                                className="mt-8 text-[10px] uppercase tracking-widest text-[#8A796F] hover:text-[#4A3B32] transition-opacity">
+                                                className="mt-8 text-[10px] uppercase tracking-widest text-slate-500 hover:text-[#293b64] transition-opacity">
                                                 {showDiagnostics ? 'Ocultar diagnóstico' : 'Ver diagnóstico'}
                                             </button>
 
                                             {showDiagnostics && (
-                                                <div className="mt-4 p-3 rounded-lg bg-[#E8DFD5]/50 text-[10px] text-left font-mono break-all text-[#8A796F]">
+                                                <div className="mt-4 p-3 rounded-lg bg-slate-100 text-[10px] text-left font-mono break-all text-slate-500">
                                                     <p>Secure: {window.isSecureContext ? 'YES' : 'NO'}</p>
                                                     <p>Device: {navigator.mediaDevices ? 'YES' : 'NO'}</p>
                                                     <p>Error: {errorMsg}</p>
@@ -438,14 +438,14 @@ const AgeBotFacialPage: React.FC = () => {
                                 <div className="py-8 flex items-center justify-around px-8 mt-2">
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="w-14 h-14 rounded-full flex items-center justify-center transition-all hover:bg-black/5 active:scale-90 border border-[#E8DFD5] bg-white shadow-sm">
-                                        <ImageIcon size={22} className="text-[#8A796F]" />
+                                        className="w-14 h-14 rounded-full flex items-center justify-center transition-all hover:bg-black/5 active:scale-90 border border-slate-200 bg-white shadow-sm">
+                                        <ImageIcon size={22} className="text-slate-500" />
                                     </button>
                                     <button
                                         onClick={capturePhoto}
                                         disabled={!cameraActive}
-                                        className="w-20 h-20 rounded-full border-4 border-[#9E5B4B] flex items-center justify-center active:scale-90 transition-all shadow-xl disabled:opacity-30 disabled:cursor-not-allowed">
-                                        <div className="w-16 h-16 rounded-full bg-[#9E5B4B]" />
+                                        className="w-20 h-20 rounded-full border-4 border-[#14b8a6] flex items-center justify-center active:scale-90 transition-all shadow-xl disabled:opacity-30 disabled:cursor-not-allowed">
+                                        <div className="w-16 h-16 rounded-full bg-[#14b8a6]" />
                                     </button>
                                     <div className="w-14 h-14" /> {/* spacer */}
                                 </div>
@@ -464,16 +464,16 @@ const AgeBotFacialPage: React.FC = () => {
                             <div className="relative mb-8">
                                 {capturedImage && (
                                     <img src={capturedImage} alt="Foto capturada"
-                                        className="w-40 h-40 object-cover rounded-full opacity-40 border-2 border-[#9E5B4B]" />
+                                        className="w-40 h-40 object-cover rounded-full opacity-40 border-2 border-[#14b8a6]" />
                                 )}
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <Loader2 size={52} className="text-[#9E5B4B] animate-spin" />
+                                    <Loader2 size={52} className="text-[#14b8a6] animate-spin" />
                                 </div>
                             </div>
-                            <p className="text-lg font-black mb-2 text-[#4A3B32] uppercase">
+                            <p className="text-lg font-black mb-2 text-[#293b64] uppercase">
                                 Analizando tu vitalidad facial...
                             </p>
-                            <p className="text-sm font-medium text-[#8A796F]">
+                            <p className="text-sm font-medium text-slate-500">
                                 Detectando 24 puntos de referencia epigenética
                             </p>
                         </motion.div>
@@ -488,7 +488,7 @@ const AgeBotFacialPage: React.FC = () => {
                             <div className="relative w-52 h-52 mb-6">
                                 {capturedImage && (
                                     <img src={capturedImage} alt="Analysis"
-                                        className="w-full h-full object-cover rounded-[2rem] border-4 border-white shadow-xl shadow-[#D6B5A7]/40" />
+                                        className="w-full h-full object-cover rounded-[2rem] border-4 border-white shadow-xl shadow-slate-200" />
                                 )}
                                 <FacialOverlay size={208} />
                                 <motion.div
@@ -502,28 +502,28 @@ const AgeBotFacialPage: React.FC = () => {
                             {/* Age result Card Premium */}
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                                className="w-full max-w-sm rounded-[2.5rem] p-8 mb-6 text-center bg-white/90 backdrop-blur-sm border border-[#E8DFD5] shadow-xl shadow-[#D6B5A7]/20">
-                                <p className="text-[11px] uppercase tracking-[0.2em] font-black mb-3 text-[#8A796F]">
+                                className="w-full max-w-sm rounded-[2.5rem] p-8 mb-6 text-center bg-white/90 backdrop-blur-sm border border-slate-200 shadow-xl shadow-slate-200/50">
+                                <p className="text-[11px] uppercase tracking-[0.2em] font-black mb-3 text-slate-500">
                                     Tu {VITALITY_LABELS.age_result}
                                 </p>
-                                <p className="text-7xl font-black mb-2 text-[#4A3B32] tracking-tighter">
+                                <p className="text-7xl font-black mb-2 text-[#293b64] tracking-tighter">
                                     {result.estimatedAge}
-                                    <span className="text-2xl ml-1 text-[#8A796F]">años</span>
+                                    <span className="text-2xl ml-1 text-slate-500">años</span>
                                 </p>
-                                <div className="inline-block mt-2 mb-6 rounded-full px-4 py-1.5 bg-[#F4EBE6]">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9E5B4B]">IA de Precisión</p>
+                                <div className="inline-block mt-2 mb-6 rounded-full px-4 py-1.5 bg-slate-100">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#14b8a6]">IA de Precisión</p>
                                 </div>
                                 <div className="flex items-center justify-center gap-8 mt-2">
                                     <div className="text-center">
-                                        <p className="text-[10px] uppercase font-black tracking-widest mb-1 text-[#8A796F]">Confianza</p>
-                                        <p className="text-base font-black text-[#4A3B32] tracking-tight">
+                                        <p className="text-[10px] uppercase font-black tracking-widest mb-1 text-slate-500">Confianza</p>
+                                        <p className="text-base font-black text-[#293b64] tracking-tight">
                                             {Math.round(result.confidence * 100)}%
                                         </p>
                                     </div>
-                                    <div className="w-px h-8 bg-[#E8DFD5]" />
+                                    <div className="w-px h-8 bg-slate-200" />
                                     <div className="text-center">
-                                        <p className="text-[10px] uppercase font-black tracking-widest mb-1 text-[#8A796F]">Marcadores</p>
-                                        <p className="text-base font-black text-[#4A3B32] tracking-tight">{result.analysisPoints}</p>
+                                        <p className="text-[10px] uppercase font-black tracking-widest mb-1 text-slate-500">Marcadores</p>
+                                        <p className="text-base font-black text-[#293b64] tracking-tight">{result.analysisPoints}</p>
                                     </div>
                                 </div>
                             </motion.div>
@@ -539,11 +539,11 @@ const AgeBotFacialPage: React.FC = () => {
                                 className="w-full max-w-sm flex flex-col gap-3">
                                 <button
                                     onClick={handleFinalCTA}
-                                    className="w-full py-5 bg-gradient-to-r from-[#9E5B4B] to-[#7D4638] text-white font-black text-[14px] flex items-center justify-center gap-2 rounded-2xl shadow-xl shadow-[#7D4638]/20 transform active:scale-95 transition-all uppercase tracking-widest">
+                                    className="w-full py-5 bg-gradient-to-r from-[#293b64] to-[#14b8a6] text-white font-black text-[14px] flex items-center justify-center gap-2 rounded-2xl shadow-xl shadow-[#293b64]/20 transform active:scale-95 transition-all uppercase tracking-widest">
                                     Siguiente Paso <ArrowRight size={18} strokeWidth={3} />
                                 </button>
                                 <button onClick={reset}
-                                    className="w-full font-bold text-[10px] py-4 flex items-center justify-center gap-2 text-[#8A796F] hover:text-[#4A3B32] transition-all uppercase tracking-widest bg-white rounded-xl border border-[#E8DFD5] shadow-sm">
+                                    className="w-full font-bold text-[10px] py-4 flex items-center justify-center gap-2 text-slate-500 hover:text-[#293b64] transition-all uppercase tracking-widest bg-white rounded-xl border border-slate-200 shadow-sm">
                                     <RefreshCw size={12} /> Analizar otra foto
                                 </button>
                             </motion.div>
@@ -553,12 +553,12 @@ const AgeBotFacialPage: React.FC = () => {
                     {/* ── ERROR PHASE ── */}
                     {phase === 'error' && (
                         <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                            className="flex-1 flex flex-col items-center justify-center px-8 text-center bg-[#FAF7F2]">
-                            <AlertTriangle size={48} className="mb-4 text-[#9E5B4B]" />
-                            <p className="text-xl font-black mb-2 text-[#4A3B32] uppercase">Error de análisis</p>
-                            <p className="text-sm mb-8 font-medium text-[#8A796F] leading-relaxed">{errorMsg}</p>
+                            className="flex-1 flex flex-col items-center justify-center px-8 text-center bg-[#f8fafc]">
+                            <AlertTriangle size={48} className="mb-4 text-red-500" />
+                            <p className="text-xl font-black mb-2 text-[#293b64] uppercase">Error de análisis</p>
+                            <p className="text-sm mb-8 font-medium text-slate-500 leading-relaxed">{errorMsg}</p>
                             <button onClick={reset}
-                                className="px-10 py-4 bg-[#9E5B4B] text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-[#9E5B4B]/20 active:scale-95 transition-all">
+                                className="px-10 py-4 bg-[#293b64] text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-[#293b64]/20 active:scale-95 transition-all">
                                 Intentar de nuevo
                             </button>
                         </motion.div>
