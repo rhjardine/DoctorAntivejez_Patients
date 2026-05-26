@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line
 } from 'recharts';
-import { TrendingDown, Activity, Award, Calendar, Loader2, Info } from 'lucide-react';
+import { TrendingDown, Activity, Award, Calendar, Loader2, Info, AlertCircle } from 'lucide-react';
 import { fetchMetrics } from '../services/patientDataService';
 import { ProgressMetric, COLORS } from '../types';
 
@@ -16,6 +15,7 @@ const MetricsView: React.FC<MetricsViewProps> = ({ onInfoPress }) => {
   const [adherenceData, setAdherenceData] = useState<ProgressMetric[]>([]);
   const [bioAgeData, setBioAgeData] = useState<ProgressMetric[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -24,10 +24,14 @@ const MetricsView: React.FC<MetricsViewProps> = ({ onInfoPress }) => {
           fetchMetrics('ADHERENCE'),
           fetchMetrics('BIO_AGE')
         ]);
-        setAdherenceData(adh);
-        setBioAgeData(bio);
+        if (adh.error || bio.error) {
+          setHasError(true);
+        }
+        setAdherenceData(adh.data);
+        setBioAgeData(bio.data);
       } catch (err) {
         console.error("Error loading metrics", err);
+        setHasError(true);
       } finally {
         setIsLoading(false);
       }
@@ -40,6 +44,15 @@ const MetricsView: React.FC<MetricsViewProps> = ({ onInfoPress }) => {
       <div className="flex flex-col items-center justify-center h-full text-primary">
         <Loader2 size={48} className="animate-spin" />
         <p className="mt-4 font-bold uppercase text-[10px] tracking-[0.2em]">Analizando Evolución...</p>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-primary">
+        <AlertCircle size={48} className="text-slate-300" />
+        <p className="mt-4 font-bold uppercase text-[10px] tracking-[0.2em] text-textMedium">No hay datos disponibles en este momento.</p>
       </div>
     );
   }

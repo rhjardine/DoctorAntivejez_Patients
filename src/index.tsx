@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import * as Sentry from "@sentry/react";
-import { cryptoService } from './services/cryptoService';
+import { cryptoService, CryptoConfigError } from './services/cryptoService';
+import { logger } from './utils/logger';
 
 // ✅ SECURITY: Sentry solo se inicializa si el DSN está configurado via env var
 if (import.meta.env.VITE_SENTRY_DSN) {
@@ -67,8 +68,13 @@ async function main() {
   try {
     await cryptoService.init();
   } catch (error: any) {
-    // Check if it's the critical production seed error
-    if (import.meta.env.PROD && error.message?.includes('VITE_ENCRYPTION_SEED missing')) {
+    // Typed catch: CryptoConfigError signals a misconfigured encryption seed.
+    // Fails loudly in ALL environments — there is no degraded mode.
+    if (error instanceof CryptoConfigError) {
+      logger.error('[Boot] Crypto configuration invalid — halting application boot', {
+        errorName: error.name,
+        errorMessage: error.message,
+      });
       const root = createRoot(container);
       root.render(
         <div style={{
@@ -87,8 +93,9 @@ async function main() {
       return; // STOP BOOT
     }
 
-    // For other failures (e.g. FingerprintJS or subtle crypto issues), fall back gracefully
-    console.warn('[Boot] Crypto init failed — profile will re-fetch from network');
+    // For other failures (e.g. FingerprintJS or WebCrypto unavailable), continue boot.
+    // The profile store will re-fetch fresh data from the network on next mount.
+    logger.error('[Boot] Crypto init failed — profile will re-fetch from network', { error });
   }
 
   const root = createRoot(container);

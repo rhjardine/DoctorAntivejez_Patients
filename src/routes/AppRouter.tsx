@@ -49,11 +49,40 @@ const BioPaseView = React.lazy(() => import('../components/BioPaseView'));
 // ----------------------------------------------------------------------
 // MIDDLEWARE DE SEGURIDAD
 // ----------------------------------------------------------------------
+
+/** Session validity window — acts as a safety net for fully stale sessions.
+ *  Mid-session expiration (JWT exp) is already handled by the apiClient 401 interceptor.
+ *  Set to 24 h to match the server-side refresh token lifetime. */
+const SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24 horas
+
+/**
+ * Pure function — no side effects, no imports needed.
+ * Returns true if the session is older than SESSION_TTL_MS.
+ * Treats invalid or unparseable dates as expired (fail-safe).
+ */
+const isSessionExpired = (lastLoginAt: string): boolean => {
+  try {
+    const loginTime = new Date(lastLoginAt).getTime();
+    if (isNaN(loginTime)) return true; // fecha inválida = expirado
+    return Date.now() - loginTime > SESSION_TTL_MS;
+  } catch {
+    return true; // fail safe
+  }
+};
+
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { session, isAuthenticated, logout } = useAuthStore();
 
-    // Validación estricta: Si no hay sesión ni autenticación, expulsa al usuario al login
+    // Guard 1: No session at all (existing — do not change)
     if (!session && !isAuthenticated) {
+        return <Navigate to="/acceso" replace />;
+    }
+
+    // Guard 2: Session exists but is older than SESSION_TTL_MS
+    // The apiClient 401 interceptor handles mid-session JWT expiration.
+    // This guard catches fully stale sessions (e.g., user returns after 24+ h).
+    if (session && isSessionExpired(session.lastLoginAt)) {
+        logout();
         return <Navigate to="/acceso" replace />;
     }
 

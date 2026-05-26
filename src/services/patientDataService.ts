@@ -7,6 +7,12 @@ import {
 } from '../types';
 import { authService } from './authService';
 import apiClient from './apiClient';
+import { logger } from '../utils/logger';
+
+export interface MetricsResult {
+  data: ProgressMetric[];
+  error: boolean;
+}
 
 export const fetchPatientGuide = async (): Promise<PatientGuideResponse> => {
   const user = authService.getCurrentUser();
@@ -54,25 +60,16 @@ const getOfflineGuideFallback = (userId: string): PatientGuideResponse => {
   };
 };
 
-export const fetchMetrics = async (type: 'BIO_AGE' | 'ADHERENCE'): Promise<ProgressMetric[]> => {
+export const fetchMetrics = async (type: 'BIO_AGE' | 'ADHERENCE'): Promise<MetricsResult> => {
   const user = authService.getCurrentUser();
   if (!user) throw new Error("No hay sesión activa");
 
   try {
     const response = await apiClient.get(`/patients/${user.id}/metrics?type=${type}`);
-    return response.data;
-  } catch (error) {
-
-    const now = new Date();
-    return Array.from({ length: 6 }).map((_, i) => {
-      const date = new Date();
-      date.setMonth(now.getMonth() - (5 - i));
-      return {
-        date: date.toISOString().split('T')[0],
-        value: type === 'BIO_AGE' ? 42 - (i * 0.8) : 65 + (i * 5),
-        label: date.toLocaleDateString('es-ES', { month: 'short' })
-      };
-    });
+    return { data: response.data, error: false };
+  } catch {
+    logger.warn('fetchMetrics: API call failed, returning empty dataset', { metricType: type });
+    return { data: [], error: true };
   }
 };
 

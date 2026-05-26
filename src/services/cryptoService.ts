@@ -1,12 +1,34 @@
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { logger } from '../utils/logger';
 
-// Load seed from env
-const ENCRYPTION_SEED =
-    import.meta.env.VITE_ENCRYPTION_SEED ||
-    (import.meta.env.DEV
-        ? 'dev-only-insecure-seed-do-not-use-in-prod'
-        : null);
+// Load seed from env — no fallback: missing or weak seed is always a hard failure
+const ENCRYPTION_SEED = import.meta.env.VITE_ENCRYPTION_SEED as string | undefined;
+
+/** Patterns that indicate a placeholder or weak seed — checked case-insensitively as substrings */
+const WEAK_SEED_PATTERNS = [
+    'changeme',
+    'secret',
+    'password',
+    '12345',
+    'test',
+    'dev',
+    'development',
+    'your_seed_here',
+    'CHANGE_THIS',
+    'dev-only-insecure-seed-do-not-use-in-prod',
+];
+
+/**
+ * Error tipado para fallos de configuración criptográfica.
+ * Exportado para que index.tsx pueda capturarlo por tipo (instanceof)
+ * eliminando la dependencia de comparación frágil de strings de mensaje.
+ */
+export class CryptoConfigError extends Error {
+    constructor(reason: string) {
+        super(`[CryptoConfig] ${reason}`);
+        this.name = 'CryptoConfigError';
+    }
+}
 
 /**
  * Servicio de Encriptación PHI (Personal Health Information).
@@ -25,10 +47,62 @@ class CryptoService {
      * Inicializa el servicio derivando la llave de encriptación.
      */
     async init() {
-        // ✅ HARDENING: Throw error in production if seed is missing
-        if (!ENCRYPTION_SEED && import.meta.env.PROD) {
-            throw new Error('VITE_ENCRYPTION_SEED missing in production');
+        // ── SEED VALIDATION (runs in ALL environments — no degraded mode) ────────
+        // Placed BEFORE the try block so CryptoConfigError propagates directly
+        // to the caller without being caught and re-wrapped by the crypto catch below.
+
+        // Rule 1 — Existence
+        if (!ENCRYPTION_SEED || ENCRYPTION_SEED.trim() === '') {
+            logger.warn('[CryptoConfig] Seed validation failed', { rule: 'EXISTENCE', seedLength: 0 });
+            if (import.meta.env.DEV) {
+                console.error(
+                    '[CryptoConfig] VITE_ENCRYPTION_SEED no configurada.\n' +
+                    'Crea un archivo .env.local con una semilla de mínimo 32 caracteres.\n' +
+                    'Ejemplo: VITE_ENCRYPTION_SEED=tu_semilla_segura_aqui_minimo_32_chars'
+                );
+            }
+            throw new CryptoConfigError('VITE_ENCRYPTION_SEED no configurada.');
         }
+
+        // Rule 2 — Minimum length (32 chars = 256-bit passphrase equivalent)
+        if (ENCRYPTION_SEED.length < 32) {
+            logger.warn('[CryptoConfig] Seed validation failed', {
+                rule: 'MIN_LENGTH',
+                seedLength: ENCRYPTION_SEED.length,
+                required: 32,
+            });
+            if (import.meta.env.DEV) {
+                console.error(
+                    '[CryptoConfig] VITE_ENCRYPTION_SEED no configurada.\n' +
+                    'Crea un archivo .env.local con una semilla de mínimo 32 caracteres.\n' +
+                    'Ejemplo: VITE_ENCRYPTION_SEED=tu_semilla_segura_aqui_minimo_32_chars'
+                );
+            }
+            throw new CryptoConfigError(
+                `Seed demasiado corta: ${ENCRYPTION_SEED.length} caracteres (mínimo requerido: 32).`
+            );
+        }
+
+        // Rule 3 — Weak/placeholder pattern detection (case-insensitive substring match)
+        const seedLower = ENCRYPTION_SEED.toLowerCase();
+        const matchedPattern = WEAK_SEED_PATTERNS.find(p => seedLower.includes(p.toLowerCase()));
+        if (matchedPattern) {
+            logger.warn('[CryptoConfig] Seed validation failed', {
+                rule: 'WEAK_PATTERN',
+                seedLength: ENCRYPTION_SEED.length,
+            });
+            if (import.meta.env.DEV) {
+                console.error(
+                    '[CryptoConfig] VITE_ENCRYPTION_SEED no configurada.\n' +
+                    'Crea un archivo .env.local con una semilla de mínimo 32 caracteres.\n' +
+                    'Ejemplo: VITE_ENCRYPTION_SEED=tu_semilla_segura_aqui_minimo_32_chars'
+                );
+            }
+            throw new CryptoConfigError(
+                'Seed contiene un patrón débil conocido. Usa una semilla aleatoria de 32+ caracteres.'
+            );
+        }
+        // ─────────────────────────────────────────────────────────────────────────
 
         try {
             // 1. Obtener huella digital del dispositivo

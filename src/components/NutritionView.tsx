@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { COLORS } from '../types';
 import { Dna, Salad, ScanBarcode, Flame, Drumstick, Droplet, ChevronRight, Zap, ArrowRight, LayoutDashboard, ClipboardList, Stethoscope } from 'lucide-react';
-import CircularProgress from './CircularProgress';
 import FoodScannerModal from './FoodScannerModal';
 import NutrigenomicsView from './NutrigenomicsView';
 import { useProfileStore } from '../store/useProfileStore';
@@ -26,29 +25,22 @@ const NutritionView: React.FC = () => {
 
             {/* 1. Compact Daily Summary - Optimized for Seniors (Large Text, High Contrast) */}
             <div className="mx-4 bg-darkBlue rounded-3xl shadow-lg p-5 flex items-center justify-between border-b-4 border-primary/30">
-                <div className="flex items-center gap-5 w-full">
+                <div className="flex items-center gap-5 w-full opacity-60 select-none pointer-events-none">
                     <div className="relative flex-shrink-0">
-                        <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse"></div>
-                        <CircularProgress
-                            percentage={66}
-                            label=""
-                            icon={<span className="text-sm font-bold text-white">66%</span>}
-                            color={COLORS.PrimaryBlue}
-                            size={70}
-                            fillColor="transparent"
-                        />
+                        <div className="w-[70px] h-[70px] rounded-full border-2 border-white/20 flex items-center justify-center bg-white/5">
+                            <Flame size={28} className="text-white/40" />
+                        </div>
                     </div>
 
                     <div className="flex flex-col flex-1">
                         <div className="flex justify-between items-baseline">
                             <h2 className="text-base font-bold text-white/90 uppercase tracking-tight">Consumo Hoy</h2>
-                            <span className="text-2xl font-black text-primary">1,450</span>
+                            <span className="text-sm font-bold text-white/60 bg-white/10 px-2.5 py-0.5 rounded-full uppercase tracking-wider">Pronto Disponible</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 mt-1">
                             <div className="h-2 flex-1 bg-white/10 rounded-full overflow-hidden">
-                                <div className="h-full bg-primary w-[66%] rounded-full"></div>
+                                <div className="h-full bg-white/20 w-0 rounded-full"></div>
                             </div>
-                            <span className="text-[11px] font-bold text-white/60">de 2,200 kcal</span>
                         </div>
                     </div>
                 </div>
