@@ -234,15 +234,30 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         <button onClick={() => { navigate('/'); setMainTab(MainTab.KEYS_5A); toggleDrawer(false); }} className={`flex flex-col items-center gap-1 transition-all ${isHome ? 'text-[#293b64] scale-110' : 'text-slate-400'}`}>
                             <LayoutDashboard size={24} strokeWidth={isHome ? 2.5 : 2} /><span className="text-[9px] font-black uppercase tracking-widest">Inicio</span>
                         </button>
-                        <button onClick={() => navigate('/achievements')} className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/achievements' ? 'text-[#293b64] scale-110' : 'text-slate-400'}`}>
-                            <Trophy size={24} strokeWidth={location.pathname === '/achievements' ? 2.5 : 2} /><span className="text-[9px] font-black uppercase tracking-widest">Logros</span>
-                        </button>
-                        <button onClick={() => navigate('/biomics')} className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/biomics' ? 'text-[#293b64] scale-110' : 'text-slate-400'}`}>
-                            <Dna size={24} strokeWidth={location.pathname === '/biomics' ? 2.5 : 2} /><span className="text-[9px] font-black uppercase tracking-widest">Biomics</span>
-                        </button>
-                        <button onClick={() => navigate('/store')} className={`flex flex-col items-center gap-1 transition-all ${location.pathname === '/store' ? 'text-[#293b64] scale-110' : 'text-slate-400'}`}>
-                            <Store size={24} strokeWidth={location.pathname === '/store' ? 2.5 : 2} /><span className="text-[9px] font-black uppercase tracking-widest">Tienda</span>
-                        </button>
+                        
+                        <div className="flex flex-col items-center justify-center py-2 text-slate-300 opacity-40 cursor-not-allowed select-none relative group">
+                            <Trophy size={24} strokeWidth={2} />
+                            <span className="text-[9px] font-black uppercase tracking-widest mt-1">Logros</span>
+                            <span className="absolute -top-6 bg-[#293b64] text-white text-[9px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                Pronto
+                            </span>
+                        </div>
+                        
+                        <div className="flex flex-col items-center justify-center py-2 text-slate-300 opacity-40 cursor-not-allowed select-none relative group">
+                            <Dna size={24} strokeWidth={2} />
+                            <span className="text-[9px] font-black uppercase tracking-widest mt-1">Biomics</span>
+                            <span className="absolute -top-6 bg-[#293b64] text-white text-[9px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                Pronto
+                            </span>
+                        </div>
+                        
+                        <div className="flex flex-col items-center justify-center py-2 text-slate-300 opacity-40 cursor-not-allowed select-none relative group">
+                            <Store size={24} strokeWidth={2} />
+                            <span className="text-[9px] font-black uppercase tracking-widest mt-1">Tienda</span>
+                            <span className="absolute -top-6 bg-[#293b64] text-white text-[9px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                Pronto
+                            </span>
+                        </div>
                     </div>
                 </footer>
             )}

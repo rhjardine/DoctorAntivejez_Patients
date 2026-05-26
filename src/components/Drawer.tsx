@@ -46,10 +46,10 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
       />
 
       <div
-        className={`fixed top-0 left-0 h-full w-[300px] bg-white z-50 shadow-2xl transform transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 left-0 h-full w-[300px] flex flex-col bg-white z-50 shadow-2xl transform transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
-        <div className="bg-darkBlue p-6 pt-14 text-white relative overflow-hidden">
+        <div className="bg-darkBlue p-6 pt-14 text-white relative overflow-hidden shrink-0">
           {/* Decorative background circles */}
           <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-primary/10 pointer-events-none" />
           <div className="absolute top-10 -right-2 w-14 h-14 rounded-full bg-primary/15 pointer-events-none" />
@@ -81,7 +81,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
           </div>
         </div>
 
-        <div className="py-6 flex flex-col h-full overflow-y-auto no-scrollbar">
+        <div className="py-6 flex flex-col flex-1 overflow-y-auto no-scrollbar">
 
           {/* ── FASE 2: INHABILITADAS ── */}
 
