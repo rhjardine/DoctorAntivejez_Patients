@@ -90,31 +90,36 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
 
         <div className="py-6 flex flex-col h-full overflow-y-auto no-scrollbar">
 
-          <button
-            onClick={() => handleNavigation('/biometrics')}
-            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group"
-          >
-            <Activity size={22} className="text-textMedium group-hover:text-primary" />
-            <span className="font-black text-[13px] uppercase tracking-widest">Mis Biométricos</span>
-          </button>
+          {/* ── FASE 2: INHABILITADAS ── */}
 
-          <button
-            onClick={() => handleNavigation('/history')}
-            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group"
-          >
-            <FileClock size={22} className="text-textMedium group-hover:text-primary" />
-            <span className="font-black text-[13px] uppercase tracking-widest">Historial Médico</span>
-          </button>
+          {/* Mis Biométricos — Pronto */}
+          <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
+            <Activity size={22} className="text-textMedium shrink-0" />
+            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Mis Biométricos</span>
+            <span className="ml-auto text-[9px] font-bold bg-[#14b8a6]/10 text-[#14b8a6] px-2 py-1 rounded-md uppercase tracking-wider border border-[#14b8a6]/20 whitespace-nowrap">
+              Pronto
+            </span>
+          </div>
 
-          <button
-            onClick={() => handleNavigation('/biopase')}
-            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group"
-          >
-            <QrCode size={22} className="text-textMedium group-hover:text-primary" />
-            <span className="font-black text-[13px] uppercase tracking-widest">Bio-Pase (Check-in)</span>
-          </button>
+          {/* Historial Médico — Pronto */}
+          <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
+            <FileClock size={22} className="text-textMedium shrink-0" />
+            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Historial Médico</span>
+            <span className="ml-auto text-[9px] font-bold bg-[#14b8a6]/10 text-[#14b8a6] px-2 py-1 rounded-md uppercase tracking-wider border border-[#14b8a6]/20 whitespace-nowrap">
+              Pronto
+            </span>
+          </div>
 
+          {/* Bio-Pase — Pronto */}
+          <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
+            <QrCode size={22} className="text-textMedium shrink-0" />
+            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Bio-Pase (Check-in)</span>
+            <span className="ml-auto text-[9px] font-bold bg-[#14b8a6]/10 text-[#14b8a6] px-2 py-1 rounded-md uppercase tracking-wider border border-[#14b8a6]/20 whitespace-nowrap">
+              Pronto
+            </span>
+          </div>
 
+          {/* ── Notificaciones (Toggle activo) ── */}
           <div className="px-6 py-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -130,20 +135,27 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
             </div>
           </div>
 
-          <button onClick={() => handleNavigation('/settings')} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group">
-            <Settings size={22} className="text-textMedium group-hover:text-primary" />
-            <span className="font-black text-[13px] uppercase tracking-widest">{t('nav.settings') || 'Configuración'}</span>
-          </button>
+          {/* Configuración — Pronto */}
+          <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
+            <Settings size={22} className="text-textMedium shrink-0" />
+            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Configuración</span>
+            <span className="ml-auto text-[9px] font-bold bg-[#14b8a6]/10 text-[#14b8a6] px-2 py-1 rounded-md uppercase tracking-wider border border-[#14b8a6]/20 whitespace-nowrap">
+              Pronto
+            </span>
+          </div>
 
           <div className="h-px bg-gray-100 mx-6 my-3"></div>
 
-          <button onClick={() => handleNavigation('/about')} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-pearlyGray transition-all text-darkBlue group">
-            <span className="flex items-center gap-4">
-              <Info size={22} className="text-textMedium group-hover:text-primary" />
-              <span className="font-black text-[13px] uppercase tracking-widest">Sobre la App</span>
+          {/* Sobre la App — Pronto */}
+          <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
+            <Info size={22} className="text-textMedium shrink-0" />
+            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Sobre la App</span>
+            <span className="ml-auto text-[9px] font-bold bg-[#14b8a6]/10 text-[#14b8a6] px-2 py-1 rounded-md uppercase tracking-wider border border-[#14b8a6]/20 whitespace-nowrap">
+              Pronto
             </span>
-          </button>
+          </div>
 
+          {/* Reportar Problema (activo — canal de soporte) */}
           <a
             href={`mailto:soporte@doctorantivejez.com?subject=Reporte%20de%20Error%20PWA&body=Paciente%3A%20${encodeURIComponent(session?.name || '')}%0AFecha%3A%20${encodeURIComponent(new Date().toLocaleString('es-VE'))}%0A%0ADescripci%C3%B3n%20del%20problema%3A%0A`}
             className="w-full flex items-center gap-4 px-6 py-4 hover:bg-amber-50 transition-all text-amber-600 group"
@@ -154,10 +166,12 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
             </span>
           </a>
 
+          {/* Cerrar Sesión (siempre activo) */}
           <button onClick={() => setShowLogoutConfirm(true)} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-red-50 transition-all text-accentRed group">
             <LogOut size={22} className="group-hover:text-red-600" />
             <span className="font-black text-[13px] uppercase tracking-widest">Cerrar Sesión</span>
           </button>
+
 
           <div className="mt-auto mb-10 px-8 text-center">
             <p className="text-[10px] font-black text-gray-300 tracking-[0.3em] uppercase">Rejuvenate v2.0</p>

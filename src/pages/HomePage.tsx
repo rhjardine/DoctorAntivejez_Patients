@@ -250,13 +250,25 @@ const HomePage: React.FC = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex flex-col flex-1">
-                                    <div className="flex items-center justify-center py-2">
-                                        {renderDashboardMatrix()}
-                                    </div>
-
+                                <div className="flex flex-col flex-1 px-4 pb-4">
+                                    {/* =========================================================
+                                        SCOPING FASE 1: CLAVES 5A & TERAPIAS 4R — BLOQUEADAS
+                                        ========================================================= */}
+                                    <section className="mb-4 relative">
+                                        {/* Overlay de Bloqueo Fase 2 */}
+                                        <div className="absolute inset-0 z-20 bg-slate-50/60 backdrop-blur-[2px] flex items-center justify-center rounded-3xl border border-white/50">
+                                            <span className="bg-[#293b64] text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-xl flex items-center gap-2 transform -translate-y-4">
+                                                <span className="animate-pulse text-[#14b8a6]">✨</span> Pronto disponible
+                                            </span>
+                                        </div>
+                                        {/* Contenido Oscurecido e Inactivo */}
+                                        <div className="opacity-30 pointer-events-none select-none transition-all duration-300">
+                                            {renderDashboardMatrix()}
+                                        </div>
+                                    </section>
                                 </div>
                             )}
+
                         </div>
                     </motion.div>
                 ) : (
