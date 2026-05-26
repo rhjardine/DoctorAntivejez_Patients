@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
-import { authService, tokenStore } from '../services/authService';
+import { authService } from '../services/authService';
 
 const server = setupServer(
     http.post('*/mobile-auth-v1', async ({ request }) => {
