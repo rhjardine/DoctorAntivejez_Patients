@@ -194,7 +194,7 @@ const TestAntivejezPage: React.FC = () => {
     const questionOffset = QUESTIONS.filter(q => q.group < currentGroup).length;
 
     return (
-        <div className="min-h-screen flex flex-col relative bg-vytalix-sand">
+        <div className="min-h-screen flex flex-col relative bg-[#f8fafc]">
             <PublicHeader
                 theme="wellness"
                 showBack={true}
@@ -221,11 +221,11 @@ const TestAntivejezPage: React.FC = () => {
                             const qNumber = questionOffset + idx + 1;
                             const val = answers[q.id];
                             return (
-                                <div key={q.id} className="p-6 bg-white rounded-[1.5rem] border border-vytalix-graphite/5 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-vytalix-sage">
+                                <div key={q.id} className="p-6 bg-white rounded-[1.5rem] border border-[#293b64]/5 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-[#14b8a6]">
                                         ANÁLISIS VITAL {qNumber}
                                     </p>
-                                    <p className="text-[17px] font-semibold mb-8 leading-tight text-vytalix-graphite tracking-tight">
+                                    <p className="text-[17px] font-semibold mb-8 leading-tight text-[#293b64] tracking-tight">
                                         {q.text}
                                     </p>
                                     <div className="flex gap-3">
@@ -233,8 +233,8 @@ const TestAntivejezPage: React.FC = () => {
                                         <button
                                             onClick={() => answer(q.id, true)}
                                             className={`flex-1 py-4 rounded-2xl font-black text-sm transition-all duration-200 active:scale-95 ${val === true
-                                                ? 'bg-vytalix-sage text-white shadow-lg shadow-vytalix-sage/30'
-                                                : 'bg-vytalix-sand text-vytalix-graphite/40 border border-vytalix-graphite/10'
+                                                ? 'bg-[#14b8a6] text-white shadow-lg shadow-[#14b8a6]/30'
+                                                : 'bg-[#f8fafc] text-[#293b64]/40 border border-[#293b64]/10'
                                                 }`}
                                         >
                                             SÍ
@@ -244,8 +244,8 @@ const TestAntivejezPage: React.FC = () => {
                                         <button
                                             onClick={() => answer(q.id, false)}
                                             className={`flex-1 py-4 rounded-2xl font-black text-sm transition-all duration-200 active:scale-95 ${val === false
-                                                ? 'bg-vytalix-graphite text-vytalix-sand shadow-lg shadow-vytalix-graphite/30'
-                                                : 'bg-vytalix-sand text-vytalix-graphite/40 border border-vytalix-graphite/10'
+                                                ? 'bg-[#293b64] text-[#f8fafc] shadow-lg shadow-[#293b64]/30'
+                                                : 'bg-[#f8fafc] text-[#293b64]/40 border border-[#293b64]/10'
                                                 }`}
                                         >
                                             NO
@@ -259,7 +259,7 @@ const TestAntivejezPage: React.FC = () => {
             </div>
 
             {/* Sticky footer */}
-            <div className="fixed bottom-0 left-0 right-0 px-6 py-5 z-20 bg-vytalix-sand/90 backdrop-blur-md border-t border-vytalix-graphite/5"
+            <div className="fixed bottom-0 left-0 right-0 px-6 py-5 z-20 bg-[#f8fafc]/90 backdrop-blur-md border-t border-[#293b64]/5"
                 style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
                 {/* Disclaimer */}
                 <div className="mb-6">
@@ -268,7 +268,7 @@ const TestAntivejezPage: React.FC = () => {
                 <button
                     onClick={next}
                     disabled={!allAnswered}
-                    className="w-full py-5 bg-vytalix-terracotta text-white font-black text-[15px] flex items-center justify-center gap-2 rounded-full shadow-xl shadow-vytalix-terracotta/20 transform active:scale-95 transition-all uppercase tracking-[0.15em] disabled:opacity-40 disabled:scale-100"
+                    className="w-full py-5 bg-[#14b8a6] text-white font-black text-[15px] flex items-center justify-center gap-2 rounded-full shadow-xl shadow-[#14b8a6]/20 transform active:scale-95 transition-all uppercase tracking-[0.15em] disabled:opacity-40 disabled:scale-100"
                 >
                     {currentGroup < 5 ? (
                         <>Siguiente bloque <ChevronRight size={18} strokeWidth={3} /></>
@@ -276,7 +276,7 @@ const TestAntivejezPage: React.FC = () => {
                         <>Consultar Vitalidad <ChevronRight size={18} strokeWidth={3} /></>
                     )}
                 </button>
-                <p className="text-center text-[9px] mt-4 font-black uppercase tracking-[0.3em] text-vytalix-graphite/30">
+                <p className="text-center text-[9px] mt-4 font-black uppercase tracking-[0.3em] text-[#293b64]/30">
                     SISTEMA BIOMÉTRICO VYTALIX
                 </p>
             </div>

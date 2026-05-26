@@ -21,6 +21,7 @@ const UniversalEntry = React.lazy(() => import('../pages/public/UniversalEntry')
 // ----------------------------------------------------------------------
 import LoginPage from '../pages/LoginPage';
 import HomePage from '../pages/HomePage';
+const WelcomePage = React.lazy(() => import('../pages/WelcomePage'));
 const PatientGuidePage = React.lazy(() => import('../pages/PatientGuidePage'));
 const ChatPage = React.lazy(() => import('../pages/ChatPage'));
 const AchievementsPage = React.lazy(() => import('../pages/AchievementsPage'));
@@ -54,6 +55,12 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     // Validación estricta: Si no hay sesión ni autenticación, expulsa al usuario al login
     if (!session && !isAuthenticated) {
         return <Navigate to="/acceso" replace />;
+    }
+
+    // Redirección Onboarding
+    // Si el usuario está autenticado, no completó el onboarding y no está ya en la ruta /welcome
+    if (session && (session as any).onboardingCompleted === false && window.location.pathname !== '/welcome') {
+        return <Navigate to="/welcome" replace />;
     }
 
     if (session && session.role && session.role !== 'PATIENT') {
@@ -111,7 +118,7 @@ const AppRouter: React.FC = () => {
                 {/* Rutas Públicas (Marketing / Funnel) */}
                 <Route path="/longevidad" element={<LandingPublica />} />
                 <Route path="/longevidad-tests" element={<TestsSelector />} />
-                <Route path="/welcome" element={<Navigate to="/acceso" replace />} />
+                <Route path="/welcome" element={<ProtectedRoute><WelcomePage /></ProtectedRoute>} />
                 <Route path="/test" element={<TestAntivejez />} />
                 <Route path="/agebot" element={<AgeBotFacial />} />
                 <Route path="/resultado" element={<ResultadoScore />} />

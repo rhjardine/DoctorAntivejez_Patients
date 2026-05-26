@@ -46,24 +46,24 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center text-center px-8 py-16 min-h-screen bg-vytalix-sand"
+            className="flex flex-col items-center text-center px-8 py-16 min-h-screen bg-[#f8fafc]"
         >
-            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-8 bg-vytalix-sage/10 border border-vytalix-sage/20">
-                <CheckCircle size={48} className="text-vytalix-sage" />
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-8 bg-[#14b8a6]/10 border border-[#14b8a6]/20">
+                <CheckCircle size={48} className="text-[#14b8a6]" />
             </div>
 
-            <h2 className="text-3xl font-black text-vytalix-graphite mb-4 tracking-tight">
+            <h2 className="text-3xl font-black text-[#293b64] mb-4 tracking-tight">
                 Instrucciones Generadas
             </h2>
 
             <div className="max-w-[320px] mb-12">
                 {tipo === 'basica' ? (
-                    <p className="text-[15px] leading-relaxed text-vytalix-graphite/60 font-medium">
-                        Tu solicitud para el <strong className="text-vytalix-graphite">Programa de Optimización</strong> ha sido procesada. Un especialista te contactará en <strong className="text-vytalix-terracotta uppercase tracking-widest text-[11px]">menos de 24 horas</strong>.
+                    <p className="text-[15px] leading-relaxed text-[#293b64]/60 font-medium">
+                        Tu solicitud para el <strong className="text-[#293b64]">Programa de Optimización</strong> ha sido procesada. Un especialista te contactará en <strong className="text-[#14b8a6] uppercase tracking-widest text-[11px]">menos de 24 horas</strong>.
                     </p>
                 ) : (
-                    <p className="text-[15px] leading-relaxed text-vytalix-graphite/60 font-medium">
-                        Tu <strong className="text-vytalix-graphite">Evaluación de Longevidad</strong> ha sido pre-agendada. Recibirás la confirmación técnica y el protocolo de preparación en WhatsApp.
+                    <p className="text-[15px] leading-relaxed text-[#293b64]/60 font-medium">
+                        Tu <strong className="text-[#293b64]">Evaluación de Longevidad</strong> ha sido pre-agendada. Recibirás la confirmación técnica y el protocolo de preparación en WhatsApp.
                     </p>
                 )}
             </div>
@@ -75,13 +75,13 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
                 </a>
 
                 <button onClick={() => navigate('/longevidad')}
-                    className="w-full py-5 bg-white text-vytalix-graphite border border-vytalix-graphite/10 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all hover:bg-vytalix-sand">
+                    className="w-full py-5 bg-white text-[#293b64] border border-[#293b64]/10 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all hover:bg-[#f8fafc]">
                     Finalizar Sesión
                 </button>
             </div>
 
             <div className="mt-auto pt-10">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-vytalix-graphite/20">VYTALIX Longevity Suite</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#293b64]/20">VYTALIX Longevity Suite</p>
             </div>
         </motion.div>
     );
@@ -161,38 +161,38 @@ const ConsultaExploratoriaPage: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen w-full flex flex-col items-center overflow-y-auto pb-20 bg-vytalix-sand">
+        <div className="min-h-screen w-full flex flex-col items-center overflow-y-auto pb-20 bg-[#f8fafc]">
             <div className="w-full max-w-[440px] px-6 pt-12">
 
                 {/* Header Section */}
                 <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10 text-center">
-                    <div className="inline-block px-4 py-1.5 rounded-full bg-vytalix-sage/10 border border-vytalix-sage/20 mb-6">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-vytalix-sage">
+                    <div className="inline-block px-4 py-1.5 rounded-full bg-[#14b8a6]/10 border border-[#14b8a6]/20 mb-6">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#14b8a6]">
                             Protocolo de Longevidad
                         </p>
                     </div>
-                    <h1 className="text-3xl font-black leading-tight text-vytalix-graphite tracking-tight mb-4">
+                    <h1 className="text-3xl font-black leading-tight text-[#293b64] tracking-tight mb-4">
                         {tipo === 'basica' ? 'Programa de Optimización' : 'Evaluación de Edad Celular Full'}
                     </h1>
-                    <p className="text-base font-medium text-vytalix-graphite/50 px-4">
+                    <p className="text-base font-medium text-[#293b64]/50 px-4">
                         {tipo === 'basica' ? 'Análisis estratégico · Virtual · Sin costo' : 'Evaluación biofísica con especialista · USD 49'}
                     </p>
                 </motion.div>
 
                 {/* Benefits Card */}
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
-                    className="bg-white rounded-[2rem] p-8 border border-vytalix-graphite/5 shadow-sm mb-8">
-                    <div className="flex items-center gap-3 mb-8 pb-4 border-b border-vytalix-graphite/5">
-                        <div className="p-2.5 bg-vytalix-sand rounded-xl">
-                            {tipo === 'basica' ? <Video size={18} className="text-vytalix-sage" /> : <ClipboardList size={18} className="text-vytalix-sage" />}
+                    className="bg-white rounded-[2rem] p-8 border border-[#293b64]/5 shadow-sm mb-8">
+                    <div className="flex items-center gap-3 mb-8 pb-4 border-b border-[#293b64]/5">
+                        <div className="p-2.5 bg-[#f8fafc] rounded-xl">
+                            {tipo === 'basica' ? <Video size={18} className="text-[#14b8a6]" /> : <ClipboardList size={18} className="text-[#14b8a6]" />}
                         </div>
-                        <p className="text-[12px] font-black uppercase tracking-widest text-vytalix-graphite">Inclusiones</p>
+                        <p className="text-[12px] font-black uppercase tracking-widest text-[#293b64]">Inclusiones</p>
                     </div>
                     <div className="space-y-6">
                         {BENEFITS[tipo].map((b, i) => (
                             <div key={i} className="flex items-start gap-4">
                                 <span className="text-lg leading-none shrink-0">{b.emoji}</span>
-                                <p className="text-[14px] font-medium leading-relaxed text-vytalix-graphite/70">{b.text}</p>
+                                <p className="text-[14px] font-medium leading-relaxed text-[#293b64]/70">{b.text}</p>
                             </div>
                         ))}
                     </div>
@@ -200,50 +200,50 @@ const ConsultaExploratoriaPage: React.FC = () => {
 
                 {/* Booking Form */}
                 <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                    onSubmit={handleSubmit} className="bg-white rounded-[2rem] p-8 border border-vytalix-graphite/5 shadow-sm mb-8 space-y-4">
+                    onSubmit={handleSubmit} className="bg-white rounded-[2rem] p-8 border border-[#293b64]/5 shadow-sm mb-8 space-y-4">
 
-                    <p className="text-[12px] font-black uppercase tracking-widest text-vytalix-graphite mb-2">Reserva Técnica</p>
+                    <p className="text-[12px] font-black uppercase tracking-widest text-[#293b64] mb-2">Reserva Técnica</p>
 
                     <div className="space-y-3">
                         <input name="name" type="text" placeholder="TU NOMBRE *" required value={form.name} onChange={handleFormChange}
-                            className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite placeholder:text-vytalix-graphite/20 focus:ring-1 focus:ring-vytalix-sage outline-none" />
+                            className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] placeholder:text-[#293b64]/20 focus:ring-1 focus:ring-[#14b8a6] outline-none" />
                         <input name="email" type="email" placeholder="TU@EMAIL.COM *" required value={form.email} onChange={handleFormChange}
-                            className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite placeholder:text-vytalix-graphite/20 focus:ring-1 focus:ring-vytalix-sage outline-none" />
+                            className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] placeholder:text-[#293b64]/20 focus:ring-1 focus:ring-[#14b8a6] outline-none" />
                         <input name="phone" type="tel" placeholder="WHATSAPP / TEL *" required value={form.phone} onChange={handleFormChange}
-                            className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite placeholder:text-vytalix-graphite/20 focus:ring-1 focus:ring-vytalix-sage outline-none" />
+                            className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] placeholder:text-[#293b64]/20 focus:ring-1 focus:ring-[#14b8a6] outline-none" />
                     </div>
 
                     <div className="relative">
                         <select name="country" value={form.country} onChange={handleFormChange}
-                            className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite appearance-none outline-none">
+                            className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] appearance-none outline-none">
                             {['Venezuela', 'Colombia', 'Panamá', 'EEUU', 'Otro'].map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
-                        <ArrowRight size={14} className="absolute right-5 top-1/2 -translate-y-1/2 rotate-90 text-vytalix-graphite/30" />
+                        <ArrowRight size={14} className="absolute right-5 top-1/2 -translate-y-1/2 rotate-90 text-[#293b64]/30" />
                     </div>
 
                     <div className="space-y-2 pt-2">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-vytalix-graphite/30 ml-1">Especialista Preferido</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-[#293b64]/30 ml-1">Especialista Preferido</p>
                         {!showSelector && preselectedDoc ? (
-                            <div className="flex items-center justify-between p-4 rounded-2xl bg-vytalix-sand/50 border border-vytalix-graphite/5">
+                            <div className="flex items-center justify-between p-4 rounded-2xl bg-[#f8fafc]/50 border border-[#293b64]/5">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-vytalix-graphite/5 overflow-hidden border-2 border-white shadow-sm">
-                                        {preselectedDoc.imageUrl ? <img src={preselectedDoc.imageUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center font-black text-xs text-vytalix-graphite/30">{preselectedDoc.name[0]}</div>}
+                                    <div className="w-10 h-10 rounded-full bg-[#293b64]/5 overflow-hidden border-2 border-white shadow-sm">
+                                        {preselectedDoc.imageUrl ? <img src={preselectedDoc.imageUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center font-black text-xs text-[#293b64]/30">{preselectedDoc.name[0]}</div>}
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[13px] font-black text-vytalix-graphite leading-none mb-1">{preselectedDoc.name}</span>
-                                        <span className="text-[10px] uppercase font-bold text-vytalix-graphite/40">{preselectedDoc.location}</span>
+                                        <span className="text-[13px] font-black text-[#293b64] leading-none mb-1">{preselectedDoc.name}</span>
+                                        <span className="text-[10px] uppercase font-bold text-[#293b64]/40">{preselectedDoc.location}</span>
                                     </div>
                                 </div>
-                                <button type="button" onClick={() => setShowSelector(true)} className="text-[10px] font-black uppercase text-vytalix-terracotta underline decoration-vytalix-terracotta/20 underline-offset-4">Cambiar</button>
+                                <button type="button" onClick={() => setShowSelector(true)} className="text-[10px] font-black uppercase text-[#14b8a6] underline decoration-[#14b8a6]/20 underline-offset-4">Cambiar</button>
                             </div>
                         ) : (
                             <div className="relative">
                                 <select name="doctorId" value={form.doctorId} onChange={handleFormChange}
-                                    className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite appearance-none outline-none">
+                                    className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] appearance-none outline-none">
                                     <option value="">Cualquier Especialista Disponible</option>
                                     {availableDoctors.map(doc => <option key={doc.id} value={doc.id}>{doc.name} ({doc.location.split(',')[0]})</option>)}
                                 </select>
-                                <ArrowRight size={14} className="absolute right-5 top-1/2 -translate-y-1/2 rotate-90 text-vytalix-graphite/30" />
+                                <ArrowRight size={14} className="absolute right-5 top-1/2 -translate-y-1/2 rotate-90 text-[#293b64]/30" />
                             </div>
                         )}
                     </div>
@@ -251,52 +251,52 @@ const ConsultaExploratoriaPage: React.FC = () => {
                     {/* Payment Section - High Security Feel */}
                     <AnimatePresence>
                         {tipo === 'profunda' && (
-                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-6 border-t border-vytalix-graphite/5 space-y-4 overflow-hidden">
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-6 border-t border-[#293b64]/5 space-y-4 overflow-hidden">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <Lock size={12} className="text-vytalix-sage" />
-                                    <p className="text-[11px] font-black uppercase tracking-widest text-vytalix-sage">Pasarela Segura (Pre-Autorización)</p>
+                                    <Lock size={12} className="text-[#14b8a6]" />
+                                    <p className="text-[11px] font-black uppercase tracking-widest text-[#14b8a6]">Pasarela Segura (Pre-Autorización)</p>
                                 </div>
 
-                                <div className="p-4 bg-vytalix-sage/5 rounded-2xl border border-vytalix-sage/10 mb-4">
-                                    <p className="text-[11px] font-medium leading-relaxed text-vytalix-graphite/70">
+                                <div className="p-4 bg-[#14b8a6]/5 rounded-2xl border border-[#14b8a6]/10 mb-4">
+                                    <p className="text-[11px] font-medium leading-relaxed text-[#293b64]/70">
                                         Coordinamos el pago de <strong>USD 49</strong> vía Zelle o transferencia una vez confirmada la cita. Introduce tus datos para pre-autorizar el protocolo.
                                     </p>
                                 </div>
 
                                 <input name="number" type="tel" placeholder="NÚMERO DE TARJETA" value={card.number} onChange={handleCardChange} maxLength={19}
-                                    className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite outline-none" />
+                                    className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] outline-none" />
                                 <div className="grid grid-cols-2 gap-4">
                                     <input name="expiry" type="text" placeholder="MM/AA" value={card.expiry} onChange={handleCardChange} maxLength={5}
-                                        className="bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite outline-none" />
+                                        className="bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] outline-none" />
                                     <input name="cvc" type="tel" placeholder="CVC" value={card.cvc} onChange={handleCardChange} maxLength={4}
-                                        className="bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite outline-none" />
+                                        className="bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] outline-none" />
                                 </div>
                                 <input name="holder" type="text" placeholder="TITULAR DE LA TARJETA" value={card.holder} onChange={handleCardChange}
-                                    className="w-full bg-vytalix-sand border-none rounded-2xl px-5 py-4 text-sm font-bold text-vytalix-graphite outline-none uppercase" />
+                                    className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] outline-none uppercase" />
                             </motion.div>
                         )}
                     </AnimatePresence>
 
                     {/* Submit Button */}
                     <button type="submit" disabled={!isFormValid || submitState === 'sending'}
-                        className="w-full py-5 mt-6 bg-vytalix-terracotta text-white font-black text-[15px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-vytalix-terracotta/20 transition-all active:scale-95 disabled:opacity-30">
+                        className="w-full py-5 mt-6 bg-[#14b8a6] text-white font-black text-[15px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[#14b8a6]/20 transition-all active:scale-95 disabled:opacity-30">
                         {submitState === 'sending' ? <Loader2 size={24} className="animate-spin mx-auto" /> :
                             tipo === 'profunda' ? 'Confirmar Evaluación (USD 49)' : 'Activar Mi Programa →'}
                     </button>
 
-                    <p className="text-center text-[10px] font-bold text-vytalix-graphite/30 uppercase tracking-widest mt-4">
+                    <p className="text-center text-[10px] font-bold text-[#293b64]/30 uppercase tracking-widest mt-4">
                         Cifrado de grado clínico SSL/AES-256
                     </p>
                 </motion.form>
 
                 <div className="text-center pb-8 flex flex-col items-center gap-6">
-                    <button onClick={() => navigate(-1)} className="text-[11px] font-black uppercase tracking-[0.2em] text-vytalix-graphite/40 hover:text-vytalix-graphite transition-colors">
+                    <button onClick={() => navigate(-1)} className="text-[11px] font-black uppercase tracking-[0.2em] text-[#293b64]/40 hover:text-[#293b64] transition-colors">
                         ← Ver mis resultados de vitalidad
                     </button>
 
-                    <div className="h-px w-20 bg-vytalix-graphite/10" />
+                    <div className="h-px w-20 bg-[#293b64]/10" />
 
-                    <button onClick={() => navigate('/login')} className="text-xs font-black text-vytalix-graphite/50 underline decoration-vytalix-graphite/20 underline-offset-4">
+                    <button onClick={() => navigate('/login')} className="text-xs font-black text-[#293b64]/50 underline decoration-[#293b64]/20 underline-offset-4">
                         Acceso Médico Autorizado →
                     </button>
                 </div>

@@ -19,13 +19,7 @@ export default {
                 darkBlue: "#293B64",
                 primary: "#23BCEF",
 
-                // Longevidad Orgánica (Organics & Earth)
-                vytalix: {
-                    sand: '#F8FAFC',
-                    terracotta: '#14B8A6',
-                    sage: '#14B8A6',
-                    graphite: '#293B64',
-                },
+
 
                 // Precisión Clínica (Scientific & Corporate)
                 clinical: {

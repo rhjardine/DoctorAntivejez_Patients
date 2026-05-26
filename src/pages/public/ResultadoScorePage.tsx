@@ -230,7 +230,7 @@ const ResultadoScorePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center overflow-y-auto pb-20 bg-vytalix-sand">
+    <div className="min-h-screen w-full flex flex-col items-center overflow-y-auto pb-20 bg-[#f8fafc]">
       <div className="w-full max-w-[420px] px-6 pt-12">
         {/* ── BLOQUE 1: Hero Score ── */}
         <motion.div
@@ -248,11 +248,11 @@ const ResultadoScorePage: React.FC = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
-                className="text-6xl font-black text-vytalix-graphite tracking-tighter leading-none"
+                className="text-6xl font-black text-[#293b64] tracking-tighter leading-none"
               >
                 {score}
               </motion.span>
-              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-vytalix-graphite/30 mt-2">
+              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-[#293b64]/30 mt-2">
                 SCORE VITAL
               </span>
             </div>
@@ -273,12 +273,12 @@ const ResultadoScorePage: React.FC = () => {
           </motion.div>
 
           {sessionStorage.getItem('da_result_source') === 'agebot' && (
-            <div className="mt-8 p-5 bg-white rounded-3xl border border-vytalix-terracotta/20 animate-pulse-subtle">
+            <div className="mt-8 p-5 bg-white rounded-3xl border border-[#14b8a6]/20 animate-pulse-subtle">
               <div className="flex items-start gap-4 mb-4">
-                <Info className="w-6 h-6 shrink-0 text-vytalix-terracotta" />
-                <p className="text-[13px] font-medium leading-relaxed text-vytalix-graphite/70">
+                <Info className="w-6 h-6 shrink-0 text-[#14b8a6]" />
+                <p className="text-[13px] font-medium leading-relaxed text-[#293b64]/70">
                   Este score es una{' '}
-                  <strong className="text-vytalix-terracotta">
+                  <strong className="text-[#14b8a6]">
                     estimación biométrica facial
                   </strong>
                   . Realiza el test clínico para precisión total.
@@ -286,7 +286,7 @@ const ResultadoScorePage: React.FC = () => {
               </div>
               <button
                 onClick={() => navigate('/test')}
-                className="w-full py-3 bg-vytalix-sand text-vytalix-terracotta font-black text-[11px] uppercase tracking-widest rounded-xl border border-vytalix-terracotta/30"
+                className="w-full py-3 bg-[#f8fafc] text-[#14b8a6] font-black text-[11px] uppercase tracking-widest rounded-xl border border-[#14b8a6]/30"
               >
                 Iniciar Test Completo →
               </button>
@@ -299,33 +299,33 @@ const ResultadoScorePage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-[2rem] p-8 border border-vytalix-graphite/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)] mb-8"
+          className="bg-white rounded-[2rem] p-8 border border-[#293b64]/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)] mb-8"
         >
           <div className="flex items-start gap-4 mb-6">
             <div className="shrink-0" style={{ color: hookConfig.color }}>
               {hookConfig.icon}
             </div>
             <div>
-              <p className="text-lg font-black leading-tight text-vytalix-graphite tracking-tight mb-2">
+              <p className="text-lg font-black leading-tight text-[#293b64] tracking-tight mb-2">
                 {hookConfig.title}
               </p>
               <span
-                className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-vytalix-sand border border-vytalix-graphite/5"
+                className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-[#f8fafc] border border-[#293b64]/5"
                 style={{ color: hookConfig.color }}
               >
                 {hookConfig.rangeBadge}
               </span>
             </div>
           </div>
-          <p className="text-[14px] leading-relaxed text-vytalix-graphite/60 mb-6 font-medium">
+          <p className="text-[14px] leading-relaxed text-[#293b64]/60 mb-6 font-medium">
             {hookConfig.context}
           </p>
-          <div className="p-4 bg-vytalix-sand/50 rounded-2xl border border-vytalix-graphite/5">
-            <p className="text-[13px] leading-relaxed text-vytalix-graphite font-semibold">
+          <div className="p-4 bg-[#f8fafc]/50 rounded-2xl border border-[#293b64]/5">
+            <p className="text-[13px] leading-relaxed text-[#293b64] font-semibold">
               {hookConfig.opportunity}
             </p>
           </div>
-          <div className="mt-8 pt-6 border-t border-vytalix-graphite/5">
+          <div className="mt-8 pt-6 border-t border-[#293b64]/5">
             <WellnessDisclaimer text="Este análisis es una estimación biológica. La edad celular real requiere evaluación clínica." />
           </div>
         </motion.div>
@@ -335,9 +335,9 @@ const ResultadoScorePage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="bg-white rounded-[2rem] p-8 border border-vytalix-graphite/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)] mb-8"
+          className="bg-white rounded-[2rem] p-8 border border-[#293b64]/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)] mb-8"
         >
-          <p className="text-[11px] font-black uppercase tracking-[0.25em] text-vytalix-sage mb-8">
+          <p className="text-[11px] font-black uppercase tracking-[0.25em] text-[#14b8a6] mb-8">
             Mapa de Biomarcadores
           </p>
           <div className="space-y-6">
@@ -347,7 +347,7 @@ const ResultadoScorePage: React.FC = () => {
               return (
                 <div key={d.key}>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-[13px] font-bold text-vytalix-graphite tracking-tight">
+                    <span className="text-[13px] font-bold text-[#293b64] tracking-tight">
                       {d.label}
                     </span>
                     <span
@@ -357,7 +357,7 @@ const ResultadoScorePage: React.FC = () => {
                       {val}%
                     </span>
                   </div>
-                  <div className="h-2 rounded-full bg-vytalix-sand overflow-hidden">
+                  <div className="h-2 rounded-full bg-[#f8fafc] overflow-hidden">
                     <motion.div
                       className="h-full rounded-full"
                       style={{ background: col }}
@@ -381,9 +381,9 @@ const ResultadoScorePage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="bg-vytalix-graphite text-white rounded-[2rem] p-8 shadow-xl shadow-vytalix-graphite/20 mb-10 overflow-hidden relative"
+          className="bg-[#293b64] text-white rounded-[2rem] p-8 shadow-xl shadow-[#293b64]/20 mb-10 overflow-hidden relative"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-vytalix-sage/20 blur-3xl -mr-16 -mt-16" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#14b8a6]/20 blur-3xl -mr-16 -mt-16" />
 
           <AnimatePresence mode="wait">
             {!alreadyCaptured && leadStatus !== 'sent' ? (
@@ -409,7 +409,7 @@ const ResultadoScorePage: React.FC = () => {
                     required
                     value={leadName}
                     onChange={(e) => setLeadName(e.target.value)}
-                    className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 text-xs font-black uppercase tracking-widest outline-none focus:border-vytalix-sage transition-all placeholder:text-white/30"
+                    className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 text-xs font-black uppercase tracking-widest outline-none focus:border-[#14b8a6] transition-all placeholder:text-white/30"
                   />
                   <input
                     type="email"
@@ -417,13 +417,13 @@ const ResultadoScorePage: React.FC = () => {
                     required
                     value={leadEmail}
                     onChange={(e) => setLeadEmail(e.target.value)}
-                    className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 text-xs font-black uppercase tracking-widest outline-none focus:border-vytalix-sage transition-all placeholder:text-white/30"
+                    className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 text-xs font-black uppercase tracking-widest outline-none focus:border-[#14b8a6] transition-all placeholder:text-white/30"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={leadStatus === 'sending'}
-                  className="w-full py-5 bg-vytalix-sage text-white font-black text-[13px] uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-vytalix-sage/20 transition-all active:scale-95 disabled:opacity-50"
+                  className="w-full py-5 bg-[#14b8a6] text-white font-black text-[13px] uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-[#14b8a6]/20 transition-all active:scale-95 disabled:opacity-50"
                 >
                   {leadStatus === 'sending' ? (
                     <Loader2 className="animate-spin mx-auto" />
@@ -441,7 +441,7 @@ const ResultadoScorePage: React.FC = () => {
               >
                 <CheckCircle
                   size={56}
-                  className="text-vytalix-sage mx-auto mb-6"
+                  className="text-[#14b8a6] mx-auto mb-6"
                 />
                 <p className="text-xl font-black mb-2 uppercase tracking-tighter">
                   Acceso Concedido
@@ -461,7 +461,7 @@ const ResultadoScorePage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col gap-4 mb-12"
           >
-            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-vytalix-graphite/40 text-center mb-2">
+            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-[#293b64]/40 text-center mb-2">
               SIGUIENTE PASO CLÍNICO
             </p>
 
@@ -469,22 +469,22 @@ const ResultadoScorePage: React.FC = () => {
               onClick={() => setSelectedTier('basica')}
               className={`w-full text-left p-6 rounded-[2rem] transition-all border-2 ${
                 selectedTier === 'basica'
-                  ? 'border-vytalix-sage bg-vytalix-sage/5'
-                  : 'border-vytalix-graphite/5 bg-white'
+                  ? 'border-[#14b8a6] bg-[#14b8a6]/5'
+                  : 'border-[#293b64]/5 bg-white'
               }`}
             >
               <div className="flex justify-between items-center mb-4">
-                <span className="text-[9px] font-black uppercase px-2 py-1 rounded bg-vytalix-sand text-vytalix-graphite/40 tracking-widest">
+                <span className="text-[9px] font-black uppercase px-2 py-1 rounded bg-[#f8fafc] text-[#293b64]/40 tracking-widest">
                   Inversión: $0
                 </span>
                 {selectedTier === 'basica' && (
-                  <CheckCircle className="text-vytalix-sage" size={20} />
+                  <CheckCircle className="text-[#14b8a6]" size={20} />
                 )}
               </div>
-              <p className="text-base font-black text-vytalix-graphite tracking-tight">
+              <p className="text-base font-black text-[#293b64] tracking-tight">
                 Review de Optimización
               </p>
-              <p className="text-xs mt-1 text-vytalix-graphite/50 font-medium leading-relaxed">
+              <p className="text-xs mt-1 text-[#293b64]/50 font-medium leading-relaxed">
                 Definición de tus 2 prioridades críticas con nuestro equipo
                 médico.
               </p>
@@ -497,7 +497,7 @@ const ResultadoScorePage: React.FC = () => {
                     e.stopPropagation();
                     navigate('/consulta?tipo=basica');
                   }}
-                  className="w-full mt-6 py-4 bg-vytalix-sage text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-md"
+                  className="w-full mt-6 py-4 bg-[#14b8a6] text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-md"
                 >
                   Agendar Sesión →
                 </motion.button>
@@ -508,25 +508,25 @@ const ResultadoScorePage: React.FC = () => {
               onClick={() => setSelectedTier('profunda')}
               className={`w-full text-left p-6 rounded-[2rem] transition-all border-2 relative overflow-hidden ${
                 selectedTier === 'profunda'
-                  ? 'border-vytalix-terracotta bg-vytalix-terracotta/5'
-                  : 'border-vytalix-graphite/5 bg-white'
+                  ? 'border-[#14b8a6] bg-[#14b8a6]/5'
+                  : 'border-[#293b64]/5 bg-white'
               }`}
             >
-              <div className="absolute top-0 right-0 py-1 px-4 bg-vytalix-terracotta text-white text-[8px] font-black uppercase tracking-[0.3em] rounded-bl-xl">
+              <div className="absolute top-0 right-0 py-1 px-4 bg-[#14b8a6] text-white text-[8px] font-black uppercase tracking-[0.3em] rounded-bl-xl">
                 Protocolo Full
               </div>
               <div className="flex justify-between items-center mb-4">
-                <span className="text-[9px] font-black uppercase px-2 py-1 rounded bg-vytalix-terracotta/10 text-vytalix-terracotta tracking-widest">
+                <span className="text-[9px] font-black uppercase px-2 py-1 rounded bg-[#14b8a6]/10 text-[#14b8a6] tracking-widest">
                   Vytalix Premium
                 </span>
                 {selectedTier === 'profunda' && (
-                  <CheckCircle className="text-vytalix-terracotta" size={20} />
+                  <CheckCircle className="text-[#14b8a6]" size={20} />
                 )}
               </div>
-              <p className="text-base font-black text-vytalix-graphite tracking-tight">
+              <p className="text-base font-black text-[#293b64] tracking-tight">
                 Evaluación de Edad Celular
               </p>
-              <p className="text-xs mt-1 text-vytalix-graphite/50 font-medium leading-relaxed">
+              <p className="text-xs mt-1 text-[#293b64]/50 font-medium leading-relaxed">
                 Evaluación biofísica multimodal + Plan maestro de longevidad.
               </p>
 
@@ -538,7 +538,7 @@ const ResultadoScorePage: React.FC = () => {
                     e.stopPropagation();
                     navigate('/consulta?tipo=profunda');
                   }}
-                  className="w-full mt-6 py-4 bg-vytalix-terracotta text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-md"
+                  className="w-full mt-6 py-4 bg-[#14b8a6] text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-md"
                 >
                   Comenzar Programa →
                 </motion.button>
@@ -548,12 +548,12 @@ const ResultadoScorePage: React.FC = () => {
         )}
 
         <div className="text-center pb-12">
-          <p className="text-[10px] font-semibold text-vytalix-graphite/30 uppercase tracking-[0.4em] mb-4">
+          <p className="text-[10px] font-semibold text-[#293b64]/30 uppercase tracking-[0.4em] mb-4">
             VYTALIX Longevity Suite
           </p>
           <button
             onClick={() => navigate('/login')}
-            className="text-xs font-black uppercase tracking-widest text-vytalix-graphite/50 underline decoration-vytalix-graphite/10"
+            className="text-xs font-black uppercase tracking-widest text-[#293b64]/50 underline decoration-[#293b64]/10"
           >
             Portal Médico →
           </button>
