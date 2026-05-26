@@ -109,7 +109,7 @@ const HomePage: React.FC = () => {
                 <div className="flex justify-center gap-12 w-full px-4">
                     <div onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
-                            percentage={is5A ? 75 : 25}
+                            percentage={adherence}
                             label={is5A ? "Alimentación" : "Remoción"}
                             icon={is5A ? getIcon('NUTRITION') : <Trash2 size={18} />}
                             color={COLORS.PrimaryBlue}
@@ -118,7 +118,7 @@ const HomePage: React.FC = () => {
                     </div>
                     <div onClick={() => is5A ? navigate('/activity') : navigate('/restoration')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
-                            percentage={is5A ? 40 : 35}
+                            percentage={adherence}
                             label={is5A ? "Actividad" : "Restauración"}
                             icon={is5A ? getIcon('ACTIVITY') : <RefreshCw size={18} />}
                             color={COLORS.PrimaryBlue}
@@ -145,7 +145,7 @@ const HomePage: React.FC = () => {
                 <div className={`flex justify-center w-full py-2 ${is5A ? 'gap-4' : 'gap-12'}`}>
                     <div onClick={() => is5A ? navigate('/attitude') : null /* Regeneración */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
-                            percentage={is5A ? 60 : 40}
+                            percentage={adherence}
                             label={is5A ? "Actitud" : "Regeneración"}
                             icon={is5A ? getIcon('ATTITUDE') : <Activity size={18} />}
                             color={COLORS.PrimaryBlue}
@@ -154,7 +154,7 @@ const HomePage: React.FC = () => {
                     </div>
                     <div onClick={() => is5A ? navigate('/environment') : null /* Revitalización */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
-                            percentage={is5A ? 30 : 60}
+                            percentage={adherence}
                             label={is5A ? "Ambiente" : "Revitalización"}
                             icon={is5A ? getIcon('ENVIRONMENT') : <Flame size={18} />}
                             color={COLORS.PrimaryBlue}
@@ -165,7 +165,7 @@ const HomePage: React.FC = () => {
                     {is5A && (
                         <div onClick={() => navigate('/rest')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                             <CircularProgress
-                                percentage={55}
+                                percentage={0}
                                 label="Asueto"
                                 icon={getIcon('REST') || <Bed size={18} />}
                                 color={COLORS.PrimaryBlue}
