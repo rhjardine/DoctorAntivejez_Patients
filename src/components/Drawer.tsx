@@ -21,18 +21,11 @@ interface DrawerProps {
 const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }) => {
   const navigate = useNavigate();
   const { logout, session } = useAuthStore();
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const { notificationsEnabled, enableNotifications, disableNotifications } = notificationControls;
   const { t } = useLocale();
 
   const handleNavigation = (path: string) => {
     navigate(path);
-    onClose();
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
     onClose();
   };
 
@@ -166,33 +159,23 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
             </span>
           </a>
 
-          {/* Cerrar Sesión (siempre activo) */}
-          <button onClick={() => setShowLogoutConfirm(true)} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-red-50 transition-all text-accentRed group">
-            <LogOut size={22} className="group-hover:text-red-600" />
-            <span className="font-black text-[13px] uppercase tracking-widest">Cerrar Sesión</span>
-          </button>
-
-
-          <div className="mt-auto mb-10 px-8 text-center">
+          <div className="mt-auto mb-4 px-8 text-center">
             <p className="text-[10px] font-black text-gray-300 tracking-[0.3em] uppercase">Rejuvenate v2.0</p>
           </div>
 
-          {showLogoutConfirm && (
-            <div className="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-8 animate-in fade-in">
-              <div className="flex flex-col items-center text-center">
-                <div className="bg-red-50 p-6 rounded-[2rem] mb-6">
-                  <AlertCircle size={48} className="text-accentRed" />
-                </div>
-                <h3 className="text-2xl font-black text-darkBlue uppercase tracking-tighter">¿Cerrar Sesión?</h3>
-                <p className="text-sm text-textMedium mt-3 font-bold">Perderás la conexión con tu doctor hasta que vuelvas a ingresar.</p>
-
-                <div className="flex flex-col w-full gap-3 mt-8">
-                  <button onClick={() => setShowLogoutConfirm(false)} className="py-4 rounded-2xl bg-darkBlue text-white text-sm font-black uppercase tracking-widest">Volver</button>
-                  <button onClick={handleLogout} className="py-4 rounded-2xl border-2 border-accentRed text-accentRed text-sm font-black uppercase tracking-widest">Salir</button>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Botón de Logout: Ubicado al final del contenedor del Drawer */}
+          <div className="p-4 border-t border-slate-100 mt-auto">
+            <button
+              onClick={() => {
+                logout();
+                onClose();
+              }}
+              className="w-full flex items-center gap-3 p-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-semibold"
+            >
+              <LogOut size={20} />
+              <span>Cerrar Sesión</span>
+            </button>
+          </div>
         </div>
       </div>
     </>
