@@ -26,22 +26,22 @@ const BioAgeAlert: React.FC<BioAgeAlertProps> = ({ bioAge, chronoAge, onAction }
               <AlertTriangle size={20} strokeWidth={2.5} />
             </div>
             <h3 className="text-lg font-black text-darkBlue uppercase tracking-tighter leading-none">
-              Regeneration Opportunity Detected!
+              ¡Oportunidad de Regeneración Detectada!
             </h3>
           </div>
 
           <div className="space-y-4">
             <p className="text-[13px] font-bold text-darkBlue leading-relaxed">
-              Your Biophysical Test indicates that your Biological Age <span className="text-amber-600">({bioAge})</span> is currently higher than your Chronological Age <span className="text-slate-400">({chronoAge})</span>. 
+              Tu prueba biofísica indica que tu Edad Biológica <span className="text-amber-600">({bioAge})</span> es actualmente mayor que tu Edad Cronológica <span className="text-slate-400">({chronoAge})</span>. 
               <br /><br />
-              This <span className="bg-amber-200 px-1.5 rounded-md">+ {gap} year gap</span> is a signal that your cells need support. The good news is: through your Patient Guide and Nutrigenomic Plan, you have the validated tools to reverse this marker. Every action you take today counts toward your rejuvenation!
+              Esta <span className="bg-amber-200 px-1.5 rounded-md">+ {gap} años</span> de brecha indica que tus células necesitan apoyo. La buena noticia: a través de tu Guía del Paciente y Plan Nutrigenómico, tienes las herramientas validadas para revertir este marcador. ¡Cada acción de hoy cuenta hacia tu rejuvenecimiento!
             </p>
 
             <button 
               onClick={onAction}
               className="w-full bg-darkBlue text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.15em] shadow-lg shadow-darkBlue/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
             >
-              View Today's Mission
+              Ver Misión de Hoy
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </button>
 
