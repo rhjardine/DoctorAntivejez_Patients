@@ -79,17 +79,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete }) => {
                     className="bg-white rounded-[28px] mx-6 w-full max-w-[340px] overflow-hidden shadow-2xl"
                     style={{ boxShadow: '0 32px 80px rgba(0,0,0,0.4)' }}
                 >
-                    {/* Skip button */}
-                    {step < slides.length - 1 && (
-                        <button
-                            onClick={handleSkip}
-                            className="absolute top-4 right-4 z-10 text-slate-400 hover:text-slate-600 p-1.5 bg-slate-50 rounded-full"
-                            style={{ position: 'absolute', top: 'calc(50% - 180px)', right: 'calc(50% - 170px)' }}
-                        >
-                            <X size={16} />
-                        </button>
-                    )}
-
                     <div className="p-8 flex flex-col items-center text-center relative">
                         {/* Skip button positioned correctly */}
                         {step < slides.length - 1 && (
