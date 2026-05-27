@@ -82,7 +82,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     // The apiClient 401 interceptor handles mid-session JWT expiration.
     // This guard catches fully stale sessions (e.g., user returns after 24+ h).
     if (session && isSessionExpired(session.lastLoginAt)) {
-        logout();
+        void logout();
         return <Navigate to="/acceso" replace />;
     }
 
@@ -102,7 +102,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
                         Acceso denegado. Utilice el portal médico web.
                     </p>
                     <button 
-                        onClick={() => logout()}
+                    onClick={async () => { await logout(); }}
                         className="mt-4 w-full bg-cyan-500 text-[#0f172a] py-3 rounded-xl font-bold active:scale-95 transition-all"
                     >
                         Cerrar Sesión

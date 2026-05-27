@@ -59,9 +59,10 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         warningMs: 5 * 60 * 1000,
         onWarning: () => setShowTimeoutWarning(true),
         onTimeout: () => {
-            logout();
-            navigate('/acceso');
-            setShowTimeoutWarning(false);
+            void logout().then(() => {
+                navigate('/acceso');
+                setShowTimeoutWarning(false);
+            });
         },
         enabled: !!session
     });
@@ -122,7 +123,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const isHome = location.pathname === '/';
     const isDetailView = !isHome && !['/chat', '/achievements', '/store'].includes(location.pathname);
 
-    const handleLogout = () => { logout(); navigate('/login'); };
+    const handleLogout = async () => { await logout(); navigate('/acceso'); };
     const handleRefresh = async () => {
         setIsRefreshing(true);
         forceRefresh();

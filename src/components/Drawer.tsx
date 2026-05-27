@@ -185,8 +185,8 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
                     Volver
                   </button>
                   <button
-                    onClick={() => {
-                      logout();
+                    onClick={async () => {
+                      await logout();
                       onClose();
                       setShowLogoutConfirm(false);
                     }}

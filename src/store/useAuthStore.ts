@@ -14,7 +14,7 @@ interface AuthState {
   token: string | null;
 
   login: (identification: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   checkSession: () => void;
 }
 
@@ -42,20 +42,26 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: () => {
-        authService.logout();
+      logout: async () => {
+        // STEP 1 — Zero Zustand in-memory state immediately.
+        // Must happen FIRST to prevent re-hydration from reading a stale session
+        // before the storage keys below are removed.
+        set({ session: null, isAuthenticated: false, token: null });
 
-        // Limpiar stores de perfil DIRECTAMENTE sin importarlos
+        // STEP 2 — Atomically destroy all persisted state from localStorage.
+        // 'auth-storage' is the Zustand persist key for THIS store — removing it
+        // prevents the persist middleware from reloading the dead session on the
+        // next event loop tick.
+        localStorage.removeItem('auth-storage');
         localStorage.removeItem('rejuvenate_profile_v1');
         localStorage.removeItem('profile-storage');
         localStorage.removeItem('vytalix-funnel-v2');
         sessionStorage.clear();
 
-        set({
-          session: null,
-          isAuthenticated: false,
-          token: null,
-        });
+        // STEP 3 — Run tokenStore clear + backend-side logout last.
+        // authService.logout() is currently synchronous but awaited for
+        // forward-compatibility if it ever becomes async.
+        await authService.logout();
       },
 
       checkSession: () => {
