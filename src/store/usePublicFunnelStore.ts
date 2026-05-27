@@ -93,15 +93,21 @@ export const usePublicFunnelStore = create<PublicFunnelState>()(
         {
             name: 'da_funnel_v1',
             storage: createJSONStorage(() => localStorage),
-            // Only persist non-sensitive funnel metadata — NOT phone, name (PII not needed after session)
-            partialize: (state) => ({
-                leadEmail: state.leadEmail,
-                testScore: state.testScore,
-                testCategory: state.testCategory,
-                testDimensiones: state.testDimensiones,
-                testCompletedAt: state.testCompletedAt,
-                currentStep: state.currentStep,
-            }),
+            // PCI-DSS / PHI ISOLATION: Use destructuring exclusion so that any future
+            // addition of cardData, creditCard, rawSymptoms, or similar sensitive fields
+            // is NEVER silently persisted to localStorage.
+            // Only non-sensitive funnel progression data is stored.
+            partialize: (state) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { cardData, creditCard, rawSymptoms, leadName, leadPhone, leadCountry, setLead, setTestResult, setAgeBotResult, setCurrentStep, setBookingType, resetFunnel, ...safeState } = state as any;
+                return {
+                    testScore: safeState.testScore,
+                    testCategory: safeState.testCategory,
+                    testDimensiones: safeState.testDimensiones,
+                    testCompletedAt: safeState.testCompletedAt,
+                    currentStep: safeState.currentStep,
+                };
+            },
         }
     )
 );
