@@ -84,7 +84,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigateToTeam, onNavigateToGui
       {/* Legal Footer */}
       <div className="text-center pt-8 pb-12 opacity-40 flex flex-col items-center gap-3">
         <p className="text-[9px] font-black text-darkBlue uppercase tracking-[0.3em]">
-          DOCTOR ANTIVEJEZ © 2024
+          DOCTOR ANTIVEJEZ © {new Date().getFullYear()}
         </p>
         <p className="text-[10px] font-black tracking-[0.2em] text-primary/60">
           Vytalix.io

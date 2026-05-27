@@ -38,16 +38,21 @@ export class CryptoConfigError extends Error {
 class CryptoService {
     private key: CryptoKey | null = null;
     private initializationPromise: Promise<void> | null = null;
+    private isInitialized = false;
 
     constructor() {
-        this.initializationPromise = this.init();
     }
 
     /**
      * Inicializa el servicio derivando la llave de encriptación.
      */
-    async init() {
-        // ── SEED VALIDATION (runs in ALL environments — no degraded mode) ────────
+    async init(): Promise<void> {
+        if (this.isInitialized) return;
+        if (this.initializationPromise) return this.initializationPromise;
+
+        this.initializationPromise = (async () => {
+            try {
+                // ── SEED VALIDATION (runs in ALL environments — no degraded mode) ────────
         // Placed BEFORE the try block so CryptoConfigError propagates directly
         // to the caller without being caught and re-wrapped by the crypto catch below.
 
@@ -140,7 +145,16 @@ class CryptoService {
             logger.error('Failed to initialize crypto service', error);
             throw new Error('Encryption service failure');
         }
-    }
+
+        this.isInitialized = true;
+      } catch (error) {
+        this.initializationPromise = null;
+        throw error;
+      }
+    })();
+
+    return this.initializationPromise;
+  }
 
     /**
      * Asegura que el servicio esté inicializado antes de usarlo.

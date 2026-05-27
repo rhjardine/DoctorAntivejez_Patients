@@ -67,33 +67,26 @@ async function main() {
   // This guarantees the key is ready before any Zustand persist read is attempted
   try {
     await cryptoService.init();
+    // Proceder a montar la aplicación normalmente
   } catch (error: any) {
-    // Typed catch: CryptoConfigError signals a misconfigured encryption seed.
-    // Fails loudly in ALL environments — there is no degraded mode.
-    if (error instanceof CryptoConfigError) {
-      logger.error('[Boot] Crypto configuration invalid — halting application boot', {
-        errorName: error.name,
-        errorMessage: error.message,
-      });
-      const root = createRoot(container);
+    console.error("Fallo crítico en la inicialización del motor criptográfico:", error);
+    
+    if (import.meta.env.PROD || error instanceof CryptoConfigError) {
+      const rootElement = document.getElementById('root')!;
+      const root = createRoot(rootElement);
       root.render(
-        <div style={{
-          height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: '#F8FAFC', color: '#1E293B', fontFamily: 'system-ui', padding: '20px', textAlign: 'center'
-        }}>
-          <div style={{ maxWidth: '400px' }}>
-            <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔐</div>
-            <h1 style={{ fontSize: '20px', fontWeight: 'bold' }}>Error de configuración de seguridad</h1>
-            <p style={{ marginTop: '10px', color: '#64748B', lineHeight: '1.5' }}>
-              Contacte al administrador del sistema para verificar las variables de entorno (SEED).
-            </p>
+        <div className="flex h-screen items-center justify-center bg-white text-[#293b64] p-6 text-center">
+          <div className="max-w-md bg-slate-50 p-8 rounded-3xl border border-red-100 shadow-sm">
+            <span className="text-4xl mb-4 block">🔒</span>
+            <h1 className="text-xl font-bold mb-2">Error de Configuración de Seguridad</h1>
+            <p className="text-sm text-slate-500">No se pudo establecer la conexión segura de datos. Por favor, contacte al administrador o recargue la aplicación.</p>
           </div>
         </div>
       );
-      return; // STOP BOOT
+      return; // Detener el arranque
     }
 
-    // For other failures (e.g. FingerprintJS or WebCrypto unavailable), continue boot.
+    // For other failures in DEV, continue boot.
     // The profile store will re-fetch fresh data from the network on next mount.
     logger.error('[Boot] Crypto init failed — profile will re-fetch from network', { error });
   }
