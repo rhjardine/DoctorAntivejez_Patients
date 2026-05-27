@@ -60,7 +60,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         onWarning: () => setShowTimeoutWarning(true),
         onTimeout: () => {
             logout();
-            navigate('/login');
+            navigate('/acceso');
             setShowTimeoutWarning(false);
         },
         enabled: !!session
