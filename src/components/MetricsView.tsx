@@ -60,6 +60,12 @@ const MetricsView: React.FC<MetricsViewProps> = ({ onInfoPress }) => {
   const latestAdherence = adherenceData.length > 0 ? adherenceData[adherenceData.length - 1].value : 0;
   const currentBioAge = bioAgeData.length > 0 ? bioAgeData[bioAgeData.length - 1].value : 0;
 
+  // Derive trend text from actual data — null if insufficient history
+  const adherenceTrend = adherenceData.length >= 2
+    ? adherenceData[adherenceData.length - 1].value -
+      adherenceData[adherenceData.length - 2].value
+    : null;
+
   return (
     <div className="flex flex-col gap-6 px-4 py-6 pb-32 overflow-y-auto no-scrollbar animate-in fade-in duration-500">
       
@@ -79,7 +85,13 @@ const MetricsView: React.FC<MetricsViewProps> = ({ onInfoPress }) => {
           <div className="flex items-baseline gap-1">
             <span className="text-3xl font-black text-darkBlue">{latestAdherence}%</span>
           </div>
-          <p className="text-[10px] font-bold text-accentGreen mt-1">+5% vs mes anterior</p>
+          {adherenceTrend !== null && (
+            <p className={`text-[10px] font-bold mt-1 ${
+              adherenceTrend >= 0 ? 'text-accentGreen' : 'text-accentRed'
+            }`}>
+              {adherenceTrend >= 0 ? '+' : ''}{adherenceTrend}% vs período anterior
+            </p>
+          )}
         </div>
 
         <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100 relative overflow-hidden group">
@@ -97,7 +109,9 @@ const MetricsView: React.FC<MetricsViewProps> = ({ onInfoPress }) => {
             <span className="text-3xl font-black text-darkBlue">{currentBioAge.toFixed(1)}</span>
             <span className="text-[10px] font-bold text-textMedium">años</span>
           </div>
-          <p className="text-[10px] font-bold text-primary mt-1">Rejuvenecimiento activo</p>
+          {currentBioAge > 0 && (
+            <p className="text-[10px] font-bold text-primary mt-1">Rejuvenecimiento activo</p>
+          )}
         </div>
       </div>
 
