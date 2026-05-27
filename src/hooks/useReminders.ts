@@ -54,6 +54,9 @@ export const useReminders = (items: PatientProtocol[]) => {
     if (!notificationsEnabled || permission !== 'granted') return;
 
     const checkTimeAndNotify = () => {
+      // Only fire from the active tab to prevent duplicates across tabs
+      if (document.visibilityState !== 'visible') return;
+
       const now = new Date();
       const currentHour = now.getHours();
       const todayStr = now.toISOString().split('T')[0];
@@ -109,8 +112,12 @@ export const useReminders = (items: PatientProtocol[]) => {
     // Check immediately on mount, then every minute
     checkTimeAndNotify();
     const interval = setInterval(checkTimeAndNotify, 60000); // 1 minute
+    document.addEventListener('visibilitychange', checkTimeAndNotify);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', checkTimeAndNotify);
+    };
   }, [notificationsEnabled, permission, items]);
 
   // Test function for UI
