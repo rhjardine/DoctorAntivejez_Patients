@@ -143,16 +143,26 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <PrivacyConsentModal isOpen={isPrivacyConsentOpen} onAccept={(() => { togglePrivacyConsent(false); }) as any} />
 
             {showHeaderFooter && (
-                <header className="bg-[#293b64]/85 backdrop-blur-md border-b border-white/5 text-white pt-safe-top z-30 shadow-sm shrink-0">
-                    <div className="flex items-center justify-between px-6 py-3.5">
+                <header className="bg-[#001334] border-b border-white/5 text-white pt-safe-top z-30 shadow-sm shrink-0 relative overflow-hidden">
+                    {/* Glowing background effect */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(35,188,239,0.12)_0%,transparent_70%)] pointer-events-none" />
+                    
+                    <div className="relative flex items-center justify-between px-6 h-20 z-10">
                         {isDetailView ? (
-                            <button onClick={() => navigate(-1)} className="p-1"><ChevronLeft size={28} /></button>
+                            <button onClick={() => navigate(-1)} className="p-1 hover:text-primary transition-colors"><ChevronLeft size={28} /></button>
                         ) : (
-                            <button onClick={() => toggleDrawer(true)} className="p-1"><Menu size={28} /></button>
+                            <button onClick={() => toggleDrawer(true)} className="p-1 hover:text-primary transition-colors"><Menu size={28} /></button>
                         )}
-                        <div className="flex items-center justify-center">
-                            <img src="/logoadn.png.jpeg" alt="Doctor Antivejez" className="h-12 w-auto object-contain" />
+                        
+                        {/* Perfect centering with absolute positioning and enlarged logo */}
+                        <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                            <img 
+                                src="/logoadn.png.jpeg" 
+                                alt="Doctor Antivejez" 
+                                className="h-16 w-auto object-contain transition-all duration-300 hover:scale-[1.05]" 
+                            />
                         </div>
+                        
                         <div className="flex items-center gap-2">
                             <button onClick={handleRefresh} className={`p-1 text-white/70 hover:text-white transition-all ${isRefreshing ? 'animate-spin' : ''}`} disabled={isRefreshing}>
                                 <RefreshCw size={18} />
