@@ -10,6 +10,7 @@ interface FoodScannerModalProps {
 const FoodScannerModal: React.FC<FoodScannerModalProps> = ({ onClose }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const activeStreamRef = useRef<MediaStream | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -24,6 +25,7 @@ const FoodScannerModal: React.FC<FoodScannerModalProps> = ({ onClose }) => {
           video: { facingMode: 'environment' } 
         });
         setStream(mediaStream);
+        activeStreamRef.current = mediaStream;
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
         }
@@ -38,8 +40,12 @@ const FoodScannerModal: React.FC<FoodScannerModalProps> = ({ onClose }) => {
     }
 
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      if (activeStreamRef.current) {
+        activeStreamRef.current.getTracks().forEach(track => {
+          track.stop();
+          console.log("[Escáner] Apagando sensor de cámara física:", track.label);
+        });
+        activeStreamRef.current = null;
       }
     };
   }, [capturedImage]);

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const BiomicsPage: React.FC = () => {
     const navigate = useNavigate();
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const animationIdRef = useRef<number | null>(null);
     const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
 
     // Particle animation logic
@@ -65,7 +66,6 @@ const BiomicsPage: React.FC = () => {
             particles.push(new Particle());
         }
 
-        let animationFrameId: number;
         const animate = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -78,7 +78,7 @@ const BiomicsPage: React.FC = () => {
                 particle.update();
                 particle.draw();
             });
-            animationFrameId = requestAnimationFrame(animate);
+            animationIdRef.current = requestAnimationFrame(animate);
         };
 
         animate();
@@ -90,7 +90,9 @@ const BiomicsPage: React.FC = () => {
 
         window.addEventListener('resize', handleResize);
         return () => {
-            cancelAnimationFrame(animationFrameId);
+            if (animationIdRef.current) {
+                cancelAnimationFrame(animationIdRef.current);
+            }
             window.removeEventListener('resize', handleResize);
         };
     }, []);
