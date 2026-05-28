@@ -150,14 +150,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         ) : (
                             <button onClick={() => toggleDrawer(true)} className="p-1"><Menu size={28} /></button>
                         )}
-                        <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center">
-                                <Dna size={18} className="text-primary" />
-                            </div>
-                            <div className="flex flex-col">
-                                <h1 className="text-[10px] font-black tracking-widest uppercase leading-none">Doctor</h1>
-                                <h1 className="text-sm font-black text-primary tracking-tighter uppercase leading-none">Antivejez</h1>
-                            </div>
+                        <div className="flex items-center justify-center">
+                            <img src="/logoadn.png.jpeg" alt="Doctor Antivejez" className="h-8 w-auto object-contain rounded-sm" />
                         </div>
                         <div className="flex items-center gap-2">
                             <button onClick={handleRefresh} className={`p-1 text-white/70 hover:text-white transition-all ${isRefreshing ? 'animate-spin' : ''}`} disabled={isRefreshing}>
