@@ -21,14 +21,16 @@ const UniversalEntry = React.lazy(() => import('../pages/public/UniversalEntry')
 // ----------------------------------------------------------------------
 import LoginPage from '../pages/LoginPage';
 import HomePage from '../pages/HomePage';
+import FeatureGateView from '../components/FeatureGateView';
 const WelcomePage = React.lazy(() => import('../pages/WelcomePage'));
 const PatientGuidePage = React.lazy(() => import('../pages/PatientGuidePage'));
 const ChatPage = React.lazy(() => import('../pages/ChatPage'));
-const AchievementsPage = React.lazy(() => import('../pages/AchievementsPage'));
+// Gated — re-enable when feature is production-ready:
+const AchievementsPage = React.lazy(() => import('../pages/AchievementsPage'));   // keep
 const StorePage = React.lazy(() => import('../pages/StorePage'));
 const SettingsPage = React.lazy(() => import('../pages/SettingsPage'));
 const BiometricsPage = React.lazy(() => import('../pages/BiometricsPage'));
-const BiomicsPage = React.lazy(() => import('../pages/BiomicsPage'));
+const BiomicsPage = React.lazy(() => import('../pages/BiomicsPage'));              // keep
 
 // ----------------------------------------------------------------------
 // 3. VISTAS DE DETALLE (Componentes Privados)
@@ -43,7 +45,7 @@ const RestorationView = React.lazy(() => import('../components/Therapies/Restora
 const AboutView = React.lazy(() => import('../components/AboutView'));
 const MedicalTeamView = React.lazy(() => import('../components/MedicalTeamView'));
 const UsageGuideView = React.lazy(() => import('../components/UsageGuideView'));
-const ConsultationHistoryView = React.lazy(() => import('../components/ConsultationHistoryView'));
+const ConsultationHistoryView = React.lazy(() => import('../components/ConsultationHistoryView')); // keep
 const BioPaseView = React.lazy(() => import('../components/BioPaseView'));
 
 // ----------------------------------------------------------------------
@@ -158,10 +160,24 @@ const AppRouter: React.FC = () => {
                 <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
                 <Route path="/guide" element={<ProtectedRoute><PatientGuidePage /></ProtectedRoute>} />
                 <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-                <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
+                <Route path="/achievements" element={
+                  <ProtectedRoute>
+                    <FeatureGateView
+                      featureName="Centro de Logros"
+                      description="Tu sistema de logros, insignias y puntos Omics estará disponible próximamente."
+                    />
+                  </ProtectedRoute>
+                } />
                 <Route path="/store" element={<ProtectedRoute><StorePage /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-                <Route path="/biomics" element={<ProtectedRoute><BiomicsPage /></ProtectedRoute>} />
+                <Route path="/biomics" element={
+                  <ProtectedRoute>
+                    <FeatureGateView
+                      featureName="Explorador Ómico"
+                      description="El análisis de tus biomarcadores epigenéticos estará disponible en la próxima fase."
+                    />
+                  </ProtectedRoute>
+                } />
                 <Route path="/biometrics" element={<ProtectedRoute><BiometricsPage /></ProtectedRoute>} />
 
                 {/* Rutas Privadas de Detalle */}
@@ -175,7 +191,14 @@ const AppRouter: React.FC = () => {
                 <Route path="/about" element={<ProtectedRoute><AboutView onNavigateToTeam={() => navigate('/team')} onNavigateToGuide={() => navigate('/usage-guide')} /></ProtectedRoute>} />
                 <Route path="/team" element={<ProtectedRoute><MedicalTeamView /></ProtectedRoute>} />
                 <Route path="/usage-guide" element={<ProtectedRoute><UsageGuideView /></ProtectedRoute>} />
-                <Route path="/history" element={<ProtectedRoute><ConsultationHistoryView onBack={() => navigate(-1)} onInfoPress={() => toggleClinicalInfo(true)} /></ProtectedRoute>} />
+                <Route path="/history" element={
+                  <ProtectedRoute>
+                    <FeatureGateView
+                      featureName="Historial Clínico"
+                      description="Tu historial de consultas y evolución de biomarcadores estará disponible próximamente."
+                    />
+                  </ProtectedRoute>
+                } />
                 <Route path="/biopase" element={<ProtectedRoute><BioPaseView patientId={session?.id || ''} onRefresh={async () => { }} onBack={() => navigate(-1)} /></ProtectedRoute>} />
 
                 {/* Fallback 404 */}

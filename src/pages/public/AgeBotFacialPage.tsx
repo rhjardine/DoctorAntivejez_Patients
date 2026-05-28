@@ -31,16 +31,25 @@ async function analyzeFacialAge(imageBase64: string): Promise<FacialResult> {
         clearTimeout(timeoutId);
 
         if (response.ok) return await response.json();
-        throw new Error('API not available');
+        throw new Error(`API error: ${response.status}`);
+
     } catch (error) {
-        console.warn('[AgeBot] API timeout o error, usando mock simulado:', error);
-        // Mock result while backend endpoint is implemented
-        await new Promise(r => setTimeout(r, 1500)); // Simulate processing time
-        return {
-            estimatedAge: Math.floor(35 + Math.random() * 25),
-            confidence: 0.72 + Math.random() * 0.2,
-            analysisPoints: 22 + Math.floor(Math.random() * 8),
-        };
+        // In development only: use mock to allow testing without backend
+        if (import.meta.env.DEV) {
+            console.warn('[AgeBot][DEV] API unavailable, using mock result:', error);
+            await new Promise(r => setTimeout(r, 1500));
+            return {
+                estimatedAge: Math.floor(35 + Math.random() * 25),
+                confidence: 0.72 + Math.random() * 0.2,
+                analysisPoints: 22 + Math.floor(Math.random() * 8),
+            };
+        }
+
+        // In production: surface the error honestly — do not fabricate results
+        throw new Error(
+            'El análisis no está disponible en este momento. ' +
+            'Por favor intenta de nuevo en unos minutos.'
+        );
     }
 }
 
@@ -232,8 +241,12 @@ const AgeBotFacialPage: React.FC = () => {
             const r = await analyzeFacialAge(base64);
             setResult(r);
             setPhase('result');
-        } catch {
-            setErrorMsg('No se pudo analizar la imagen. Asegúrate de que tu rostro sea visible.');
+        } catch (err) {
+            setErrorMsg(
+                err instanceof Error
+                    ? err.message
+                    : 'No se pudo analizar la imagen. Intenta de nuevo.'
+            );
             setPhase('error');
         }
     };
@@ -560,6 +573,15 @@ const AgeBotFacialPage: React.FC = () => {
                             <button onClick={reset}
                                 className="px-10 py-4 bg-[#293b64] text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-[#293b64]/20 active:scale-95 transition-all">
                                 Intentar de nuevo
+                            </button>
+                            {/* Secondary action: text-based test as fallback when camera analysis unavailable */}
+                            <button
+                                onClick={() => navigate('/test')}
+                                className="mt-3 text-sm font-bold text-white/60
+                                           underline decoration-white/20 underline-offset-4
+                                           hover:text-white transition-colors"
+                            >
+                                Usar el Test de Vitalidad en su lugar →
                             </button>
                         </motion.div>
                     )}

@@ -74,28 +74,17 @@ export const fetchMetrics = async (type: 'BIO_AGE' | 'ADHERENCE'): Promise<Metri
 };
 
 export const fetchConsultationHistory = async (): Promise<ConsultationRecord[]> => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
   const user = authService.getCurrentUser();
-  return [
-    {
-      consultationId: "BETA-001",
-      patientId: user?.id || "",
-      date: new Date().toLocaleDateString('es-VE', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }),
-      doctorName: "Dr. Juan Carlos Méndez",
-      doctorNotes: "Consulta Beta v1.0. Protocolo 4R activado. " +
-        "Se inicia seguimiento de biomarcadores y adherencia " +
-        "al plan nutrigenómico personalizado. Próxima evaluación " +
-        "en 30 días para ajuste de guía clínica.",
-      adherenceRate: 0,
-      biologicalAgeAtTime: 0,
-      chronologicalAgeAtTime: 0,
-      treatmentSnapshot: []
-    }
-  ];
+  if (!user) throw new Error("No hay sesión activa");
+
+  try {
+    const response = await apiClient.get(`/patients/${user.id}/consultations`);
+    return response.data ?? [];
+  } catch {
+    // Endpoint not yet available in Beta — return empty, not fabricated data
+    logger.warn('fetchConsultationHistory: endpoint not available, returning empty');
+    return [];
+  }
 };
 
 // Fix: Add missing properties 'dietTypes' and 'updatedAt' to satisfy the NutrigenomicPlan interface
