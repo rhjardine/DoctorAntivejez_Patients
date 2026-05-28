@@ -19,6 +19,7 @@ const VCoachChat: React.FC = () => {
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -30,18 +31,24 @@ const VCoachChat: React.FC = () => {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || cooldown) return;
+
+    const finalInput = input.trim().substring(0, 400);
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      text: input,
+      text: finalInput,
       timestamp: new Date().toISOString()
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    
+    // Rate Limiting P2: Bloqueo de 3 segundos mínimo
+    setCooldown(true);
+    setTimeout(() => setCooldown(false), 3000);
 
     try {
       // 1. Construir chatHistory mapeando roles y partes
@@ -51,7 +58,7 @@ const VCoachChat: React.FC = () => {
       }));
 
       // 2. Llamar al servicio real
-      const responseText = await sendMessageToVCoach(input, chatHistory);
+      const responseText = await sendMessageToVCoach(finalInput, chatHistory);
 
       // 3. Crear mensaje del bot
       const botMessage: ChatMessage = {
@@ -140,16 +147,17 @@ const VCoachChat: React.FC = () => {
           <input
             type="text"
             value={input}
+            maxLength={400}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Pregunta a tu VCoach..."
+            placeholder={cooldown && !isLoading ? "Espera unos segundos..." : "Pregunta a tu VCoach..."}
             className="flex-1 bg-transparent border-none focus:ring-0 outline-none text-sm font-medium text-textDark px-2 py-2"
-            disabled={isLoading}
+            disabled={isLoading || cooldown}
           />
           <button
             onClick={handleSend}
-            disabled={!input.trim() || isLoading}
-            className={`p-3 rounded-full transition-all ${input.trim() ? 'bg-primary text-white shadow-lg scale-105' : 'bg-gray-200 text-gray-400'
+            disabled={!input.trim() || isLoading || cooldown}
+            className={`p-3 rounded-full transition-all ${input.trim() && !isLoading && !cooldown ? 'bg-primary text-white shadow-lg scale-105' : 'bg-gray-200 text-gray-400'
               }`}
           >
             <Send size={18} strokeWidth={2.5} />
