@@ -157,9 +157,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         {/* Perfect centering with absolute positioning and enlarged logo */}
                         <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center">
                             <img 
-                                src="/logoadn.png.jpeg" 
+                                src="/logoadn.jpeg" 
                                 alt="Doctor Antivejez" 
-                                className="h-16 w-auto object-contain transition-all duration-300 hover:scale-[1.05]" 
+                                className="h-[76px] w-auto object-contain transition-all duration-300 hover:scale-[1.05]" 
                             />
                         </div>
                         
