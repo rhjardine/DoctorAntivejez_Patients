@@ -143,7 +143,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <PrivacyConsentModal isOpen={isPrivacyConsentOpen} onAccept={(() => { togglePrivacyConsent(false); }) as any} />
 
             {showHeaderFooter && (
-                <header className="bg-[var(--dark-navy)] text-white pt-safe-top z-30 shadow-sm shrink-0">
+                <header className="bg-[#293b64]/85 backdrop-blur-md border-b border-white/5 text-white pt-safe-top z-30 shadow-sm shrink-0">
                     <div className="flex items-center justify-between px-6 py-3.5">
                         {isDetailView ? (
                             <button onClick={() => navigate(-1)} className="p-1"><ChevronLeft size={28} /></button>
@@ -151,7 +151,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             <button onClick={() => toggleDrawer(true)} className="p-1"><Menu size={28} /></button>
                         )}
                         <div className="flex items-center justify-center">
-                            <img src="/logoadn.png.jpeg" alt="Doctor Antivejez" className="h-8 w-auto object-contain rounded-sm" />
+                            <img src="/logoadn.png.jpeg" alt="Doctor Antivejez" className="h-12 w-auto object-contain" />
                         </div>
                         <div className="flex items-center gap-2">
                             <button onClick={handleRefresh} className={`p-1 text-white/70 hover:text-white transition-all ${isRefreshing ? 'animate-spin' : ''}`} disabled={isRefreshing}>
