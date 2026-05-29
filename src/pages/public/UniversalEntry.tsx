@@ -112,10 +112,10 @@ const UniversalEntry: React.FC = () => {
             id='access-btn-paciente'
             onClick={() => handleSelection('paciente', '/login')}
             disabled={isLoading}
-            className={`w-full flex items-center gap-4 py-4 px-6 rounded-2xl border border-sky-300 bg-white bg-opacity-10 hover:bg-opacity-20 text-white font-bold text-left transition-all duration-200 transform active:scale-[0.98] focus:outline-none ${
+            className={`w-full flex items-center gap-4 py-4 px-6 rounded-2xl bg-gradient-to-r from-[rgb(26,37,60)] to-[rgb(41,59,100)] text-white font-bold text-left border-2 transition-all duration-200 transform active:scale-[0.98] focus:outline-none shadow-md ${
               selectedRole === 'paciente'
-                ? 'ring-2 ring-white'
-                : 'hover:ring-2 hover:ring-white'
+                ? 'border-white'
+                : 'border-transparent hover:border-white focus:border-white'
             } ${isLoading && selectedRole !== 'paciente' ? 'opacity-60 cursor-not-allowed' : ''}`}
           >
             {/* Direct white User icon with no rounded background wrapper */}
@@ -135,9 +135,14 @@ const UniversalEntry: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <p className='absolute bottom-6 text-[10px] font-bold uppercase tracking-widest' style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
-          DOCTOR ANTIVEJEZ © 2026
-        </p>
+        <div className='absolute bottom-6 flex flex-col items-center gap-1.5 text-center w-full z-10'>
+          <p className='text-[10px] font-bold text-white uppercase tracking-widest'>
+            DOCTOR ANTIVEJEZ © 2026
+          </p>
+          <p className='text-[9px] font-bold text-white uppercase tracking-widest'>
+            VITALYX - INFRAESTRUCTURA CLINICA INTELIGENTE
+          </p>
+        </div>
       </div>
     </div>
   );
