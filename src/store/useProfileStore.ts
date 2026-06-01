@@ -28,8 +28,28 @@ interface ProfileState {
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+let pendingWrites = 0;
+const memoryBuffer = new Map<string, string>();
+
+const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    if (pendingWrites > 0) {
+        e.preventDefault();
+        e.returnValue = 'Tus datos médicos se están encriptando. ¿Seguro que deseas salir y arriesgarte a perder los cambios?';
+        return e.returnValue;
+    }
+};
+
+if (typeof window !== 'undefined') {
+    window.addEventListener('beforeunload', handleBeforeUnload);
+}
+
 const encryptedStorage: StateStorage = {
     getItem: async (name: string) => {
+        // Return from in-memory buffer if available (synchronous-like read for Zustand)
+        if (memoryBuffer.has(name)) {
+            return memoryBuffer.get(name)!;
+        }
+
         try {
             const raw = localStorage.getItem(name);
 
@@ -64,7 +84,10 @@ const encryptedStorage: StateStorage = {
                 localStorage.removeItem(name);
                 return null;
             }
-            return JSON.stringify(decrypted);
+            
+            const stringified = JSON.stringify(decrypted);
+            memoryBuffer.set(name, stringified);
+            return stringified;
 
         } catch (e) {
             // AES-GCM can fail in degraded security contexts (some Android browsers)
@@ -74,14 +97,23 @@ const encryptedStorage: StateStorage = {
         }
     },
     setItem: async (name: string, value: string) => {
+        // Update buffer synchronously so Zustand gets the latest data immediately
+        memoryBuffer.set(name, value);
+        pendingWrites++;
+        
         try {
             const encrypted = await cryptoService.encrypt(JSON.parse(value));
             localStorage.setItem(name, encrypted);
         } catch (e) {
             console.error('[encryptedStorage] Encrypt failed', e);
+        } finally {
+            pendingWrites = Math.max(0, pendingWrites - 1);
         }
     },
-    removeItem: (name: string) => localStorage.removeItem(name),
+    removeItem: (name: string) => {
+        memoryBuffer.delete(name);
+        localStorage.removeItem(name);
+    },
 };
 
 export const useProfileStore = create<ProfileState>()(

@@ -103,7 +103,7 @@ const AgeBotFacialPage: React.FC = () => {
 
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const streamRef = useRef<MediaStream | null>(null);
+    const activeStreamRef = useRef<MediaStream | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [phase, setPhase] = useState<Phase>('capture');
@@ -120,7 +120,7 @@ const AgeBotFacialPage: React.FC = () => {
 
     /* ─── FIX 2: WebRTC — Robust camera initialization para Redmi ──────────────────── */
     const startCamera = useCallback(async () => {
-        if (streamRef.current) return;
+        if (activeStreamRef.current) return;
         setIsCameraLoading(true);
         setCameraActive(false);
 
@@ -138,7 +138,7 @@ const AgeBotFacialPage: React.FC = () => {
                 });
             }
 
-            streamRef.current = mediaStream;
+            activeStreamRef.current = mediaStream;
 
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
@@ -180,11 +180,35 @@ const AgeBotFacialPage: React.FC = () => {
     useEffect(() => {
         if (phase !== 'capture') return;
         return () => {
-            streamRef.current?.getTracks().forEach(t => t.stop());
-            streamRef.current = null;
+            if (activeStreamRef.current) {
+                activeStreamRef.current.getTracks().forEach(track => {
+                    track.stop();
+                    console.log(`[Hardware] Sensor de cámara apagado forzosamente: ${track.label}`);
+                });
+                activeStreamRef.current = null;
+            }
             setCameraActive(false);
         };
     }, [phase]);
+
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'hidden' && activeStreamRef.current) {
+                activeStreamRef.current.getTracks().forEach(track => {
+                    track.stop();
+                    console.log(`[Hardware] Sensor de cámara apagado forzosamente: ${track.label}`);
+                });
+                activeStreamRef.current = null;
+                setCameraActive(false);
+                setCameraRequested(false);
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
 
     /* ─── FIX 3: Capture with Relaxed ReadyState para Redmi ─────────────────── */
     const capturePhoto = () => {
@@ -215,8 +239,10 @@ const AgeBotFacialPage: React.FC = () => {
 
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-        streamRef.current?.getTracks().forEach(t => t.stop());
-        streamRef.current = null;
+        if (activeStreamRef.current) {
+            activeStreamRef.current.getTracks().forEach(t => t.stop());
+            activeStreamRef.current = null;
+        }
         setCameraActive(false);
 
         processImage(dataUrl);
@@ -227,8 +253,10 @@ const AgeBotFacialPage: React.FC = () => {
         if (!file) return;
         const reader = new FileReader();
         reader.onloadend = () => {
-            streamRef.current?.getTracks().forEach(t => t.stop());
-            streamRef.current = null;
+            if (activeStreamRef.current) {
+                activeStreamRef.current.getTracks().forEach(t => t.stop());
+                activeStreamRef.current = null;
+            }
             processImage(reader.result as string);
         };
         reader.readAsDataURL(file);
@@ -258,8 +286,10 @@ const AgeBotFacialPage: React.FC = () => {
         setCameraError(false);
         setCameraActive(false);
         setCameraRequested(false);
-        streamRef.current?.getTracks().forEach(t => t.stop());
-        streamRef.current = null;
+        if (activeStreamRef.current) {
+            activeStreamRef.current.getTracks().forEach(t => t.stop());
+            activeStreamRef.current = null;
+        }
         setPhase('capture');
     };
 
@@ -305,7 +335,10 @@ const AgeBotFacialPage: React.FC = () => {
             <div className="bg-white/80 backdrop-blur-md px-4 py-4 flex items-center gap-4 border-b border-slate-100 z-20 sticky top-0 shadow-sm">
                 <button
                     onClick={() => {
-                        if (streamRef.current) streamRef.current.getTracks().forEach(track => track.stop());
+                        if (activeStreamRef.current) {
+                            activeStreamRef.current.getTracks().forEach(track => track.stop());
+                            activeStreamRef.current = null;
+                        }
                         navigate('/longevidad'); // Regresa limpio a la landing
                     }}
                     className="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-xl text-[#293b64] active:scale-95 transition-transform"

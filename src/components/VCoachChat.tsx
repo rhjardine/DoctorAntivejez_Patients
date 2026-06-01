@@ -21,6 +21,7 @@ const VCoachChat: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [cooldown, setCooldown] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const cooldownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -29,6 +30,14 @@ const VCoachChat: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    return () => {
+      if (cooldownTimeoutRef.current) {
+        clearTimeout(cooldownTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading || cooldown) return;
@@ -45,10 +54,6 @@ const VCoachChat: React.FC = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
-    
-    // Rate Limiting P2: Bloqueo de 3 segundos mínimo
-    setCooldown(true);
-    setTimeout(() => setCooldown(false), 3000);
 
     try {
       // 1. Construir chatHistory mapeando roles y partes
@@ -80,6 +85,13 @@ const VCoachChat: React.FC = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setCooldown(true);
+      if (cooldownTimeoutRef.current) {
+        clearTimeout(cooldownTimeoutRef.current);
+      }
+      cooldownTimeoutRef.current = setTimeout(() => {
+        setCooldown(false);
+      }, 3000);
     }
   };
 
@@ -150,7 +162,7 @@ const VCoachChat: React.FC = () => {
             maxLength={400}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder={cooldown && !isLoading ? "Espera unos segundos..." : "Pregunta a tu VCoach..."}
+            placeholder={cooldown ? 'Procesando bio-asistencia... por favor espere.' : 'Pregunta a tu VCoach...'}
             className="flex-1 bg-transparent border-none focus:ring-0 outline-none text-sm font-medium text-textDark px-2 py-2"
             disabled={isLoading || cooldown}
           />
