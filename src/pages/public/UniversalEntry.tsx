@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, UserPlus } from 'lucide-react';
 
@@ -6,6 +6,16 @@ const UniversalEntry: React.FC = () => {
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Pre-warming para mitigar el cold start en Render.com
+  useEffect(() => {
+    fetch('https://doctor-antivejez-web.onrender.com/api-render/ping', {
+      mode: 'no-cors',
+      priority: 'low',
+    } as RequestInit).catch(() => {
+      // Ignorar fallos silenciosamente, es solo un ping
+    });
+  }, []);
 
   const handleSelection = (role: 'paciente' | 'invitado', route: string) => {
     if (isLoading) return;

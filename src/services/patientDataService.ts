@@ -87,18 +87,31 @@ export const fetchConsultationHistory = async (): Promise<ConsultationRecord[]> 
   }
 };
 
-// Fix: Add missing properties 'dietTypes' and 'updatedAt' to satisfy the NutrigenomicPlan interface
+// Fix: Refactored to try real API and fallback to mock safely
 export const fetchNutrigenomicPlan = async (): Promise<NutrigenomicPlan> => {
-  return {
-    bloodType: 'O',
-    dietTypes: ['METABOLIC'],
-    forbidden: ['Trigo', 'Cerdo', 'Azúcar refinada'],
-    foods: [
-      { id: '1', name: 'Creps de yuca', category: 'Carbohidratos', mealTypes: ['BREAKFAST'] },
-      { id: '2', name: 'Huevos orgánicos', category: 'Proteína', mealTypes: ['BREAKFAST'] }
-    ],
-    updatedAt: new Date().toISOString()
-  };
+  const user = authService.getCurrentUser();
+  if (!user) throw new Error("No hay sesión activa");
+
+  try {
+    const response = await apiClient.get(`/patients/${user.id}/nutrition-plan`);
+    return {
+      ...response.data,
+      isDemoTemplate: false
+    };
+  } catch (error) {
+    logger.warn('fetchNutrigenomicPlan: API call failed or not configured, returning demo template');
+    return {
+      bloodType: 'O',
+      dietTypes: ['METABOLIC'],
+      forbidden: ['Trigo', 'Cerdo', 'Azúcar refinada'],
+      foods: [
+        { id: '1', name: 'Creps de yuca', category: 'Carbohidratos', mealTypes: ['BREAKFAST'] },
+        { id: '2', name: 'Huevos orgánicos', category: 'Proteína', mealTypes: ['BREAKFAST'] }
+      ],
+      updatedAt: new Date().toISOString(),
+      isDemoTemplate: true
+    };
+  }
 };
 
 export const toggleGuideItemCompletion = async (itemId: string, status: 'pending' | 'completed'): Promise<boolean> => {

@@ -101,6 +101,7 @@ export interface NutrigenomicPlan {
   forbidden: string[];
   foods: NutrigenomicFood[];
   updatedAt: string;
+  isDemoTemplate?: boolean;
 }
 
 export interface UserPreferences {

@@ -575,5 +575,6 @@ export const buildNutrigenomicPlan = (
       alimentacion.enviadaAt ||
       alimentacion.updatedAt ||
       new Date().toISOString(),
+    isDemoTemplate: false,
   };
 };

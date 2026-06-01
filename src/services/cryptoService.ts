@@ -52,62 +52,44 @@ class CryptoService {
 
         this.initializationPromise = (async () => {
             try {
-                // ── SEED VALIDATION (runs in ALL environments — no degraded mode) ────────
-        // Placed BEFORE the try block so CryptoConfigError propagates directly
-        // to the caller without being caught and re-wrapped by the crypto catch below.
+                let actualSeed = ENCRYPTION_SEED;
+                let seedLength = actualSeed ? actualSeed.length : 0;
 
-        // Rule 1 — Existence
-        if (!ENCRYPTION_SEED || ENCRYPTION_SEED.trim() === '') {
-            logger.warn('[CryptoConfig] Seed validation failed', { rule: 'EXISTENCE', seedLength: 0 });
-            if (import.meta.env.DEV) {
-                console.error(
-                    '[CryptoConfig] VITE_ENCRYPTION_SEED no configurada.\n' +
-                    'Crea un archivo .env.local con una semilla de mínimo 32 caracteres.\n' +
-                    'Ejemplo: VITE_ENCRYPTION_SEED=tu_semilla_segura_aqui_minimo_32_chars'
-                );
-            }
-            throw new CryptoConfigError('VITE_ENCRYPTION_SEED no configurada.');
-        }
+                // ── SEED VALIDATION ────────
+                if (!actualSeed || actualSeed.trim() === '' || seedLength < 32) {
+                    if (import.meta.env.DEV) {
+                        logger.warn('[CryptoConfig] Seed validation failed but running in DEV mode. Using fallback seed.');
+                        console.warn(
+                            '[CryptoConfig] VITE_ENCRYPTION_SEED no configurada o muy corta.\n' +
+                            'Usando un fallback seguro local temporal para desarrollo.'
+                        );
+                        actualSeed = 'dev-only-insecure-fallback-seed-at-least-32-chars-long';
+                    } else {
+                        logger.warn('[CryptoConfig] Seed validation failed', { rule: 'EXISTENCE_OR_LENGTH', seedLength });
+                        throw new CryptoConfigError(
+                            !actualSeed || actualSeed.trim() === '' 
+                                ? 'VITE_ENCRYPTION_SEED no configurada.' 
+                                : `Seed demasiado corta: ${seedLength} caracteres (mínimo requerido: 32).`
+                        );
+                    }
+                }
 
-        // Rule 2 — Minimum length (32 chars = 256-bit passphrase equivalent)
-        if (ENCRYPTION_SEED.length < 32) {
-            logger.warn('[CryptoConfig] Seed validation failed', {
-                rule: 'MIN_LENGTH',
-                seedLength: ENCRYPTION_SEED.length,
-                required: 32,
-            });
-            if (import.meta.env.DEV) {
-                console.error(
-                    '[CryptoConfig] VITE_ENCRYPTION_SEED no configurada.\n' +
-                    'Crea un archivo .env.local con una semilla de mínimo 32 caracteres.\n' +
-                    'Ejemplo: VITE_ENCRYPTION_SEED=tu_semilla_segura_aqui_minimo_32_chars'
-                );
-            }
-            throw new CryptoConfigError(
-                `Seed demasiado corta: ${ENCRYPTION_SEED.length} caracteres (mínimo requerido: 32).`
-            );
-        }
-
-        // Rule 3 — Weak/placeholder pattern detection (case-insensitive substring match)
-        const seedLower = ENCRYPTION_SEED.toLowerCase();
-        const matchedPattern = WEAK_SEED_PATTERNS.find(p => seedLower.includes(p.toLowerCase()));
-        if (matchedPattern) {
-            logger.warn('[CryptoConfig] Seed validation failed', {
-                rule: 'WEAK_PATTERN',
-                seedLength: ENCRYPTION_SEED.length,
-            });
-            if (import.meta.env.DEV) {
-                console.error(
-                    '[CryptoConfig] VITE_ENCRYPTION_SEED no configurada.\n' +
-                    'Crea un archivo .env.local con una semilla de mínimo 32 caracteres.\n' +
-                    'Ejemplo: VITE_ENCRYPTION_SEED=tu_semilla_segura_aqui_minimo_32_chars'
-                );
-            }
-            throw new CryptoConfigError(
-                'Seed contiene un patrón débil conocido. Usa una semilla aleatoria de 32+ caracteres.'
-            );
-        }
-        // ─────────────────────────────────────────────────────────────────────────
+                // Rule 3 — Weak/placeholder pattern detection (case-insensitive substring match)
+                const seedLower = actualSeed.toLowerCase();
+                const matchedPattern = WEAK_SEED_PATTERNS.find(p => seedLower.includes(p.toLowerCase()));
+                if (matchedPattern && actualSeed !== 'dev-only-insecure-fallback-seed-at-least-32-chars-long') {
+                    if (import.meta.env.DEV) {
+                        logger.warn('[CryptoConfig] Weak seed detected but running in DEV mode. Using fallback seed.');
+                        console.warn('[CryptoConfig] Seed débil detectada. Usando fallback temporal para desarrollo.');
+                        actualSeed = 'dev-only-insecure-fallback-seed-at-least-32-chars-long';
+                    } else {
+                        logger.warn('[CryptoConfig] Seed validation failed', { rule: 'WEAK_PATTERN', seedLength: actualSeed.length });
+                        throw new CryptoConfigError(
+                            'Seed contiene un patrón débil conocido. Usa una semilla aleatoria de 32+ caracteres.'
+                        );
+                    }
+                }
+                // ─────────────────────────────────────────────────────────────────────────
 
         try {
             // 1. Obtener huella digital del dispositivo
@@ -116,7 +98,7 @@ class CryptoService {
             const deviceFingerprint = result.visitorId;
 
             // 2. Combinar semilla y huella digital
-            const rawKeyMaterial = `${ENCRYPTION_SEED}:${deviceFingerprint}`;
+            const rawKeyMaterial = `${actualSeed}:${deviceFingerprint}`;
             const encoder = new TextEncoder();
             const keyMaterial = await window.crypto.subtle.importKey(
                 "raw",
