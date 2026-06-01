@@ -2,7 +2,15 @@ import axios from 'axios';
 import { tokenStore } from './tokenStore';
 import { logger } from '../utils/logger';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com';
+const getApiUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (import.meta.env.PROD && !envUrl) {
+    throw new Error('Critical Initialization Error: VITE_API_URL is required in production environment.');
+  }
+  return envUrl || '';
+};
+
+const API_URL = getApiUrl();
 
 export const apiClient = axios.create({
     baseURL: import.meta.env.DEV ? '/api-render/api' : `${API_URL}/api`,

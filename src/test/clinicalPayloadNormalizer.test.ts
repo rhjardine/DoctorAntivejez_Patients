@@ -105,4 +105,24 @@ describe('clinicalPayloadNormalizer', () => {
     expect(plan?.forbidden).toContain('Azúcar refinada');
     expect(plan?.dietTypes).toContain('METABOLIC');
   });
+
+  it('asigna un ID prefijado con UNSTABLE_HASH_ si falta el ID en el backend', () => {
+    const profile = {
+      guides: [
+        {
+          createdAt: '2026-05-01T10:00:00.000Z',
+          selections: {
+            REMOVAL_PHASE: [
+              {
+                nombre: 'Aceite de ricino',
+              },
+            ],
+          },
+        },
+      ],
+    };
+    const items = normalizePatientProtocol(profile);
+    expect(items[0].id).toBeDefined();
+    expect(items[0].id.startsWith('UNSTABLE_HASH_')).toBe(true);
+  });
 });

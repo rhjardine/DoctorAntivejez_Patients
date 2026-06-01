@@ -6,7 +6,15 @@ import { ProtocolService } from './protocolService';
 import { tokenStore } from './tokenStore';
 
 // ✅ SECURITY: URL centralizada via variable de entorno
-const API_URL = import.meta.env.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com';
+const getApiUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (import.meta.env.PROD && !envUrl) {
+    throw new Error('Critical Initialization Error: VITE_API_URL is required in production environment.');
+  }
+  return envUrl || '';
+};
+
+const API_URL = getApiUrl();
 
 const SESSION_KEY = 'rejuvenate_session_v1';
 

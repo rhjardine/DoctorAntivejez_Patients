@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import { authService } from '../services/authService';
+import { ProtocolService } from '../services/protocolService';
 
 const server = setupServer(
     http.post('*/mobile-auth-v1', async ({ request }) => {
@@ -63,5 +64,10 @@ describe('authService', () => {
         localStorage.setItem('rejuvenate_session_v1', JSON.stringify(mockSession));
         const user = authService.getCurrentUser();
         expect(user!.id).toBe('p1');
+    });
+
+    it('updateItemStatus retorna false y no hace llamadas de red si el itemId es inestable', async () => {
+        const result = await ProtocolService.updateItemStatus('p1', 'UNSTABLE_HASH_guide_123', 'completed');
+        expect(result).toBe(false);
     });
 });

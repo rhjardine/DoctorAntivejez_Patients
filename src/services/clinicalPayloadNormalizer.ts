@@ -127,7 +127,7 @@ const stableId = (category: string, index: number, item: RawRecord): string => {
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1)
     hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
-  return `guide_${Math.abs(hash)}`;
+  return 'UNSTABLE_HASH_guide_' + Math.abs(hash);
 };
 
 const normalizeProtocolItem = (

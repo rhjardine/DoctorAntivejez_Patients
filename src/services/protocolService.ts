@@ -108,6 +108,11 @@ export const ProtocolService = {
       setToSession(PROTOCOL_CACHE_KEY, updated);
     }
 
+    if (itemId.startsWith('UNSTABLE_HASH_')) {
+      console.warn('[ProtocolService] Cancelado: itemId inestable. El contrato de datos del microservicio está incompleto.');
+      return false;
+    }
+
     try {
       // Intentar sincronizar con backend
       // Si el endpoint no existe aún, falla silenciosamente (local-first)
