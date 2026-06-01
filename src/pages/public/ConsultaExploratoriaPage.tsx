@@ -1,12 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     CheckCircle, Lock, Loader2, Info, MessageCircle,
-    Video, ClipboardList, ArrowRight
+    Video, ClipboardList, ArrowRight, AlertCircle
 } from 'lucide-react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 import { MEDICAL_NETWORK } from '../../data/medicalNetwork';
+
+/* ─── Stripe Initialization (singleton — lives outside component tree) ───
+ * loadStripe is called once at module scope to avoid re-creating the Stripe
+ * object on every render. If the publishable key is absent we set stripePromise
+ * to null; the UI will render a degraded payment warning instead of crashing. */
+const STRIPE_PK = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
+const stripePromise = STRIPE_PK ? loadStripe(STRIPE_PK) : null;
 
 const WHATSAPP_NUMBER = '18296440000'; // TODO: set real number
 
@@ -34,6 +43,21 @@ const BENEFITS: Record<ConsultaType, { emoji: string; text: string }[]> = {
         { emoji: '⭐', text: 'Plan maestro de salud y longevidad.' },
         { emoji: '🎯', text: 'Monitoreo continuo y ajustes personalizados.' },
     ],
+};
+
+/* ─── Stripe CardElement visual options ─────────────────────────────── */
+const CARD_ELEMENT_OPTIONS: Parameters<typeof CardElement>[0]['options'] = {
+    style: {
+        base: {
+            color: '#293b64',
+            fontFamily: '"Inter", "SF Pro Display", system-ui, sans-serif',
+            fontSize: '14px',
+            fontWeight: '700',
+            '::placeholder': { color: 'rgba(41, 59, 100, 0.25)' },
+        },
+        invalid: { color: '#e53e3e', iconColor: '#e53e3e' },
+    },
+    hidePostalCode: true,
 };
 
 /* ─── Confirmation Screen ───────────────────────────────────────────── */
@@ -87,6 +111,115 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
     );
 };
 
+/* ─── Stripe Payment Section — isolated component ───────────────────── *
+ * Keeping the payment logic in a child component ensures that:
+ * 1. `useStripe()` and `useElements()` are called inside the <Elements> tree.
+ * 2. The card data NEVER enters the parent's React state — Stripe's iframe
+ *    handles all sensitive fields, achieving PCI-DSS SAQ-A compliance.      */
+interface StripePaymentSectionProps {
+    onTokenReady: (paymentMethodId: string) => void;
+    onError: (msg: string) => void;
+    disabled: boolean;
+}
+
+const StripePaymentSection: React.FC<StripePaymentSectionProps> = ({ onTokenReady, onError, disabled }) => {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [cardComplete, setCardComplete] = useState(false);
+    const [cardError, setCardError] = useState<string | null>(null);
+
+    /* Called by the parent form's submit handler via ref */
+    const tokenize = async (): Promise<string | null> => {
+        if (!stripe || !elements) {
+            onError('El servicio de pago no está disponible. Recarga la página e intenta de nuevo.');
+            return null;
+        }
+
+        const cardEl = elements.getElement(CardElement);
+        if (!cardEl) {
+            onError('No se pudo acceder al elemento de tarjeta.');
+            return null;
+        }
+
+        const { error, paymentMethod } = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardEl,
+        });
+
+        if (error) {
+            const msg = error.message ?? 'Error al procesar la tarjeta.';
+            setCardError(msg);
+            onError(msg);
+            return null;
+        }
+
+        return paymentMethod?.id ?? null;
+    };
+
+    /* Expose tokenize via imperative ref */
+    React.useImperativeHandle(
+        (StripePaymentSection as any)._ref,
+        () => ({ tokenize }),
+    );
+
+    return (
+        <div className="pt-6 border-t border-[#293b64]/5 space-y-4">
+            <div className="flex items-center gap-2 mb-2">
+                <Lock size={12} className="text-[#14b8a6]" />
+                <p className="text-[11px] font-black uppercase tracking-widest text-[#14b8a6]">
+                    Pasarela Segura PCI-DSS · Powered by Stripe
+                </p>
+            </div>
+
+            <div className="p-4 bg-[#14b8a6]/5 rounded-2xl border border-[#14b8a6]/10 mb-4">
+                <p className="text-[11px] font-medium leading-relaxed text-[#293b64]/70">
+                    El pago de <strong>USD 49</strong> se procesa directamente a través de Stripe.
+                    Los datos de tu tarjeta <strong>nunca</strong> transitan ni se almacenan en nuestros servidores.
+                </p>
+            </div>
+
+            {/* ── Stripe-hosted card iframe ── */}
+            <div
+                className="w-full bg-[#f8fafc] border border-[#293b64]/10 rounded-2xl px-5 py-4"
+                style={{ minHeight: '52px' }}
+            >
+                <CardElement
+                    options={CARD_ELEMENT_OPTIONS}
+                    onChange={(e) => {
+                        setCardComplete(e.complete);
+                        setCardError(e.error?.message ?? null);
+                    }}
+                />
+            </div>
+
+            {cardError && (
+                <div className="flex items-start gap-2 px-1">
+                    <AlertCircle size={13} className="text-red-500 shrink-0 mt-0.5" />
+                    <p className="text-[11px] font-semibold text-red-500">{cardError}</p>
+                </div>
+            )}
+
+            {/* Expose completion state so parent can disable submit */}
+            <input type="hidden" id="stripe-card-complete" value={cardComplete ? '1' : ''} readOnly />
+        </div>
+    );
+};
+
+/* Attach a module-level ref that PaymentSection uses for imperative handle */
+(StripePaymentSection as any)._ref = React.createRef<{ tokenize: () => Promise<string | null> }>();
+
+/* ─── Missing Stripe Key warning ────────────────────────────────────── */
+const MissingKeyWarning: React.FC = () => (
+    <div className="pt-6 border-t border-[#293b64]/5">
+        <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
+            <Info size={16} className="text-amber-500 shrink-0 mt-0.5" />
+            <p className="text-[12px] font-medium leading-relaxed text-amber-800">
+                El módulo de pago no está configurado. Proporciona <code className="font-mono bg-amber-100 px-1 rounded">VITE_STRIPE_PUBLISHABLE_KEY</code> en las variables de entorno para habilitar la pasarela Stripe.
+            </p>
+        </div>
+    </div>
+);
+
 /* ─── Main Component ────────────────────────────────────────────────── */
 const ConsultaExploratoriaPage: React.FC = () => {
     const navigate = useNavigate();
@@ -107,31 +240,67 @@ const ConsultaExploratoriaPage: React.FC = () => {
         horario: 'Flexible',
         doctorId: preselectedDoctorId || '',
     });
-    const [card, setCard] = useState({ number: '', expiry: '', cvc: '', holder: '' });
     const [submitState, setSubmitState] = useState<SubmitState>('idle');
+    const [paymentError, setPaymentError] = useState<string | null>(null);
+
+    /* Ref to call the Stripe tokenize method imperatively from form submit */
+    const stripeRef = (StripePaymentSection as any)._ref as React.RefObject<{ tokenize: () => Promise<string | null> }>;
 
     useEffect(() => {
         sessionStorage.removeItem('da_result_source');
-        return () => {
-            setCard({ number: '', expiry: '', cvc: '', holder: '' });
-        };
     }, []);
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    const handleCardChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-        setCard(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
+    const isCardComplete = (): boolean => {
+        if (tipo !== 'profunda') return true;
+        const el = document.getElementById('stripe-card-complete') as HTMLInputElement | null;
+        return el?.value === '1';
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!form.name || !form.email || !form.phone) return;
+        setPaymentError(null);
         setSubmitState('sending');
 
+        let paymentMethodId: string | null = null;
+
+        /* Only tokenize when the paid tier requires a card */
+        if (tipo === 'profunda') {
+            if (!stripePromise) {
+                /* Stripe not configured — fail gracefully, do not expose plain card data */
+                setPaymentError('La pasarela de pago no está disponible. Contacta al equipo para coordinar pago.');
+                setSubmitState('error');
+                return;
+            }
+
+            if (!stripeRef.current) {
+                setPaymentError('Error de inicialización del módulo de pago. Recarga la página.');
+                setSubmitState('error');
+                return;
+            }
+
+            paymentMethodId = await stripeRef.current.tokenize();
+            if (!paymentMethodId) {
+                /* tokenize() already set the error inside the payment section */
+                setSubmitState('error');
+                return;
+            }
+        }
+
         const bookingData = {
-            ...form,
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            country: form.country,
+            horario: form.horario,
             doctorId: form.doctorId || null,
             tipo,
-            ts: Date.now()
+            ts: Date.now(),
+            /* Only send the opaque Stripe token — NEVER card numbers */
+            ...(paymentMethodId ? { stripePaymentMethodId: paymentMethodId } : {}),
         };
 
         sessionStorage.setItem('vx_booking_data', JSON.stringify({
@@ -146,15 +315,18 @@ const ConsultaExploratoriaPage: React.FC = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(bookingData),
             });
-        } catch { /* Mock success */ } finally {
-            setCard({ number: '', expiry: '', cvc: '', holder: '' });
+        } catch {
+            /* Network failure — still show confirmation to user, team will contact */
         }
 
         setSubmitState('confirmed');
     };
 
-    const isFormValid = form.name && form.email && form.phone &&
-        (tipo === 'basica' || (card.number && card.expiry && card.cvc && card.holder));
+    const isFormValid =
+        form.name &&
+        form.email &&
+        form.phone &&
+        (tipo === 'basica' || isCardComplete());
 
     if (submitState === 'confirmed') {
         return <ConfirmationScreen tipo={tipo} name={form.name} navigate={navigate} />;
@@ -248,44 +420,51 @@ const ConsultaExploratoriaPage: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Payment Section - High Security Feel */}
+                    {/* ── Payment Section — PCI-DSS compliant via Stripe ── */}
                     <AnimatePresence>
                         {tipo === 'profunda' && (
-                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-6 border-t border-[#293b64]/5 space-y-4 overflow-hidden">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Lock size={12} className="text-[#14b8a6]" />
-                                    <p className="text-[11px] font-black uppercase tracking-widest text-[#14b8a6]">Pasarela Segura (Pre-Autorización)</p>
-                                </div>
-
-                                <div className="p-4 bg-[#14b8a6]/5 rounded-2xl border border-[#14b8a6]/10 mb-4">
-                                    <p className="text-[11px] font-medium leading-relaxed text-[#293b64]/70">
-                                        Coordinamos el pago de <strong>USD 49</strong> vía Zelle o transferencia una vez confirmada la cita. Introduce tus datos para pre-autorizar el protocolo.
-                                    </p>
-                                </div>
-
-                                <input name="number" type="tel" placeholder="NÚMERO DE TARJETA" value={card.number} onChange={handleCardChange} maxLength={19}
-                                    className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] outline-none" />
-                                <div className="grid grid-cols-2 gap-4">
-                                    <input name="expiry" type="text" placeholder="MM/AA" value={card.expiry} onChange={handleCardChange} maxLength={5}
-                                        className="bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] outline-none" />
-                                    <input name="cvc" type="tel" placeholder="CVC" value={card.cvc} onChange={handleCardChange} maxLength={4}
-                                        className="bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] outline-none" />
-                                </div>
-                                <input name="holder" type="text" placeholder="TITULAR DE LA TARJETA" value={card.holder} onChange={handleCardChange}
-                                    className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] outline-none uppercase" />
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="overflow-hidden"
+                            >
+                                {stripePromise ? (
+                                    <Elements stripe={stripePromise}>
+                                        <StripePaymentSection
+                                            onTokenReady={() => { /* handled in handleSubmit via ref */ }}
+                                            onError={(msg) => setPaymentError(msg)}
+                                            disabled={submitState === 'sending'}
+                                        />
+                                    </Elements>
+                                ) : (
+                                    <MissingKeyWarning />
+                                )}
                             </motion.div>
                         )}
                     </AnimatePresence>
 
+                    {/* Payment-level error (outside CardElement) */}
+                    {paymentError && submitState === 'error' && (
+                        <div className="flex items-start gap-2 px-1">
+                            <AlertCircle size={13} className="text-red-500 shrink-0 mt-0.5" />
+                            <p className="text-[11px] font-semibold text-red-500">{paymentError}</p>
+                        </div>
+                    )}
+
                     {/* Submit Button */}
-                    <button type="submit" disabled={!isFormValid || submitState === 'sending'}
-                        className="w-full py-5 mt-6 bg-[#14b8a6] text-white font-black text-[15px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[#14b8a6]/20 transition-all active:scale-95 disabled:opacity-30">
-                        {submitState === 'sending' ? <Loader2 size={24} className="animate-spin mx-auto" /> :
-                            tipo === 'profunda' ? 'Confirmar Evaluación (USD 49)' : 'Activar Mi Programa →'}
+                    <button
+                        type="submit"
+                        disabled={!isFormValid || submitState === 'sending'}
+                        className="w-full py-5 mt-6 bg-[#14b8a6] text-white font-black text-[15px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[#14b8a6]/20 transition-all active:scale-95 disabled:opacity-30"
+                    >
+                        {submitState === 'sending'
+                            ? <Loader2 size={24} className="animate-spin mx-auto" />
+                            : tipo === 'profunda' ? 'Confirmar Evaluación (USD 49)' : 'Activar Mi Programa →'}
                     </button>
 
                     <p className="text-center text-[10px] font-bold text-[#293b64]/30 uppercase tracking-widest mt-4">
-                        Cifrado de grado clínico SSL/AES-256
+                        {tipo === 'profunda' ? 'Pago seguro procesado por Stripe · PCI-DSS compliant' : 'Cifrado de grado clínico SSL/AES-256'}
                     </p>
                 </motion.form>
 
