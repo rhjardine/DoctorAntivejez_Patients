@@ -249,10 +249,16 @@ const HomePage: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
+                            ) : currentMainTab === MainTab.KEYS_5A ? (
+                                <div className="flex flex-col flex-1 px-4 pb-4">
+                                    <section className="mb-4">
+                                        {renderDashboardMatrix()}
+                                    </section>
+                                </div>
                             ) : (
                                 <div className="flex flex-col flex-1 px-4 pb-4">
                                     {/* =========================================================
-                                        SCOPING FASE 1: CLAVES 5A & TERAPIAS 4R — BLOQUEADAS
+                                        SCOPING FASE 1: TERAPIAS 4R — BLOQUEADAS
                                         ========================================================= */}
                                     <section className="mb-4 relative">
                                         {/* Overlay de Bloqueo Fase 2 */}
