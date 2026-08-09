@@ -2,6 +2,7 @@ import axios from 'axios';
 import { UserSession } from '../types';
 import { useProfileStore } from '../store/useProfileStore';
 import { logger } from '../utils/logger';
+import { clearPatientScopedStorage } from '../utils/storageCleanup';
 import { ProtocolService } from './protocolService';
 import { tokenStore } from './tokenStore';
 
@@ -165,20 +166,11 @@ export const authService = {
    */
   logout: () => {
     tokenStore.clearAccessToken();
-    storage.removeItem(SESSION_KEY);
-    storage.removeItem('refresh_token');
 
-    // Clean legacy stuff just in case
-    storage.removeItem('auth_token');
-    sessionStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem('auth_token');
-    sessionStorage.removeItem('refresh_token');
-
-    // Limpiar keys PHI del localStorage
-    localStorage.removeItem('rejuvenate_favorite_foods');
-    localStorage.removeItem('rejuvenate_reminders_log');
-    localStorage.removeItem('notifications_enabled');
-    localStorage.removeItem('rejuvenate_last_guide_seen');
+    // Barrido único por prefijo (ver utils/storageCleanup.ts). Antes había aquí
+    // una lista manual paralela a la de useAuthStore: dos inventarios del mismo
+    // conjunto, ambos incompletos y desincronizándose con cada clave nueva.
+    clearPatientScopedStorage();
 
     useProfileStore.getState().clearProfileData();
     logger.audit('logout');
