@@ -39,6 +39,9 @@ interface PatientGuideViewProps {
   onInfoPress?: () => void;
   onToggleItem: (id: string) => void;
   onRefresh?: () => void;
+  /** Mensaje visible cuando una marca de adherencia no pudo registrarse. */
+  syncError?: string | null;
+  onDismissSyncError?: () => void;
 }
 
 type ViewMode = 'PLAN' | 'TRACK';
@@ -90,6 +93,8 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
   onInfoPress,
   onToggleItem,
   onRefresh,
+  syncError,
+  onDismissSyncError,
 }) => {
   const { profileData } = useProfileStore();
   const [viewMode, setViewMode] = useState<ViewMode>('PLAN');
@@ -571,6 +576,34 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
 
   return (
     <>
+      {/* Adherence Sync Failure Banner — clinical safety: the patient must know
+          when a change was NOT recorded, instead of seeing a checkmark that
+          never reaches their doctor. */}
+      {syncError && (
+        <div
+          role="alert"
+          className="fixed top-0 left-0 right-0 z-[60] flex items-center justify-between px-5 py-4 bg-red-500 shadow-lg animate-in slide-in-from-top duration-500"
+        >
+          <div className="flex items-center gap-3">
+            <AlertTriangle size={20} className="text-white flex-shrink-0" />
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-widest text-white">
+                No se registró tu cambio
+              </p>
+              <p className="text-xs font-bold text-red-50">{syncError}</p>
+            </div>
+          </div>
+          {onDismissSyncError && (
+            <button
+              onClick={onDismissSyncError}
+              aria-label="Cerrar aviso"
+              className="w-8 h-8 flex-shrink-0 flex items-center justify-center bg-red-600 rounded-xl text-white hover:bg-red-700 transition-colors"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+      )}
       {/* New Guide Notification Banner */}
       {showNewGuideBanner && (
         <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4 bg-amber-400 shadow-lg animate-in slide-in-from-top duration-500">

@@ -10,6 +10,7 @@ const PatientGuidePage: React.FC = () => {
     const { toggleClinicalInfo } = useUIStore();
     const [items, setItems] = useState<PatientProtocol[]>([]);
     const [loading, setLoading] = useState(true);
+    const [syncError, setSyncError] = useState<string | null>(null);
 
     const loadData = async () => {
         if (!session) return;
@@ -33,11 +34,22 @@ const PatientGuidePage: React.FC = () => {
         const item = items.find(i => i.id === id);
         if (!item) return;
 
-        const newStatus = item.status === 'completed' ? 'pending' : 'completed';
+        const previousStatus = item.status;
+        const newStatus = previousStatus === 'completed' ? 'pending' : 'completed';
+
         // Optimistic update
         setItems(prev => prev.map(i => i.id === id ? { ...i, status: newStatus } : i));
 
-        await ProtocolService.updateItemStatus(session.id, id, newStatus);
+        const synced = await ProtocolService.updateItemStatus(session.id, id, newStatus);
+
+        // ⚠️ SEGURIDAD CLÍNICA: si no se pudo registrar, revertir el estado visual.
+        // Nunca dejar al paciente creyendo que registró una toma que su médico no verá.
+        if (!synced) {
+            setItems(prev => prev.map(i => i.id === id ? { ...i, status: previousStatus } : i));
+            setSyncError(
+                'No pudimos registrar este cambio. Tu médico no lo verá todavía — por favor coméntaselo en tu próxima consulta.'
+            );
+        }
     };
 
     return (
@@ -47,6 +59,8 @@ const PatientGuidePage: React.FC = () => {
             onInfoPress={() => toggleClinicalInfo(true)}
             onToggleItem={handleToggleItem}
             onRefresh={loadData}
+            syncError={syncError}
+            onDismissSyncError={() => setSyncError(null)}
         />
     );
 };

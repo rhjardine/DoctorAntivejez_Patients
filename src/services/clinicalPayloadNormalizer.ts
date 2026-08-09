@@ -10,6 +10,7 @@ import {
   DEFAULTS_COMUNES,
   DEFAULTS_O_B,
 } from './nutrigenomicaDefaults';
+import { logger } from '../utils/logger';
 
 type RawRecord = Record<string, any>;
 
@@ -122,7 +123,13 @@ const stableId = (category: string, index: number, item: RawRecord): string => {
   );
   if (explicit) return String(explicit);
   // SOLO usar hash como último fallback, y marcarlo como inestable
-  console.warn('[normalizer] Item sin ID explícito del backend, usando hash inestable:', item);
+  // ⚠️ Nunca loguear `item` completo: contiene PHI (nombre del tratamiento y dosis).
+  // Solo metadatos no identificatorios, y a través del logger que sanitiza.
+  logger.warn('[normalizer] Ítem sin ID explícito del backend, usando hash inestable', {
+    reason: 'MISSING_BACKEND_ID',
+    category,
+    index,
+  });
   const seed = `${category}:${index}:${pickFirst(item.itemName, item.name, item.nombre, item.producto, item.title, '')}`;
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1)
