@@ -40,12 +40,17 @@
 
 ### Build
 - [x] npm run build sin errores TypeScript
-- [x] npm run build completa en < 30 segundos (Completado en ~11s)
-- [!] No hay warnings de chunk size > 500kb
+- [x] npm run build completa en < 30 segundos (~7s)
+- [x] No hay warnings de chunk size > 500kb — **resuelto**
+- [x] `npm ci` sincronizado con package.json (el CI fallaba en el paso de instalación)
+- [x] `npx tsc --noEmit` exit 0
+- [x] `npm run lint` exit 0 y bloqueante en CI
 
 ***
 
-## Reporte de Anomalías [!]
+## Reporte de Anomalías
 
-- **Chunk Size Warning:** Durante el proceso de build, Vite emite una alerta indicando que `index-[hash].js` supera los 500kB (específicamente alrededor de ~701kB minificado, aunque ~213kB comprimido por gzip). Esto no impide que la aplicación funcione y se debe primordialmente a los grandes imports empaquetados juntos (React, framer-motion, lucide-react y pdfmake). 
-**Recomendación:** Para futuras optimizaciones, se podría implementar `manualChunks` en Vite para separar dependencias pesadas como el generador de PDF.
+- **Chunk Size Warning — RESUELTO (2026-08-09).** La alerta de ~701kB / ~213kB gzip ya no
+  aplica: la configuración de `manualChunks` en `vite.config.ts` reparte las dependencias en 8
+  chunks de vendor. Medición actual: `index-[hash].js` = **306 kB minificado / 93 kB gzip**.
+  El checklist anterior reflejaba un estado previo a esa optimización.
