@@ -21,7 +21,7 @@ const VCoachChat: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [cooldown, setCooldown] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const cooldownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const cooldownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
