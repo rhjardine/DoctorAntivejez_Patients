@@ -2,6 +2,7 @@ import { PatientProtocol, NutrigenomicPlan } from '../types';
 import { tokenStore } from './tokenStore';
 import apiClient from './apiClient';
 import { offlineQueue } from './offlineQueue';
+import { logger } from '../utils/logger';
 import { useProfileStore } from '../store/useProfileStore';
 import {
   buildNutrigenomicPlan,
@@ -99,18 +100,27 @@ export const ProtocolService = {
     itemId: string,
     status: 'pending' | 'completed',
   ): Promise<boolean> => {
-    // Actualización optimista en caché
+    // ⚠️ SEGURIDAD CLÍNICA: el guard va ANTES de tocar el caché.
+    // Un ítem sin ID estable NO puede sincronizarse con el backend, así que
+    // tampoco debe quedar marcado como completado en el caché local: dejaría al
+    // paciente viendo un check que su médico nunca recibirá.
+    // Deuda de backend documentada en docs/adr/ADR-005.
+    if (itemId.startsWith('UNSTABLE_HASH_')) {
+      logger.warn(
+        '[ProtocolService] Adherencia descartada: el backend no emitió un ID estable para este ítem',
+        { reason: 'UNSTABLE_ITEM_ID', status },
+      );
+      logger.audit('adherence_rejected_unstable_id', { status });
+      return false;
+    }
+
+    // Actualización optimista en caché (solo para ítems sincronizables)
     const cached = getFromSession<PatientProtocol[]>(PROTOCOL_CACHE_KEY);
     if (cached) {
       const updated = cached.map((item) =>
         item.id === itemId ? { ...item, status } : item,
       );
       setToSession(PROTOCOL_CACHE_KEY, updated);
-    }
-
-    if (itemId.startsWith('UNSTABLE_HASH_')) {
-      console.warn('[ProtocolService] Cancelado: itemId inestable. El contrato de datos del microservicio está incompleto.');
-      return false;
     }
 
     try {
