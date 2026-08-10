@@ -76,10 +76,12 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => localStorage),
+      // 🔐 `token` NO se persiste: el access token vive solo en memoria
+      // (tokenStore). Persistirlo aquí lo expondría a XSS vía localStorage.
+      // Ver ADR-002.
       partialize: (state) => ({
         session: state.session,
         isAuthenticated: state.isAuthenticated,
-        token: state.token,
       }),
     }
   )

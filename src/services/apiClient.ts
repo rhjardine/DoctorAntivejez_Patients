@@ -18,27 +18,16 @@ export const apiClient = axios.create({
 });
 
 // INTERCEPTOR DE PETICIONES
+// 🔐 El access token vive EXCLUSIVAMENTE en memoria (tokenStore). No se lee ni
+// se escribe en disco: un XSS que acceda a localStorage no debe poder recuperar
+// una sesión clínica activa.
+// Tras un F5 la memoria está vacía y la petición sale sin Authorization: el
+// interceptor de respuesta la reintenta usando el refresh token. Ese es el flujo
+// previsto, no un fallo. Ver ADR-002.
 apiClient.interceptors.request.use((config) => {
-    try {
-        // ✅ PRIORIDAD 1: Token en memoria (Síncrono, fresco tras el login)
-        const memoryToken = tokenStore.getAccessToken();
-        if (memoryToken) {
-            config.headers.Authorization = `Bearer ${memoryToken}`;
-            logger.audit('api_request', { method: config.method || 'unknown', url: config.url || 'unknown' });
-            return config;
-        }
-
-        // ✅ PRIORIDAD 2: Fallback a disco (para cuando el usuario recarga la página F5)
-        const authStorageStr = localStorage.getItem('auth-storage');
-        if (authStorageStr) {
-            const parsed = JSON.parse(authStorageStr);
-            const token = parsed?.state?.token;
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
-        }
-    } catch (error) {
-        console.error("[API Client] Error leyendo storage:", error);
+    const memoryToken = tokenStore.getAccessToken();
+    if (memoryToken) {
+        config.headers.Authorization = `Bearer ${memoryToken}`;
     }
 
     logger.audit('api_request', { method: config.method || 'unknown', url: config.url || 'unknown' });
@@ -63,19 +52,11 @@ apiClient.interceptors.response.use(
                 // Actualizar disco
                 localStorage.setItem('refresh_token', data.refreshToken);
 
-                // ✅ Actualizar memoria
+                // ✅ El access token renovado va SOLO a memoria.
+                // Antes se escribía también en 'auth-storage' (localStorage), lo que
+                // dejaba una sesión clínica activa expuesta a XSS. Ver ADR-002.
                 tokenStore.setAccessToken(data.accessToken);
                 originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-
-                // Sincronizar Zustand storage por si acaso
-                const authStorageStr = localStorage.getItem('auth-storage');
-                if (authStorageStr) {
-                    const parsed = JSON.parse(authStorageStr);
-                    if (parsed.state) {
-                        parsed.state.token = data.accessToken;
-                        localStorage.setItem('auth-storage', JSON.stringify(parsed));
-                    }
-                }
 
                 return apiClient(originalRequest);
             } catch (refreshError) {
