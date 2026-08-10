@@ -4,6 +4,7 @@ import { Dna, Salad, ScanBarcode, Flame, Drumstick, Droplet, ChevronRight, Zap, 
 import FoodScannerModal from './FoodScannerModal';
 import NutrigenomicsView from './NutrigenomicsView';
 import { useProfileStore } from '../store/useProfileStore';
+import { featureFlags } from '../config/featureFlags';
 
 const NutritionView: React.FC = () => {
     const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -71,6 +72,7 @@ const NutritionView: React.FC = () => {
                     </button>
 
                     {/* Escáner IA - High Contrast Primary Tool */}
+                    {featureFlags.foodScanner && (
                     <button
                         onClick={() => setIsScannerOpen(true)}
                         aria-label="Escanear producto con cámara"
@@ -87,6 +89,7 @@ const NutritionView: React.FC = () => {
                             <ArrowRight size={20} strokeWidth={3} />
                         </div>
                     </button>
+                    )}
                 </div>
 
                 {/* Extra Helper Tip for Seniors */}
@@ -98,7 +101,9 @@ const NutritionView: React.FC = () => {
                 </div>
             </div>
 
-            {isScannerOpen && (
+            {/* 🔴 Kill switch de IA (D-17): si el FoodScanner está desactivado,
+                el modal no se monta aunque el estado lo pida. */}
+            {isScannerOpen && featureFlags.foodScanner && (
                 <FoodScannerModal onClose={() => setIsScannerOpen(false)} />
             )}
 

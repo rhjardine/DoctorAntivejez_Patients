@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { COLORS, ChatMessage } from '../types';
-import { Send, Bot, User, Sparkles } from 'lucide-react';
+import { Send, Bot, User, Sparkles, ShieldAlert } from 'lucide-react';
 import { sendMessageToVCoach } from '../services/geminiService';
+import { featureFlags } from '../config/featureFlags';
 
 const VCoachChat: React.FC = () => {
   const [input, setInput] = useState('');
@@ -102,8 +103,36 @@ const VCoachChat: React.FC = () => {
     }
   };
 
+  // 🔴 Kill switch de IA (D-17). Ver docs/RUNBOOK.md.
+  if (!featureFlags.vcoach) {
+    return (
+      <div className="flex flex-col h-full bg-[#F8FAFC] items-center justify-center px-8 text-center">
+        <div className="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center mb-4">
+          <ShieldAlert size={32} className="text-slate-400" />
+        </div>
+        <h2 className="text-lg font-bold text-[#293B64] mb-2">VCoach no disponible</h2>
+        <p className="text-sm text-slate-500 leading-relaxed">
+          El asistente está temporalmente desactivado. Para cualquier duda sobre tu
+          tratamiento, contacta directamente con tu médico.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full bg-[#F8FAFC]">
+      {/* Aviso de transparencia de IA — obligatorio y persistente (R-P0-4).
+          El paciente debe saber en todo momento que habla con un modelo y que
+          puede escalar a su médico. No es descartable. */}
+      <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 border-b border-amber-100">
+        <ShieldAlert size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
+        <p className="text-[11px] font-medium leading-relaxed text-amber-900">
+          Estás conversando con un <strong>asistente de inteligencia artificial</strong> que
+          puede cometer errores. No sustituye a tu médico ni emite diagnósticos ni
+          prescripciones. Ante cualquier duda clínica, consulta a tu equipo médico.
+        </p>
+      </div>
+
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar pb-6">
         {messages.map((msg) => (
@@ -125,7 +154,9 @@ const VCoachChat: React.FC = () => {
               <div className="flex flex-col">
                 <p className="text-sm font-medium leading-relaxed">{msg.text}</p>
                 <span className={`text-[9px] mt-1 font-bold uppercase tracking-widest ${msg.role === 'user' ? 'text-white/60' : 'text-gray-400'}`}>
-                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {msg.role === 'model'
+                    ? `Generado por IA · ${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                    : new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
               {msg.role === 'user' && (

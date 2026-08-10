@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { X, Camera, RefreshCw, CheckCircle, AlertTriangle, XCircle, Zap, Loader2, Image as ImageIcon } from 'lucide-react';
+import { X, Camera, RefreshCw, CheckCircle, AlertTriangle, XCircle, Zap, Loader2, Image as ImageIcon, ShieldAlert } from 'lucide-react';
 import { analyzeFoodImage, FoodAnalysisResult } from '../services/geminiService';
 import { COLORS } from '../types';
 
@@ -103,27 +103,31 @@ const FoodScannerModal: React.FC<FoodScannerModalProps> = ({ onClose }) => {
   };
 
   // Helper to render result badge
+  // ⚠️ D-3(b) del Informe de Gobernanza: la salida del modelo NO puede
+  // presentarse como un veredicto absoluto. Un alimento alergénico mal
+  // clasificado como "Recomendado" puede causar daño. El lenguaje es
+  // deliberadamente tentativo y remite siempre a verificación humana.
   const renderRecommendationBadge = (status: string) => {
     switch (status) {
       case 'RECOMMENDED':
         return (
           <div className="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full font-bold">
             <CheckCircle size={20} />
-            <span>Recomendado</span>
+            <span>Posiblemente compatible</span>
           </div>
         );
       case 'MODERATE':
         return (
           <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full font-bold">
             <AlertTriangle size={20} />
-            <span>Consumo Moderado</span>
+            <span>Requiere moderación</span>
           </div>
         );
       case 'AVOID':
         return (
           <div className="flex items-center gap-2 bg-red-100 text-red-700 px-4 py-2 rounded-full font-bold">
             <XCircle size={20} />
-            <span>Evitar</span>
+            <span>Posible incompatibilidad</span>
           </div>
         );
       default:
@@ -204,6 +208,16 @@ const FoodScannerModal: React.FC<FoodScannerModalProps> = ({ onClose }) => {
                    <p className="mt-3 text-sm text-textMedium leading-relaxed">
                      {result.reasoning}
                    </p>
+                   {/* Aviso de transparencia de IA — R-P0-4 / D-3(b) */}
+                   <div className="mt-4 w-full flex items-start gap-2 p-3 rounded-2xl bg-amber-50 border border-amber-100 text-left">
+                     <ShieldAlert size={14} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                     <p className="text-[11px] font-medium leading-relaxed text-amber-900">
+                       Clasificación generada por <strong>inteligencia artificial</strong>, que
+                       puede equivocarse. No considera tus alergias ni tu plan médico
+                       específico. Verifica con tu nutricionista antes de cambiar tu
+                       alimentación.
+                     </p>
+                   </div>
                 </div>
 
                 {/* Macros Grid */}
