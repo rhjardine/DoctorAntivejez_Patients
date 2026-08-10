@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { authService } from '../services/authService';
+import { clearPatientScopedStorage } from '../utils/storageCleanup';
+import { logger } from '../utils/logger';
 import { UserSession } from '../types';
 
 // ✅ CONTRATO CORRECTO: Compatible con Drawer, MainLayout, AppRouter, LoginPage
@@ -48,15 +50,16 @@ export const useAuthStore = create<AuthState>()(
         // before the storage keys below are removed.
         set({ session: null, isAuthenticated: false, token: null });
 
-        // STEP 2 — Atomically destroy all persisted state from localStorage.
-        // 'auth-storage' is the Zustand persist key for THIS store — removing it
-        // prevents the persist middleware from reloading the dead session on the
-        // next event loop tick.
-        localStorage.removeItem('auth-storage');
-        localStorage.removeItem('rejuvenate_profile_v1');
-        localStorage.removeItem('profile-storage');
-        localStorage.removeItem('vytalix-funnel-v2');
-        sessionStorage.clear();
+        // STEP 2 — Atomically destroy all persisted patient state.
+        // Barrido por prefijo, no por lista: el proyecto arrastra tres
+        // generaciones de claves ('rejuvenate_*', 'vx_*'/'vytalix*', 'da_*') y
+        // la enumeración manual dejaba fuera las más recientes — entre ellas
+        // 'da_pending_leads', con nombre y correo en texto plano.
+        // Incluye 'auth-storage', la clave de persist de ESTE store: sin
+        // eliminarla, el middleware recargaría la sesión muerta en el
+        // siguiente tick del event loop.
+        const removedKeys = clearPatientScopedStorage();
+        logger.audit('logout_storage_cleared', { removedKeys });
 
         // STEP 3 — Run tokenStore clear + backend-side logout last.
         // authService.logout() is currently synchronous but awaited for
