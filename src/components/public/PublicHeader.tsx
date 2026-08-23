@@ -23,8 +23,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
     // Vytalix (Organic/Wellness) vs Clinical (Professional)
     const bgColor = isWellness ? 'bg-[#293b64]' : 'bg-clinical-navy';
-    const accentColorClass = isWellness ? 'bg-[#14b8a6]' : 'bg-clinical-cyan';
-    const accentColorHex = isWellness ? '#14b8a6' : '#14b8a6';
+    const accentColorClass = isWellness ? 'bg-[#23bcef]' : 'bg-clinical-cyan';
+    const accentColorHex = isWellness ? '#23bcef' : '#23bcef';
     const textColor = isWellness ? 'text-[#f8fafc]' : 'text-white';
 
     return (
@@ -80,7 +80,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                 <div className="absolute top-[64px] left-0 right-0 flex justify-center pointer-events-none">
                     <span
                         className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md shadow-sm border ${isWellness
-                            ? 'text-[#14b8a6] bg-[#f8fafc]/10 border-[#14b8a6]/20'
+                            ? 'text-[#23bcef] bg-[#f8fafc]/10 border-[#23bcef]/20'
                             : 'text-clinical-cyan bg-clinical-navy/80 border-clinical-cyan/20'
                             }`}
                     >

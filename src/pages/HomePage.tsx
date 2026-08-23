@@ -217,7 +217,7 @@ const HomePage: React.FC = () => {
 
                                     <div onClick={() => navigate('/guide')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-4 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
                                         <div className="flex items-center gap-4">
-                                            <div className="bg-sky-50 p-3.5 rounded-2xl text-[#14b8a6]"><ClipboardCheck size={28} /></div>
+                                            <div className="bg-sky-50 p-3.5 rounded-2xl text-[#107da8]"><ClipboardCheck size={28} /></div>
                                             <div>
                                                 <h3 className="font-black text-[#293b64] text-lg">Guía del Paciente</h3>
                                                 <p className="text-[10px] font-bold text-textMedium uppercase">Misión Diaria</p>
@@ -229,23 +229,23 @@ const HomePage: React.FC = () => {
                                     </div>
                                     <div onClick={() => navigate('/mi-guia/alimentacion')} className="w-full bg-white rounded-[2rem] p-5 shadow-md border border-sky-50 mb-6 flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all">
                                         <div className="flex items-center gap-4">
-                                            <div className="bg-sky-50 p-3.5 rounded-2xl text-[#14b8a6]"><Dna size={28} /></div>
+                                            <div className="bg-sky-50 p-3.5 rounded-2xl text-[#107da8]"><Dna size={28} /></div>
                                             <div>
                                                 <h3 className="font-black text-[#293b64] text-lg leading-tight">Alimentación Sana</h3>
                                                 <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#23bcef' }}>Antienvejecimiento</p>
                                             </div>
                                         </div>
-                                        <div className="text-[#14b8a6] pr-2">
+                                        <div className="text-[#107da8] pr-2">
                                             <ChevronRight size={24} />
                                         </div>
                                     </div>
                                     <div className="w-full bg-white rounded-[2rem] p-5 shadow-sm border border-gray-50 mb-6">
                                         <div className="flex justify-between items-center mb-3">
                                             <span className="text-xs font-black text-[#293b64] uppercase">Progreso Hoy</span>
-                                            <span className="text-xs font-black text-[#14b8a6]">{adherence}%</span>
+                                            <span className="text-xs font-black text-[#107da8]">{adherence}%</span>
                                         </div>
                                         <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
-                                            <div className="h-full bg-[#14b8a6] rounded-full transition-all duration-500" style={{ width: `${adherence}%` }}></div>
+                                            <div className="h-full bg-[#23bcef] rounded-full transition-all duration-500" style={{ width: `${adherence}%` }}></div>
                                         </div>
                                     </div>
                                 </div>
@@ -264,7 +264,7 @@ const HomePage: React.FC = () => {
                                         {/* Overlay de Bloqueo Fase 2 */}
                                         <div className="absolute inset-0 z-20 bg-slate-50/60 backdrop-blur-[2px] flex items-center justify-center rounded-3xl border border-white/50">
                                             <span className="bg-[#293b64] text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-xl flex items-center gap-2 transform -translate-y-4">
-                                                <span className="animate-pulse text-[#14b8a6]">✨</span> Pronto disponible
+                                                <span className="animate-pulse text-[#107da8]">✨</span> Pronto disponible
                                             </span>
                                         </div>
                                         {/* Contenido Oscurecido e Inactivo */}

@@ -74,7 +74,7 @@ export const EvaluacionInicial: React.FC<EvaluacionInicialProps> = ({ branding }
                 className="w-full max-w-2xl text-center mb-10"
             >
                 <div className="inline-flex items-center justify-center p-3 bg-white/60 rounded-full mb-4 shadow-sm">
-                    <Activity className="w-6 h-6 text-[#14b8a6]" />
+                    <Activity className="w-6 h-6 text-[#107da8]" />
                 </div>
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-[#293b64] mb-2">
                     Su Hub de Diagnóstico
@@ -96,10 +96,10 @@ export const EvaluacionInicial: React.FC<EvaluacionInicialProps> = ({ branding }
                         key={step.id}
                         variants={itemVariants}
                         whileTap={{ scale: 0.95 }}
-                        className="w-full text-left group bg-white/70 backdrop-blur-sm rounded-2xl p-5 shadow-sm transition-all hover:bg-white/90 hover:shadow-md flex items-center justify-between border border-transparent hover:border-[#14b8a6]/20 focus:outline-none focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent min-h-[5rem]"
+                        className="w-full text-left group bg-white/70 backdrop-blur-sm rounded-2xl p-5 shadow-sm transition-all hover:bg-white/90 hover:shadow-md flex items-center justify-between border border-transparent hover:border-[#23bcef]/20 focus:outline-none focus:ring-2 focus:ring-[#23bcef] focus:border-transparent min-h-[5rem]"
                     >
                         <div className="flex items-center space-x-5">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-slate-50 text-[#14b8a6] flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-slate-50 text-[#107da8] flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
                                 <step.icon className="w-6 h-6" />
                             </div>
 
@@ -109,7 +109,7 @@ export const EvaluacionInicial: React.FC<EvaluacionInicialProps> = ({ branding }
                                         {step.title}
                                     </h3>
                                     {step.badge && (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-[#14b8a6]/10 text-[#14b8a6]">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-[#23bcef]/10 text-[#107da8]">
                                             {step.badge}
                                         </span>
                                     )}
@@ -120,7 +120,7 @@ export const EvaluacionInicial: React.FC<EvaluacionInicialProps> = ({ branding }
                             </div>
                         </div>
 
-                        <div className="flex-shrink-0 text-[#14b8a6]/40 group-hover:text-[#14b8a6] transition-colors">
+                        <div className="flex-shrink-0 text-[#107da8]/40 group-hover:text-[#107da8] transition-colors">
                             <ChevronRight className="w-6 h-6" />
                         </div>
                     </motion.button>

@@ -72,8 +72,8 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
             initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center text-center px-8 py-16 min-h-screen bg-[#f8fafc]"
         >
-            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-8 bg-[#14b8a6]/10 border border-[#14b8a6]/20">
-                <CheckCircle size={48} className="text-[#14b8a6]" />
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-8 bg-[#23bcef]/10 border border-[#23bcef]/20">
+                <CheckCircle size={48} className="text-[#107da8]" />
             </div>
 
             <h2 className="text-3xl font-black text-[#293b64] mb-4 tracking-tight">
@@ -83,7 +83,7 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
             <div className="max-w-[320px] mb-12">
                 {tipo === 'basica' ? (
                     <p className="text-[15px] leading-relaxed text-[#293b64]/60 font-medium">
-                        Tu solicitud para el <strong className="text-[#293b64]">Programa de Optimización</strong> ha sido procesada. Un especialista te contactará en <strong className="text-[#14b8a6] uppercase tracking-widest text-[11px]">menos de 24 horas</strong>.
+                        Tu solicitud para el <strong className="text-[#293b64]">Programa de Optimización</strong> ha sido procesada. Un especialista te contactará en <strong className="text-[#107da8] uppercase tracking-widest text-[11px]">menos de 24 horas</strong>.
                     </p>
                 ) : (
                     <p className="text-[15px] leading-relaxed text-[#293b64]/60 font-medium">
@@ -165,13 +165,13 @@ const StripePaymentSection: React.FC<StripePaymentSectionProps> = ({ onTokenRead
     return (
         <div className="pt-6 border-t border-[#293b64]/5 space-y-4">
             <div className="flex items-center gap-2 mb-2">
-                <Lock size={12} className="text-[#14b8a6]" />
-                <p className="text-[11px] font-black uppercase tracking-widest text-[#14b8a6]">
+                <Lock size={12} className="text-[#107da8]" />
+                <p className="text-[11px] font-black uppercase tracking-widest text-[#107da8]">
                     Pasarela Segura PCI-DSS · Powered by Stripe
                 </p>
             </div>
 
-            <div className="p-4 bg-[#14b8a6]/5 rounded-2xl border border-[#14b8a6]/10 mb-4">
+            <div className="p-4 bg-[#23bcef]/5 rounded-2xl border border-[#23bcef]/10 mb-4">
                 <p className="text-[11px] font-medium leading-relaxed text-[#293b64]/70">
                     El pago de <strong>USD 49</strong> se procesa directamente a través de Stripe.
                     Los datos de tu tarjeta <strong>nunca</strong> transitan ni se almacenan en nuestros servidores.
@@ -338,8 +338,8 @@ const ConsultaExploratoriaPage: React.FC = () => {
 
                 {/* Header Section */}
                 <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10 text-center">
-                    <div className="inline-block px-4 py-1.5 rounded-full bg-[#14b8a6]/10 border border-[#14b8a6]/20 mb-6">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#14b8a6]">
+                    <div className="inline-block px-4 py-1.5 rounded-full bg-[#23bcef]/10 border border-[#23bcef]/20 mb-6">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#107da8]">
                             Protocolo de Longevidad
                         </p>
                     </div>
@@ -356,7 +356,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                     className="bg-white rounded-[2rem] p-8 border border-[#293b64]/5 shadow-sm mb-8">
                     <div className="flex items-center gap-3 mb-8 pb-4 border-b border-[#293b64]/5">
                         <div className="p-2.5 bg-[#f8fafc] rounded-xl">
-                            {tipo === 'basica' ? <Video size={18} className="text-[#14b8a6]" /> : <ClipboardList size={18} className="text-[#14b8a6]" />}
+                            {tipo === 'basica' ? <Video size={18} className="text-[#107da8]" /> : <ClipboardList size={18} className="text-[#107da8]" />}
                         </div>
                         <p className="text-[12px] font-black uppercase tracking-widest text-[#293b64]">Inclusiones</p>
                     </div>
@@ -378,11 +378,11 @@ const ConsultaExploratoriaPage: React.FC = () => {
 
                     <div className="space-y-3">
                         <input name="name" type="text" placeholder="TU NOMBRE *" required value={form.name} onChange={handleFormChange}
-                            className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] placeholder:text-[#293b64]/20 focus:ring-1 focus:ring-[#14b8a6] outline-none" />
+                            className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] placeholder:text-[#293b64]/20 focus:ring-1 focus:ring-[#23bcef] outline-none" />
                         <input name="email" type="email" placeholder="TU@EMAIL.COM *" required value={form.email} onChange={handleFormChange}
-                            className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] placeholder:text-[#293b64]/20 focus:ring-1 focus:ring-[#14b8a6] outline-none" />
+                            className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] placeholder:text-[#293b64]/20 focus:ring-1 focus:ring-[#23bcef] outline-none" />
                         <input name="phone" type="tel" placeholder="WHATSAPP / TEL *" required value={form.phone} onChange={handleFormChange}
-                            className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] placeholder:text-[#293b64]/20 focus:ring-1 focus:ring-[#14b8a6] outline-none" />
+                            className="w-full bg-[#f8fafc] border-none rounded-2xl px-5 py-4 text-sm font-bold text-[#293b64] placeholder:text-[#293b64]/20 focus:ring-1 focus:ring-[#23bcef] outline-none" />
                     </div>
 
                     <div className="relative">
@@ -406,7 +406,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                                         <span className="text-[10px] uppercase font-bold text-[#293b64]/40">{preselectedDoc.location}</span>
                                     </div>
                                 </div>
-                                <button type="button" onClick={() => setShowSelector(true)} className="text-[10px] font-black uppercase text-[#14b8a6] underline decoration-[#14b8a6]/20 underline-offset-4">Cambiar</button>
+                                <button type="button" onClick={() => setShowSelector(true)} className="text-[10px] font-black uppercase text-[#107da8] underline decoration-[#23bcef]/20 underline-offset-4">Cambiar</button>
                             </div>
                         ) : (
                             <div className="relative">
@@ -456,7 +456,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                     <button
                         type="submit"
                         disabled={!isFormValid || submitState === 'sending'}
-                        className="w-full py-5 mt-6 bg-[#14b8a6] text-white font-black text-[15px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[#14b8a6]/20 transition-all active:scale-95 disabled:opacity-30"
+                        className="w-full py-5 mt-6 bg-[#23bcef] text-white font-black text-[15px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[#23bcef]/20 transition-all active:scale-95 disabled:opacity-30"
                     >
                         {submitState === 'sending'
                             ? <Loader2 size={24} className="animate-spin mx-auto" />

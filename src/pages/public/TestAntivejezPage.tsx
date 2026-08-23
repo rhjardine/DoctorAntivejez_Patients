@@ -222,7 +222,7 @@ const TestAntivejezPage: React.FC = () => {
                             const val = answers[q.id];
                             return (
                                 <div key={q.id} className="p-6 bg-white rounded-[1.5rem] border border-[#293b64]/5 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-[#14b8a6]">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-[#107da8]">
                                         ANÁLISIS VITAL {qNumber}
                                     </p>
                                     <p className="text-[17px] font-semibold mb-8 leading-tight text-[#293b64] tracking-tight">
@@ -233,7 +233,7 @@ const TestAntivejezPage: React.FC = () => {
                                         <button
                                             onClick={() => answer(q.id, true)}
                                             className={`flex-1 py-4 rounded-2xl font-black text-sm transition-all duration-200 active:scale-95 ${val === true
-                                                ? 'bg-[#14b8a6] text-white shadow-lg shadow-[#14b8a6]/30'
+                                                ? 'bg-[#23bcef] text-white shadow-lg shadow-[#23bcef]/30'
                                                 : 'bg-[#f8fafc] text-[#293b64]/40 border border-[#293b64]/10'
                                                 }`}
                                         >
@@ -268,7 +268,7 @@ const TestAntivejezPage: React.FC = () => {
                 <button
                     onClick={next}
                     disabled={!allAnswered}
-                    className="w-full py-5 bg-[#14b8a6] text-white font-black text-[15px] flex items-center justify-center gap-2 rounded-full shadow-xl shadow-[#14b8a6]/20 transform active:scale-95 transition-all uppercase tracking-[0.15em] disabled:opacity-40 disabled:scale-100"
+                    className="w-full py-5 bg-[#23bcef] text-white font-black text-[15px] flex items-center justify-center gap-2 rounded-full shadow-xl shadow-[#23bcef]/20 transform active:scale-95 transition-all uppercase tracking-[0.15em] disabled:opacity-40 disabled:scale-100"
                 >
                     {currentGroup < 5 ? (
                         <>Siguiente bloque <ChevronRight size={18} strokeWidth={3} /></>

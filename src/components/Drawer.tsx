@@ -90,7 +90,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
           <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
             <Activity size={22} className="text-textMedium shrink-0" />
             <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Mis Biométricos</span>
-            <span className="ml-auto text-[9px] font-bold bg-[#14b8a6]/10 text-[#14b8a6] px-2 py-1 rounded-md uppercase tracking-wider border border-[#14b8a6]/20 whitespace-nowrap">
+            <span className="ml-auto text-[9px] font-bold bg-[#23bcef]/10 text-[#107da8] px-2 py-1 rounded-md uppercase tracking-wider border border-[#23bcef]/20 whitespace-nowrap">
               Pronto
             </span>
           </div>
@@ -99,7 +99,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
           <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
             <FileClock size={22} className="text-textMedium shrink-0" />
             <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Historial Médico</span>
-            <span className="ml-auto text-[9px] font-bold bg-[#14b8a6]/10 text-[#14b8a6] px-2 py-1 rounded-md uppercase tracking-wider border border-[#14b8a6]/20 whitespace-nowrap">
+            <span className="ml-auto text-[9px] font-bold bg-[#23bcef]/10 text-[#107da8] px-2 py-1 rounded-md uppercase tracking-wider border border-[#23bcef]/20 whitespace-nowrap">
               Pronto
             </span>
           </div>
@@ -108,7 +108,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
           <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
             <QrCode size={22} className="text-textMedium shrink-0" />
             <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Bio-Pase (Check-in)</span>
-            <span className="ml-auto text-[9px] font-bold bg-[#14b8a6]/10 text-[#14b8a6] px-2 py-1 rounded-md uppercase tracking-wider border border-[#14b8a6]/20 whitespace-nowrap">
+            <span className="ml-auto text-[9px] font-bold bg-[#23bcef]/10 text-[#107da8] px-2 py-1 rounded-md uppercase tracking-wider border border-[#23bcef]/20 whitespace-nowrap">
               Pronto
             </span>
           </div>
@@ -133,7 +133,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
           <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
             <Settings size={22} className="text-textMedium shrink-0" />
             <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Configuración</span>
-            <span className="ml-auto text-[9px] font-bold bg-[#14b8a6]/10 text-[#14b8a6] px-2 py-1 rounded-md uppercase tracking-wider border border-[#14b8a6]/20 whitespace-nowrap">
+            <span className="ml-auto text-[9px] font-bold bg-[#23bcef]/10 text-[#107da8] px-2 py-1 rounded-md uppercase tracking-wider border border-[#23bcef]/20 whitespace-nowrap">
               Pronto
             </span>
           </div>
@@ -144,7 +144,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
           <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
             <Info size={22} className="text-textMedium shrink-0" />
             <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Sobre la App</span>
-            <span className="ml-auto text-[9px] font-bold bg-[#14b8a6]/10 text-[#14b8a6] px-2 py-1 rounded-md uppercase tracking-wider border border-[#14b8a6]/20 whitespace-nowrap">
+            <span className="ml-auto text-[9px] font-bold bg-[#23bcef]/10 text-[#107da8] px-2 py-1 rounded-md uppercase tracking-wider border border-[#23bcef]/20 whitespace-nowrap">
               Pronto
             </span>
           </div>

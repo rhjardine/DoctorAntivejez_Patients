@@ -27,9 +27,9 @@ export default function PulsoMatinoCard({ onComplete }: Props) {
         switch (val) {
             case 1: return { emoji: '😴', bg: 'bg-red-500/20 text-red-500', base: 'bg-red-500' };
             case 2: return { emoji: '😐', bg: 'bg-amber-500/20 text-amber-500', base: 'bg-amber-500' };
-            case 3: return { emoji: '🙂', bg: 'bg-[#14b8a6]/20 text-[#14b8a6]', base: 'bg-[#14b8a6]' };
+            case 3: return { emoji: '🙂', bg: 'bg-[#23bcef]/20 text-[#107da8]', base: 'bg-[#23bcef]' };
             case 4: return { emoji: '😊', bg: 'bg-green-500/20 text-green-500', base: 'bg-green-500' };
-            case 5: default: return { emoji: '🔥', bg: 'bg-[#14b8a6] text-white', base: 'bg-[#14b8a6]' };
+            case 5: default: return { emoji: '🔥', bg: 'bg-[#23bcef] text-white', base: 'bg-[#23bcef]' };
         }
     };
 
@@ -68,7 +68,7 @@ export default function PulsoMatinoCard({ onComplete }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-[#293B64] border border-cyan-400/30 rounded-[20px] p-5 w-full shadow-lg relative overflow-hidden"
         >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#14b8a6]/10 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#23bcef]/10 blur-3xl rounded-full pointer-events-none" />
 
             <h3 className="text-[14px] text-white/90 font-medium mb-4 text-center">Buenos días · ¿Cómo amaneciste hoy?</h3>
             <div className="flex justify-center gap-2">
@@ -81,7 +81,7 @@ export default function PulsoMatinoCard({ onComplete }: Props) {
                             whileTap={{ scale: 1.3 }}
                             transition={{ duration: 0.2 }}
                             onClick={() => handlePulse(val as 1 | 2 | 3 | 4 | 5)}
-                            className={`w-12 h-12 flex items-center justify-center rounded-full text-xl ${bg} ${isMax ? 'shadow-lg shadow-[#14b8a6]/30' : ''}`}
+                            className={`w-12 h-12 flex items-center justify-center rounded-full text-xl ${bg} ${isMax ? 'shadow-lg shadow-[#23bcef]/30' : ''}`}
                         >
                             {isMax ? (
                                 <motion.span

@@ -9,7 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary';
  */
 const Loader = () => (
   <div className="flex h-screen items-center justify-center bg-[#f8fafc]">
-    <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#14b8a6] border-t-transparent"></div>
+    <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#23bcef] border-t-transparent"></div>
   </div>
 );
 

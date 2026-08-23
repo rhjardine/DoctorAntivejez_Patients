@@ -20,41 +20,32 @@ export default defineConfig(() => {
       react(),
       VitePWA({
         registerType: 'prompt',
+        // Fuente única del manifest. Antes convivía con un
+        // public/manifest.webmanifest estático que este generador pisaba en
+        // cada build: dos declaraciones del mismo contrato, condenadas a
+        // divergir.
         manifest: {
           name: 'Doctor Antivejez',
           short_name: 'Antivejez',
           description: 'Plataforma de medicina preventiva y longevidad',
+          lang: 'es',
           theme_color: '#293B64',
           background_color: '#293B64',
           display: 'standalone',
           orientation: 'portrait',
           start_url: '/',
           scope: '/',
+          // PNG con el isotipo claro sobre el navy corporativo (#293B64).
+          // Antes se declaraba un JPEG 1080x1080 —el mismo archivo— como si
+          // fuese 192 y 512. Al no tener transparencia y llevar el fondo
+          // blanco del original, el splash del sistema pintaba un recuadro
+          // blanco sobre el navy. Las variantes maskable reservan la zona
+          // segura del 80% que exigen los lanzadores Android.
           icons: [
-            {
-              src: '/Icono_app.jpeg',
-              sizes: '192x192',
-              type: 'image/jpeg',
-              purpose: 'any',
-            },
-            {
-              src: '/Icono_app.jpeg',
-              sizes: '192x192',
-              type: 'image/jpeg',
-              purpose: 'maskable',
-            },
-            {
-              src: '/Icono_app.jpeg',
-              sizes: '512x512',
-              type: 'image/jpeg',
-              purpose: 'any',
-            },
-            {
-              src: '/Icono_app.jpeg',
-              sizes: '512x512',
-              type: 'image/jpeg',
-              purpose: 'maskable',
-            },
+            { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: '/icon-192-maskable.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+            { src: '/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
           ],
         },
         workbox: {

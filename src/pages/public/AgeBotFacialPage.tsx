@@ -75,7 +75,7 @@ const FacialOverlay: React.FC<{ size: number }> = ({ size }) => {
                     key={i}
                     x1={points[a].x} y1={points[a].y}
                     x2={points[b].x} y2={points[b].y}
-                    stroke="#14b8a6" // Teal
+                    stroke="#23bcef" // Teal
                     strokeWidth="1.5" opacity="0.5"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{ pathLength: 1, opacity: 0.5 }}
@@ -86,7 +86,7 @@ const FacialOverlay: React.FC<{ size: number }> = ({ size }) => {
                 <motion.circle
                     key={i}
                     cx={p.x} cy={p.y} r="2.5"
-                    fill="#14b8a6" // Teal
+                    fill="#23bcef" // Teal
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 0.9 }}
                     transition={{ delay: i * 0.03, type: 'spring' }}
@@ -328,7 +328,7 @@ const AgeBotFacialPage: React.FC = () => {
         <div className="min-h-screen flex flex-col bg-[#f8fafc] font-sans relative overflow-hidden">
 
             {/* ELEMENTOS DECORATIVOS CLÍNICOS */}
-            <div className="absolute top-10 left-10 w-48 h-48 bg-[#14b8a6]/5 rounded-full blur-3xl opacity-50 pointer-events-none z-0"></div>
+            <div className="absolute top-10 left-10 w-48 h-48 bg-[#23bcef]/5 rounded-full blur-3xl opacity-50 pointer-events-none z-0"></div>
             <div className="absolute bottom-10 right-10 w-48 h-48 bg-[#293b64]/5 rounded-full blur-3xl opacity-30 pointer-events-none z-0"></div>
 
             {/* HEADER PREMIUM DE CRISTAL */}
@@ -382,7 +382,7 @@ const AgeBotFacialPage: React.FC = () => {
 
                                                 {isCameraLoading && (
                                                     <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[2rem] z-30 bg-[#f8fafc]/80 backdrop-blur-sm m-2">
-                                                        <Loader2 size={40} className="animate-spin mb-3 text-[#14b8a6]" />
+                                                        <Loader2 size={40} className="animate-spin mb-3 text-[#107da8]" />
                                                         <p className="text-xs font-bold tracking-widest uppercase text-slate-500 text-center px-4">Iniciando cámara...</p>
                                                     </div>
                                                 )}
@@ -393,19 +393,19 @@ const AgeBotFacialPage: React.FC = () => {
                                                         <div className="relative">
                                                             {/* Scanning bar */}
                                                             <motion.div
-                                                                className="absolute left-0 right-0 h-0.5 z-20 bg-[#14b8a6]/50 shadow-[0_0_12px_rgba(20,184,166,0.8)]"
+                                                                className="absolute left-0 right-0 h-0.5 z-20 bg-[#23bcef]/50 shadow-[0_0_12px_rgba(20,184,166,0.8)]"
                                                                 animate={{ top: ['15%', '85%', '15%'] }}
                                                                 transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
                                                             />
-                                                            <div className="w-56 h-72 rounded-[40%] border-2 border-[#14b8a6]/50 shadow-[0_0_0_4000px_rgba(0,0,0,0.4)]">
+                                                            <div className="w-56 h-72 rounded-[40%] border-2 border-[#23bcef]/50 shadow-[0_0_0_4000px_rgba(0,0,0,0.4)]">
                                                                 {/* HUD corners */}
-                                                                <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-[#14b8a6]" />
-                                                                <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-[#14b8a6]" />
-                                                                <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-[#14b8a6]" />
-                                                                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-[#14b8a6]" />
+                                                                <div className="absolute -top-2 -left-2 w-6 h-6 border-t-2 border-l-2 border-[#23bcef]" />
+                                                                <div className="absolute -top-2 -right-2 w-6 h-6 border-t-2 border-r-2 border-[#23bcef]" />
+                                                                <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-2 border-l-2 border-[#23bcef]" />
+                                                                <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-[#23bcef]" />
                                                             </div>
                                                             <div className="absolute -bottom-12 left-0 right-0 flex flex-col items-center gap-1">
-                                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#14b8a6]">
+                                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#107da8]">
                                                                     Calibración Óptica
                                                                 </p>
                                                                 <p className="text-[13px] font-medium text-white/90">
@@ -420,7 +420,7 @@ const AgeBotFacialPage: React.FC = () => {
                                             /* Primary CTA = Activar Cámara */
                                             <div className="flex flex-col items-center justify-center text-center px-6 h-full z-10">
                                                 <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 bg-slate-100">
-                                                    <Camera size={40} className="text-[#14b8a6]" />
+                                                    <Camera size={40} className="text-[#107da8]" />
                                                 </div>
                                                 <p className="font-black text-xl mb-3 text-[#293b64] uppercase tracking-tight">Análisis Facial AgeBot</p>
                                                 <p className="font-medium text-sm mb-10 leading-relaxed max-w-[260px] text-slate-500">
@@ -429,13 +429,13 @@ const AgeBotFacialPage: React.FC = () => {
 
                                                 <button
                                                     onClick={handleActivateCamera}
-                                                    className="w-full py-4 bg-gradient-to-r from-[#293b64] to-[#14b8a6] text-white font-bold rounded-2xl shadow-xl shadow-[#293b64]/20 transform active:scale-95 transition-all text-sm pointer-events-auto uppercase tracking-widest">
+                                                    className="w-full py-4 bg-gradient-to-r from-[#293b64] to-[#23bcef] text-white font-bold rounded-2xl shadow-xl shadow-[#293b64]/20 transform active:scale-95 transition-all text-sm pointer-events-auto uppercase tracking-widest">
                                                     Activar Cámara
                                                 </button>
 
                                                 <button
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className="mt-5 text-sm underline decoration-slate-200 pointer-events-auto text-slate-500 hover:text-[#14b8a6] transition-colors">
+                                                    className="mt-5 text-sm underline decoration-slate-200 pointer-events-auto text-slate-500 hover:text-[#107da8] transition-colors">
                                                     Subir foto desde galería
                                                 </button>
                                             </div>
@@ -457,7 +457,7 @@ const AgeBotFacialPage: React.FC = () => {
                                                 {retrying ? 'Reintentando...' : 'Reintentar cámara'}
                                             </button>
                                             <button onClick={() => fileInputRef.current?.click()}
-                                                className="mt-2 text-sm underline decoration-slate-200 pointer-events-auto text-slate-500 hover:text-[#14b8a6] transition-colors">
+                                                className="mt-2 text-sm underline decoration-slate-200 pointer-events-auto text-slate-500 hover:text-[#107da8] transition-colors">
                                                 Subir foto manual
                                             </button>
 
@@ -490,8 +490,8 @@ const AgeBotFacialPage: React.FC = () => {
                                     <button
                                         onClick={capturePhoto}
                                         disabled={!cameraActive}
-                                        className="w-20 h-20 rounded-full border-4 border-[#14b8a6] flex items-center justify-center active:scale-90 transition-all shadow-xl disabled:opacity-30 disabled:cursor-not-allowed">
-                                        <div className="w-16 h-16 rounded-full bg-[#14b8a6]" />
+                                        className="w-20 h-20 rounded-full border-4 border-[#23bcef] flex items-center justify-center active:scale-90 transition-all shadow-xl disabled:opacity-30 disabled:cursor-not-allowed">
+                                        <div className="w-16 h-16 rounded-full bg-[#23bcef]" />
                                     </button>
                                     <div className="w-14 h-14" /> {/* spacer */}
                                 </div>
@@ -510,10 +510,10 @@ const AgeBotFacialPage: React.FC = () => {
                             <div className="relative mb-8">
                                 {capturedImage && (
                                     <img src={capturedImage} alt="Foto capturada"
-                                        className="w-40 h-40 object-cover rounded-full opacity-40 border-2 border-[#14b8a6]" />
+                                        className="w-40 h-40 object-cover rounded-full opacity-40 border-2 border-[#23bcef]" />
                                 )}
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <Loader2 size={52} className="text-[#14b8a6] animate-spin" />
+                                    <Loader2 size={52} className="text-[#107da8] animate-spin" />
                                 </div>
                             </div>
                             <p className="text-lg font-black mb-2 text-[#293b64] uppercase">
@@ -557,7 +557,7 @@ const AgeBotFacialPage: React.FC = () => {
                                     <span className="text-2xl ml-1 text-slate-500">años</span>
                                 </p>
                                 <div className="inline-block mt-2 mb-6 rounded-full px-4 py-1.5 bg-slate-100">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#14b8a6]">IA de Precisión</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#107da8]">IA de Precisión</p>
                                 </div>
                                 <div className="flex items-center justify-center gap-8 mt-2">
                                     <div className="text-center">
@@ -585,7 +585,7 @@ const AgeBotFacialPage: React.FC = () => {
                                 className="w-full max-w-sm flex flex-col gap-3">
                                 <button
                                     onClick={handleFinalCTA}
-                                    className="w-full py-5 bg-gradient-to-r from-[#293b64] to-[#14b8a6] text-white font-black text-[14px] flex items-center justify-center gap-2 rounded-2xl shadow-xl shadow-[#293b64]/20 transform active:scale-95 transition-all uppercase tracking-widest">
+                                    className="w-full py-5 bg-gradient-to-r from-[#293b64] to-[#23bcef] text-white font-black text-[14px] flex items-center justify-center gap-2 rounded-2xl shadow-xl shadow-[#293b64]/20 transform active:scale-95 transition-all uppercase tracking-widest">
                                     Siguiente Paso <ArrowRight size={18} strokeWidth={3} />
                                 </button>
                                 <button onClick={reset}
