@@ -25,7 +25,7 @@ const EnvironmentView: React.FC = () => {
       title: "\"Biophilia\" en Casa",
       desc: "Ideas para integrar elementos naturales en tu hogar.",
       iconComponent: <Leaf size={20} />,
-      color: "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+      color: "bg-[#23bcef]/15 text-[#107da8] dark:bg-[#23bcef]/20 dark:text-[#23bcef]"
     },
     {
       title: "Evaluación de Tóxicos",

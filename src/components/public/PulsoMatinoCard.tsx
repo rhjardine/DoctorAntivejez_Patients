@@ -28,7 +28,7 @@ export default function PulsoMatinoCard({ onComplete }: Props) {
             case 1: return { emoji: '😴', bg: 'bg-red-500/20 text-red-500', base: 'bg-red-500' };
             case 2: return { emoji: '😐', bg: 'bg-amber-500/20 text-amber-500', base: 'bg-amber-500' };
             case 3: return { emoji: '🙂', bg: 'bg-[#23bcef]/20 text-[#107da8]', base: 'bg-[#23bcef]' };
-            case 4: return { emoji: '😊', bg: 'bg-green-500/20 text-green-500', base: 'bg-green-500' };
+            case 4: return { emoji: '😊', bg: 'bg-[#23bcef]/20 text-[#107da8]', base: 'bg-[#23bcef]' };
             case 5: default: return { emoji: '🔥', bg: 'bg-[#23bcef] text-white', base: 'bg-[#23bcef]' };
         }
     };
@@ -39,20 +39,20 @@ export default function PulsoMatinoCard({ onComplete }: Props) {
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-green-50 border border-green-200 rounded-[20px] p-4 flex items-center justify-between w-full shadow-sm"
+                className="bg-[#23bcef]/10 border border-[#23bcef]/30 rounded-[20px] p-4 flex items-center justify-between w-full shadow-sm"
             >
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shadow-inner">
+                    <div className="w-8 h-8 rounded-full bg-[#23bcef] text-white flex items-center justify-center shadow-inner">
                         <Check size={16} strokeWidth={3} />
                     </div>
-                    <span className="text-sm font-semibold text-green-800">Pulso del día registrado</span>
+                    <span className="text-sm font-semibold text-[#107da8]">Pulso del día registrado</span>
                 </div>
                 <div className="flex items-end gap-1.5 h-8">
                     {last7.map((entry, idx) => {
                         const h = (entry.value / 5) * 100;
                         const c = getEmojiAndColor(entry.value).base;
                         return (
-                            <div key={idx} className="w-2 rounded-full bg-green-200/50 h-full flex items-end overflow-hidden">
+                            <div key={idx} className="w-2 rounded-full bg-[#23bcef]/25/50 h-full flex items-end overflow-hidden">
                                 <div className={`w-full rounded-full ${c}`} style={{ height: `${h}%` }} />
                             </div>
                         );

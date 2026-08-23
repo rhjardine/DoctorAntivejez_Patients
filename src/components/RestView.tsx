@@ -7,7 +7,7 @@ const RestView: React.FC = () => {
       title: "Optimizador Rutina Pre-Sueño",
       desc: "Crea y sigue tu secuencia ideal para relajarte antes de dormir.",
       iconComponent: <ListChecks size={20} />,
-      color: "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400"
+      color: "bg-[#23bcef]/15 text-[#107da8] dark:bg-[#23bcef]/20 dark:text-[#23bcef]"
     },
     {
       title: "Análisis Avanzado del Sueño",

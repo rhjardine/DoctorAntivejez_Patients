@@ -79,7 +79,7 @@ const ActivityView: React.FC = () => {
       title: "Movilidad y Estabilidad",
       desc: "Ejercicios diarios para articulaciones y prevención de caídas.",
       iconComponent: <Move size={20} />,
-      color: "bg-green-100 text-green-500 dark:bg-green-900/30 dark:text-green-400"
+      color: "bg-[#23bcef]/15 text-[#107da8] dark:bg-[#23bcef]/20 dark:text-[#23bcef]"
     }
   ];
 
@@ -95,16 +95,16 @@ const ActivityView: React.FC = () => {
             onClick={() => handleCheckIn(tool.id, tool.title)}
             className={`p-4 rounded-xl shadow-sm flex items-center justify-between cursor-pointer transition-all border border-transparent 
                 ${isDone
-                ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20'
+                ? 'bg-[#23bcef]/10 border-[#23bcef]/30 dark:bg-[#107da8]/20'
                 : 'bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 hover:border-gray-100'
               }`}
           >
             <div className="flex items-center gap-4 overflow-hidden">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform ${isDone ? 'bg-emerald-100 text-emerald-600 scale-110' : tool.color}`}>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform ${isDone ? 'bg-[#23bcef]/15 text-[#107da8] scale-110' : tool.color}`}>
                 {isDone ? <CheckCircle2 size={20} /> : tool.iconComponent}
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className={`text-sm font-semibold truncate ${isDone ? 'text-emerald-700 dark:text-emerald-400' : 'text-darkBlue dark:text-white'}`}>
+                <h4 className={`text-sm font-semibold truncate ${isDone ? 'text-[#107da8] dark:text-[#23bcef]' : 'text-darkBlue dark:text-white'}`}>
                   {tool.title}
                 </h4>
                 <p className="text-[11px] text-textMedium dark:text-slate-400 mt-0.5 leading-snug line-clamp-2">
@@ -112,7 +112,7 @@ const ActivityView: React.FC = () => {
                 </p>
               </div>
             </div>
-            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isDone ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300 dark:border-slate-600'}`}>
+            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isDone ? 'border-[#23bcef] bg-[#23bcef]' : 'border-gray-300 dark:border-slate-600'}`}>
               {isLoading ? (
                 <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : isDone ? (
