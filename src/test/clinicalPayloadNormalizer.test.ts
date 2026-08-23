@@ -125,4 +125,70 @@ describe('clinicalPayloadNormalizer', () => {
     expect(items[0].id).toBeDefined();
     expect(items[0].id.startsWith('UNSTABLE_HASH_')).toBe(true);
   });
+
+  // ⚠️ SEGURIDAD CLÍNICA
+  // `pickFirst` descarta '' por diseño, así que `String(pickFirst(..., ''))`
+  // devolvía la cadena literal "undefined" cuando el backend omitía el campo.
+  // El paciente veía "undefined" donde debía ir su dosis y su horario.
+  describe('campos ausentes del backend', () => {
+    const protocolConCamposVacios = (extra: Record<string, unknown> = {}) =>
+      normalizePatientProtocol({
+        guides: [
+          {
+            createdAt: '2026-05-01T10:00:00.000Z',
+            selections: {
+              PRIMARY_NUTRACEUTICALS: [{ nombre: 'Complejo B', ...extra }],
+            },
+          },
+        ],
+      });
+
+    it('nunca emite la cadena "undefined" en dosis, horario u observaciones', () => {
+      const [item] = protocolConCamposVacios();
+
+      expect(item.dose).toBe('');
+      expect(item.schedule).toBe('');
+      expect(item.observations).toBe('');
+
+      const rendered = `${item.dose}${item.schedule}${item.observations}`;
+      expect(rendered).not.toContain('undefined');
+    });
+
+    it('conserva los valores cuando el backend sí los envía', () => {
+      const [item] = protocolConCamposVacios({
+        dosis: '5 gotas',
+        frecuencia: 'En ayunas',
+        observaciones: 'Sublingual',
+      });
+
+      expect(item.dose).toBe('5 gotas');
+      expect(item.schedule).toBe('En ayunas');
+      expect(item.observations).toBe('Sublingual');
+    });
+  });
+
+  // El backend envía claves técnicas como nombre de producto. Un identificador
+  // crudo en una prescripción es ilegible para el paciente.
+  describe('nombres de ítem', () => {
+    const nombreDe = (nombre: string) =>
+      normalizePatientProtocol({
+        guides: [
+          {
+            createdAt: '2026-05-01T10:00:00.000Z',
+            selections: { PRIMARY_NUTRACEUTICALS: [{ nombre }] },
+          },
+        ],
+      })[0].itemName;
+
+    it('humaniza una clave técnica en lugar de mostrarla cruda', () => {
+      const name = nombreDe('am_bioterapico');
+
+      expect(name).not.toContain('_');
+      expect(name).toBe('Am Bioterapico');
+    });
+
+    it('respeta un nombre que ya viene legible', () => {
+      expect(nombreDe('Aceite de ricino')).toBe('Aceite de ricino');
+    });
+  });
 });

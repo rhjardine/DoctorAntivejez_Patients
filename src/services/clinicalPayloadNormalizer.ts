@@ -102,6 +102,62 @@ const asArray = <T = any>(value: unknown): T[] => {
 const pickFirst = (...values: unknown[]): any =>
   values.find((value) => value !== undefined && value !== null && value !== '');
 
+/**
+ * Como `pickFirst`, pero garantiza una cadena.
+ *
+ * ⚠️ No sustituir por `String(pickFirst(..., ''))`. `pickFirst` descarta `''`
+ * por diseño, así que ese fallback nunca se selecciona: cuando el backend omite
+ * todos los campos, `find` devuelve `undefined` y `String(undefined)` produce la
+ * cadena literal `"undefined"`. Eso es lo que el paciente veía en el lugar de su
+ * dosis, su horario y las indicaciones de su médico.
+ */
+const pickText = (...values: unknown[]): string => {
+  const found = pickFirst(...values);
+  return found === undefined || found === null ? '' : String(found).trim();
+};
+
+/**
+ * Nombres legibles para las claves técnicas que el backend envía como
+ * identificadores de producto (p. ej. `am_bioterapico`).
+ *
+ * Este diccionario lo debe rellenar el equipo clínico con los nombres
+ * comerciales reales: aquí no se inventan, porque un nombre equivocado en una
+ * prescripción es un error clínico. Mientras una clave no esté mapeada,
+ * `humanizeItemName` la vuelve legible sin afirmar nada sobre su significado, y
+ * se registra en el log para poder recopilarlas a partir de datos reales.
+ */
+const ITEM_NAME_LABELS: Record<string, string> = {
+  // Ejemplo de formato — añadir aquí las claves confirmadas por el médico:
+  // am_bioterapico: 'Bioterápico de la mañana',
+};
+
+/** Una clave técnica: sin espacios y con separadores de código. */
+const looksTechnical = (value: string): boolean =>
+  !value.includes(' ') && /[_-]/.test(value) && value === value.toLowerCase();
+
+/**
+ * Convierte una clave técnica en algo presentable. Nunca debe llegar a la
+ * pantalla del paciente un identificador crudo como `am_bioterapico`.
+ */
+const humanizeItemName = (raw: string): string => {
+  const key = raw.trim();
+  const mapped = ITEM_NAME_LABELS[key.toLowerCase()];
+  if (mapped) return mapped;
+
+  if (!looksTechnical(key)) return key;
+
+  logger.warn('[normalizer] Nombre de ítem sin mapear en ITEM_NAME_LABELS', {
+    reason: 'UNMAPPED_ITEM_KEY',
+    key,
+  });
+
+  return key
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\p{Ll}/gu, (c) => c.toUpperCase());
+};
+
 const normalizeSlot = (value: unknown): TimeSlot => {
   if (typeof value !== 'string') return 'ANYTIME';
   const normalized = value
@@ -182,39 +238,30 @@ const normalizeProtocolItem = (
   return {
     id: stableId(normalizedCategory, index, raw),
     category: normalizedCategory,
-    itemName: String(itemName),
-    dose: String(
-      pickFirst(
-        raw.dose,
-        raw.dosis,
-        raw.amount,
-        raw.cantidad,
-        raw.presentation,
-        '',
-      ),
+    itemName: humanizeItemName(String(itemName)),
+    dose: pickText(
+      raw.dose,
+      raw.dosis,
+      raw.amount,
+      raw.cantidad,
+      raw.presentation,
     ),
-    schedule: String(
-      pickFirst(
-        raw.schedule,
-        raw.frecuencia,
-        raw.horario,
-        raw.indication,
-        raw.indicacion,
-        raw.instructions,
-        raw.instrucciones,
-        '',
-      ),
+    schedule: pickText(
+      raw.schedule,
+      raw.frecuencia,
+      raw.horario,
+      raw.indication,
+      raw.indicacion,
+      raw.instructions,
+      raw.instrucciones,
     ),
-    observations: String(
-      pickFirst(
-        raw.observations,
-        raw.observaciones,
-        raw.notes,
-        raw.notas,
-        raw.comentarios,
-        raw.warning,
-        '',
-      ),
+    observations: pickText(
+      raw.observations,
+      raw.observaciones,
+      raw.notes,
+      raw.notas,
+      raw.comentarios,
+      raw.warning,
     ),
     status:
       raw.status === 'completed' || raw.completed === true || raw.done === true
@@ -449,15 +496,7 @@ export const normalizeAlimentacion = (
   ).forEach((item) => {
     const meal =
       MEAL_ALIASES[
-        String(
-          pickFirst(
-            item.mealType,
-            item.meal,
-            item.tipoComida,
-            item.category,
-            '',
-          ),
-        ).trim()
+        pickText(item.mealType, item.meal, item.tipoComida, item.category)
       ];
     const name = pickFirst(
       item.name,
