@@ -56,6 +56,18 @@ describe('clearPatientScopedStorage', () => {
         expect(localStorage.getItem('auth_token')).toBeNull();
     });
 
+    it('borra las notas privadas del paciente sobre su plan', () => {
+        // patientNotesService usa el prefijo da_ precisamente para quedar
+        // cubierto por este barrido. Si alguien renombra la clave sin el
+        // prefijo, las notas de un paciente sobrevivirían al logout en un
+        // dispositivo compartido.
+        localStorage.setItem('da_meal_notes_v1', 'iv:ciphertext');
+
+        clearPatientScopedStorage();
+
+        expect(localStorage.getItem('da_meal_notes_v1')).toBeNull();
+    });
+
     it('conserva las preferencias de interfaz (no son PII)', () => {
         localStorage.setItem('ui-storage', '{"theme":"dark"}');
 

@@ -6,18 +6,15 @@ import {
   Moon,
   Leaf,
   ShieldAlert,
-  Stethoscope,
-  Droplet,
-  Star,
   ClipboardList,
   AlertTriangle,
   CheckCircle2,
   Dna,
   BookOpen,
   Heart,
-  Activity,
-  Zap,
+  Info,
 } from 'lucide-react';
+import MealNotesField from './MealNotesField';
 import { useProfileStore } from '../store/useProfileStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { ProtocolService } from '../services/protocolService';
@@ -31,23 +28,26 @@ interface Props {
   onBack: () => void;
 }
 
+// Solo dos entradas, por indicación médica. Las pestañas "5A" y "4R" que había
+// aquí duplicaban las principales de HomePage (MainTab.KEYS_5A y
+// THERAPIES_4R), así que al quitarlas no queda ninguna sección huérfana.
 const SECTION_TABS = [
   { id: 'diario', label: 'Plan', icon: ClipboardList },
   { id: 'guia', label: 'Guía', icon: BookOpen },
-  { id: 'claves', label: '5A', icon: Zap },
-  { id: 'terapias', label: '4R', icon: Activity },
 ] as const;
 
 type SectionTab = (typeof SECTION_TABS)[number]['id'];
 
-const MEAL_TABS = [
+// Las comidas ya no son pestañas: se recorren en scroll vertical continuo, en
+// el orden en que transcurre el día.
+const MEALS = [
   { id: 'desayuno', label: 'Desayuno', icon: Coffee },
   { id: 'almuerzo', label: 'Almuerzo', icon: Sun },
   { id: 'cena', label: 'Cena', icon: Moon },
-  { id: 'meriendas', label: 'Meriendas', icon: Leaf },
+  { id: 'meriendas', label: 'Merienda', icon: Leaf },
 ] as const;
 
-type MealTab = (typeof MEAL_TABS)[number]['id'];
+type MealId = (typeof MEALS)[number]['id'];
 
 const TIPO_LABELS: Record<string, string> = {
   tipoNino: 'Niño',
@@ -64,7 +64,6 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
   const [isLoadingPlan, setIsLoadingPlan] = useState(false);
   const [hasAttemptedPlanLoad, setHasAttemptedPlanLoad] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionTab>('diario');
-  const [activeMeal, setActiveMeal] = useState<MealTab>('desayuno');
 
   useEffect(() => {
     if (
@@ -120,16 +119,42 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
     return grupo === 'A_AB' ? DEFAULTS_A_AB : DEFAULTS_O_B;
   }, [alimentacion?.grupoSanguineo]);
 
-  // Datos del plan – priorizar lo que guardó el médico, con fallback a defaults
-  const planAlimentario = useMemo(
-    () => ({
-      desayuno: alimentacion?.planAlimentario?.desayuno ?? defaults.desayuno,
-      almuerzo: alimentacion?.planAlimentario?.almuerzo ?? defaults.almuerzo,
-      cena: alimentacion?.planAlimentario?.cenaComunes ?? defaults.cena.comunes,
-      meriendas:
-        alimentacion?.planAlimentario?.meriendas ?? DEFAULTS_COMUNES.meriendas,
-    }),
-    [alimentacion, defaults],
+  // Datos del plan – priorizar lo que guardó el médico, con fallback a defaults.
+  //
+  // ⚠️ ADR-007: el fallback es contenido genérico por grupo sanguíneo, NO una
+  // prescripción. Se marca cuál es cuál para que la pantalla pueda decirlo, en
+  // vez de presentar una pauta orientativa como si el médico la hubiera firmado.
+  const planAlimentario = useMemo(() => {
+    const prescrito: Record<MealId, string[] | undefined> = {
+      desayuno: alimentacion?.planAlimentario?.desayuno,
+      almuerzo: alimentacion?.planAlimentario?.almuerzo,
+      cena: alimentacion?.planAlimentario?.cenaComunes,
+      meriendas: alimentacion?.planAlimentario?.meriendas,
+    };
+    const generico: Record<MealId, string[]> = {
+      desayuno: defaults.desayuno,
+      almuerzo: defaults.almuerzo,
+      cena: defaults.cena.comunes,
+      meriendas: DEFAULTS_COMUNES.meriendas,
+    };
+
+    return MEALS.reduce(
+      (acc, { id }) => {
+        const delMedico = prescrito[id];
+        acc[id] = {
+          items: delMedico ?? generico[id] ?? [],
+          isPrescribed: Array.isArray(delMedico) && delMedico.length > 0,
+        };
+        return acc;
+      },
+      {} as Record<MealId, { items: string[]; isPrescribed: boolean }>,
+    );
+  }, [alimentacion, defaults]);
+
+  /** True si el médico no prescribió ninguna comida: todo lo visible es genérico. */
+  const planEsGenerico = useMemo(
+    () => MEALS.every(({ id }) => !planAlimentario[id].isPrescribed),
+    [planAlimentario],
   );
 
   const alimentosEvitar = useMemo(
@@ -148,14 +173,8 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
     [alimentacion],
   );
 
-  const claves5a = useMemo(
-    () => alimentacion?.claves5a || DEFAULTS_COMUNES.claves5a,
-    [alimentacion],
-  );
-  const terapias4r = useMemo(
-    () => alimentacion?.terapias4r || DEFAULTS_COMUNES.terapias4r,
-    [alimentacion],
-  );
+  // `claves5a` y `terapias4r` alimentaban las pestañas 5A y 4R que esta pantalla
+  // ya no tiene: viven en HomePage, que es su sitio.
 
   const tiposActivos = useMemo(() => {
     if (!alimentacion) return [];
@@ -262,44 +281,72 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
       <div className="flex-1 overflow-y-auto no-scrollbar bg-[#F8FAFC]">
         {/* 1. SECCIÓN: PLAN DIARIO (CON TABS DE COMIDA) */}
         {activeSection === 'diario' && (
-          <div className="animate-in fade-in slide-in-from-bottom-5 duration-500">
-            {/* Meal Tabs */}
-            <div className="flex gap-2 px-5 py-4 overflow-x-auto no-scrollbar">
-              {MEAL_TABS.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => setActiveMeal(id)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black transition-all border-2 whitespace-nowrap ${
-                    activeMeal === id
-                      ? 'bg-[#23BCEF] border-[#23BCEF] text-white shadow-md'
-                      : 'bg-white border-slate-100 text-slate-500'
-                  }`}
-                >
-                  <Icon size={14} />
-                  {label.toUpperCase()}
-                </button>
-              ))}
-            </div>
+          <div className="px-5 pt-5 pb-16 space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+            {/* ADR-007: no presentar una pauta orientativa como si fuera prescripción. */}
+            {planEsGenerico && (
+              <div
+                role="status"
+                className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-100"
+              >
+                <Info size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                <p className="text-[11px] font-medium leading-relaxed text-amber-900">
+                  Tu médico aún no ha registrado tu plan personalizado. Lo que ves
+                  es una <strong>pauta orientativa general</strong> según tu grupo
+                  sanguíneo, no una prescripción.
+                </p>
+              </div>
+            )}
 
-            {/* List of items */}
-            <div className="px-5 space-y-3 pb-10">
-              {(planAlimentario[activeMeal] || []).map((item, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white rounded-[1.5rem] p-5 shadow-sm border border-slate-100 flex items-center gap-4 group"
-                >
-                  <div className="w-10 h-10 rounded-2xl bg-[#23BCEF]/10 flex items-center justify-center shrink-0 group-hover:bg-[#23BCEF] transition-colors">
-                    <CheckCircle2
-                      size={18}
-                      className="text-[#23BCEF] group-hover:text-white"
-                    />
+            {/* Scroll vertical continuo: desayuno → almuerzo → cena → merienda */}
+            {MEALS.map(({ id, label, icon: Icon }) => {
+              const { items, isPrescribed } = planAlimentario[id];
+
+              return (
+                <section key={id} aria-labelledby={`meal-${id}`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-9 h-9 rounded-2xl bg-[#23BCEF]/10 flex items-center justify-center shrink-0">
+                      <Icon size={16} className="text-[#107da8]" />
+                    </div>
+                    <h3
+                      id={`meal-${id}`}
+                      className="text-[13px] font-black uppercase tracking-widest text-[#293b64]"
+                    >
+                      {label}
+                    </h3>
+                    {!isPrescribed && !planEsGenerico && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-100 px-2 py-1 rounded-lg">
+                        Orientativo
+                      </span>
+                    )}
                   </div>
-                  <span className="text-sm font-bold text-[#293b64] leading-tight">
-                    {item}
-                  </span>
-                </div>
-              ))}
-            </div>
+
+                  {items.length > 0 ? (
+                    <div className="space-y-2.5">
+                      {items.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-white rounded-[1.25rem] px-4 py-3.5 shadow-sm border border-slate-100 flex items-center gap-3"
+                        >
+                          <CheckCircle2
+                            size={16}
+                            className="text-[#23BCEF] shrink-0"
+                          />
+                          <span className="text-sm font-bold text-[#293b64] leading-snug">
+                            {item}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs font-medium text-slate-400 italic px-1">
+                      Sin indicaciones para esta comida.
+                    </p>
+                  )}
+
+                  <MealNotesField mealId={id} mealLabel={label} />
+                </section>
+              );
+            })}
           </div>
         )}
 
@@ -351,80 +398,6 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                 ))}
               </div>
             </div>
-          </div>
-        )}
-
-        {/* 3. SECCIÓN: CLAVES 5A */}
-        {activeSection === 'claves' && (
-          <div className="px-5 pt-6 space-y-4 pb-20 animate-in fade-in slide-in-from-bottom-5 duration-500">
-            {claves5a.map((clave: any, idx: number) => (
-              <div
-                key={idx}
-                className="bg-white rounded-[2rem] p-6 border border-slate-100 shadow-sm flex flex-col gap-4"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#23BCEF]/10 flex items-center justify-center text-xl shadow-inner">
-                    {clave.icono}
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-black text-[#293b64] uppercase tracking-widest">
-                      {clave.clave}
-                    </h4>
-                    <div className="h-1 w-8 bg-[#23BCEF] rounded-full mt-1 opacity-50" />
-                  </div>
-                </div>
-                <div className="space-y-2.5">
-                  {clave.items.map((item: string, i: number) => (
-                    <div
-                      key={i}
-                      className="flex gap-3 text-xs font-bold text-slate-500 leading-relaxed pl-2"
-                    >
-                      <span className="text-[#23BCEF] mt-0.5 whitespace-nowrap">
-                        🔸
-                      </span>
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* 4. SECCIÓN: TERAPIAS 4R */}
-        {activeSection === 'terapias' && (
-          <div className="px-5 pt-6 space-y-5 pb-20 animate-in fade-in slide-in-from-bottom-5 duration-500">
-            {terapias4r.map((t: any, idx: number) => (
-              <div
-                key={idx}
-                className="bg-white rounded-[2.5rem] p-7 border border-slate-100 shadow-sm relative overflow-hidden"
-              >
-                <div className="absolute top-0 left-0 w-1.5 h-full bg-[#23BCEF]" />
-                <div className="mb-4">
-                  <h3 className="text-sm font-black text-[#293b64] uppercase tracking-tight">
-                    {t.nombre}
-                  </h3>
-                  <p className="text-[11px] font-black text-[#23BCEF] italic mt-0.5 opacity-80">
-                    "{t.slogan}"
-                  </p>
-                </div>
-                <ul className="space-y-3">
-                  {t.items.map((item: string, i: number) => (
-                    <li
-                      key={i}
-                      className="flex gap-3 text-xs font-bold text-slate-600 bg-slate-50/80 p-3 rounded-2xl border border-slate-100"
-                    >
-                      <Zap
-                        size={14}
-                        className="text-amber-400 shrink-0"
-                        fill="currentColor"
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
           </div>
         )}
 
