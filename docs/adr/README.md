@@ -18,12 +18,13 @@ con el backend **se documenta aquí antes de mergear**.
 | [005](ADR-005-ids-inestables-adherencia.md) | IDs inestables y pérdida de adherencia | **Parcial — depende del backend** |
 | [006](ADR-006-hosting-render-free-tier.md) | Hosting en Render (plan gratuito) | Aceptado con fecha de revisión |
 | [007](ADR-007-nunca-fabricar-datos-clinicos.md) | Nunca fabricar datos clínicos | Aceptado |
+| [008](ADR-008-recordatorios-de-terapia-clinica.md) | Recordatorios de terapia clínica | **No implementable — requiere backend** |
 
 ## Deuda que bloquea el piloto
 
-Los ADR **004** y **005** describen deuda que **no puede cerrarse desde este repositorio**:
-requieren cambios en el backend. Ambos incluyen el contrato exacto que debe cumplirse y su
-criterio de verificación.
+Los ADR **004**, **005** y **008** describen deuda que **no puede cerrarse desde este
+repositorio**: requieren cambios en el backend. Todos incluyen el contrato exacto que debe
+cumplirse y su criterio de verificación.
 
 ## Formato
 
