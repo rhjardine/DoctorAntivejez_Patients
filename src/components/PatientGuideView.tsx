@@ -32,6 +32,11 @@ import {
 } from 'lucide-react';
 import { useProfileStore } from '../store/useProfileStore';
 import { normalizePatientProtocol } from '../services/clinicalPayloadNormalizer';
+import {
+  groupForCategory,
+  THERAPY_GROUP_LABELS,
+  type TherapyGroup,
+} from '../config/therapyGroups';
 
 interface PatientGuideViewProps {
   items: PatientProtocol[];
@@ -98,6 +103,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
 }) => {
   const { profileData } = useProfileStore();
   const [viewMode, setViewMode] = useState<ViewMode>('PLAN');
+  const [activeGroup, setActiveGroup] = useState<TherapyGroup>('ORAL');
   const [activeTab, setActiveTab] = useState<TimeSlot>('MORNING');
   const [expandedCategories, setExpandedCategories] = useState<
     Record<string, boolean>
@@ -148,26 +154,48 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     }
   }, [profileData, items]);
 
+  // Ítems de la pestaña activa: Terapia Oral o Terapéutica (ver config/therapyGroups).
+  const groupItems = useMemo(
+    () =>
+      effectiveItems.filter(
+        (item) => groupForCategory(item.category) === activeGroup,
+      ),
+    [effectiveItems, activeGroup],
+  );
+
+  /** Cuántos ítems tiene cada pestaña, para no ofrecer una que está vacía. */
+  const groupCounts = useMemo(
+    () =>
+      effectiveItems.reduce(
+        (acc, item) => {
+          acc[groupForCategory(item.category)] += 1;
+          return acc;
+        },
+        { ORAL: 0, CLINICAL: 0 } as Record<TherapyGroup, number>,
+      ),
+    [effectiveItems],
+  );
+
   // Group items by category dynamically
   const activeCategories = useMemo(() => {
     const groups: Record<string, PatientProtocol[]> = {};
-    effectiveItems.forEach((item) => {
+    groupItems.forEach((item) => {
       if (!groups[item.category]) {
         groups[item.category] = [];
       }
       groups[item.category].push(item);
     });
     return groups;
-  }, [effectiveItems]);
+  }, [groupItems]);
 
   const sortedActiveCategoryTypes = useMemo(() => {
     return (Object.keys(activeCategories) as ProtocolCategory[]).sort();
   }, [activeCategories]);
 
-  const completedCount = effectiveItems.filter(
+  const completedCount = groupItems.filter(
     (i) => i.status === 'completed',
   ).length;
-  const totalCount = effectiveItems.length;
+  const totalCount = groupItems.length;
   const progressPercent =
     totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
@@ -274,18 +302,22 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
             : 'border-white hover:border-sky-100 shadow-md shadow-slate-200/50'
           }`}
       >
+        {/* Tarjeta compacta, por indicación médica: dosis y horario en una sola
+            línea bajo el nombre. Cada dato solo ocupa espacio si el médico lo
+            indicó — antes la fila de dosis se dibujaba siempre y dejaba un hueco
+            vacío en los ítems sin posología. */}
         <div
           onClick={() => onToggleItem(item.id)}
-          className="flex items-center gap-5 p-5 cursor-pointer"
+          className="flex items-center gap-4 px-4 py-3.5 cursor-pointer"
         >
           <div
-            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-inner shrink-0 ${isCompleted
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-inner shrink-0 ${isCompleted
                 ? 'bg-emerald-500 text-white rotate-[360deg]'
                 : 'bg-slate-50 border border-slate-200 text-transparent group-hover:border-primary'
               }`}
           >
             <Check
-              size={24}
+              size={20}
               strokeWidth={4}
               className={
                 isCompleted ? 'scale-100' : 'scale-0 transition-transform'
@@ -295,31 +327,32 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
 
           <div className="flex-1 min-w-0">
             <h3
-              className={`font-black text-base leading-tight transition-all truncate ${isCompleted ? 'text-slate-400 line-through' : 'text-[#293B64]'
+              className={`font-black text-[15px] leading-snug transition-all ${isCompleted ? 'text-slate-400 line-through' : 'text-[#293B64]'
                 }`}
             >
               {item.itemName}
             </h3>
 
-            <div className="flex flex-col gap-1.5 mt-2.5">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-tighter ${isCompleted
-                      ? 'bg-slate-100 text-slate-400'
-                      : 'bg-sky-50 text-primary'
-                    }`}
-                >
-                  {getIconByType(item.category)}
-                  <span>Dosis: {item.dose}</span>
-                </div>
+            {(item.dose || item.schedule) && (
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+                {item.dose && (
+                  <span
+                    className={`text-[11px] font-bold ${isCompleted ? 'text-slate-400' : 'text-[#107da8]'}`}
+                  >
+                    {item.dose}
+                  </span>
+                )}
+                {item.dose && item.schedule && (
+                  <span className="text-[11px] text-slate-300">·</span>
+                )}
+                {item.schedule && (
+                  <span className="flex items-center gap-1 text-[11px] font-medium italic text-slate-500">
+                    <Clock size={11} className="text-slate-300" />
+                    {item.schedule}
+                  </span>
+                )}
               </div>
-              {item.schedule && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold text-textMedium italic">
-                  <Clock size={12} className="text-slate-300" />
-                  <span>{item.schedule}</span>
-                </div>
-              )}
-            </div>
+            )}
           </div>
 
           {hasNotes && (
@@ -360,8 +393,64 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     );
   };
 
+  /**
+   * Terapéutica: procedimientos de consulta.
+   *
+   * Listado vertical continuo y **solo lectura**, por indicación médica: es una
+   * receta oficial, no una lista de tareas. Sin casillas ni acciones — el
+   * paciente no ejecuta estos tratamientos, se los aplican en consulta.
+   */
+  const renderClinicalMode = () => (
+    <div className="flex-1 overflow-y-auto no-scrollbar bg-[#F8FAFC] px-5 pt-5 pb-16 space-y-3">
+      <div className="flex items-start gap-3 p-4 rounded-2xl bg-sky-50 border border-sky-100 mb-1">
+        <Stethoscope size={16} className="text-[#107da8] flex-shrink-0 mt-0.5" />
+        <p className="text-[11px] font-medium leading-relaxed text-[#293b64]/70">
+          Estos procedimientos se realizan <strong>en consulta</strong>. Es tu
+          indicación médica oficial; no requiere que registres nada.
+        </p>
+      </div>
+
+      {groupItems.map((item) => (
+        <div
+          key={item.id}
+          className="bg-white rounded-[1.25rem] px-4 py-4 shadow-sm border border-slate-100"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <h4 className="text-sm font-black text-[#293b64] leading-snug">
+              {item.itemName}
+            </h4>
+            <span className="text-[9px] font-bold uppercase tracking-wider text-[#107da8] bg-[#23bcef]/10 px-2 py-1 rounded-lg whitespace-nowrap shrink-0">
+              {CATEGORY_LABELS[item.category] || item.category}
+            </span>
+          </div>
+
+          {(item.dose || item.schedule) && (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+              {item.dose && (
+                <span className="text-xs font-bold text-slate-500">
+                  Dosis: {item.dose}
+                </span>
+              )}
+              {item.schedule && (
+                <span className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                  <Clock size={12} /> {item.schedule}
+                </span>
+              )}
+            </div>
+          )}
+
+          {item.observations && (
+            <p className="mt-2.5 text-[11px] font-medium italic leading-relaxed text-slate-500 bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
+              {item.observations}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
   const renderTrackMode = () => {
-    const filteredItems = effectiveItems.filter((item) => {
+    const filteredItems = groupItems.filter((item) => {
       if (activeTab === 'ANYTIME') return true;
       return item.timeSlot === activeTab || item.timeSlot === 'ANYTIME';
     });
@@ -516,39 +605,45 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
               <div
                 className={`bg-white transition-all overflow-hidden ${isExpanded ? 'max-h-[3000px]' : 'max-h-0'}`}
               >
-                <div className="p-4 space-y-4">
+                {/* Formato compacto, por indicación médica: nombre, dosis y
+                    horario en una línea. Cada dato aparece solo si el médico lo
+                    indicó, de modo que un ítem sin posología no deja un hueco. */}
+                <div className="p-3 space-y-2">
                   {categoryItems.map((item) => (
                     <div
                       key={item.id}
-                      className="p-5 rounded-[1.5rem] bg-slate-50/50 border border-slate-100 shadow-inner"
+                      className="px-4 py-3 rounded-[1.25rem] bg-slate-50/50 border border-slate-100"
                     >
-                      <div className="flex justify-between items-start mb-4">
-                        <h4 className="font-black text-darkBlue text-base leading-tight flex-1">
+                      <div className="flex justify-between items-start gap-3">
+                        <h4 className="font-black text-darkBlue text-[15px] leading-snug flex-1">
                           {item.itemName}
                         </h4>
-                        <span className="text-[9px] font-black text-primary bg-white px-3 py-1.5 rounded-xl uppercase tracking-tighter border border-sky-100 shadow-sm">
+                        <span className="text-[9px] font-black text-primary bg-white px-2.5 py-1 rounded-lg uppercase tracking-tighter border border-sky-100 shrink-0">
                           {getSlotLabel(item.timeSlot)}
                         </span>
                       </div>
-                      <div className="grid grid-cols-1 gap-2.5 mb-4">
-                        <div className="flex items-center gap-2 bg-white p-3 rounded-2xl border border-slate-100">
-                          <Stethoscope size={14} className="text-primary" />
-                          <p className="text-xs font-black text-darkBlue uppercase tracking-tighter">
-                            Dosis:{' '}
-                            <span className="text-primary">{item.dose}</span>
-                          </p>
-                        </div>
-                        {item.schedule && (
-                          <div className="flex items-center gap-2 bg-white p-3 rounded-2xl border border-slate-100">
-                            <Clock size={14} className="text-slate-400" />
-                            <p className="text-xs font-bold text-textMedium italic">
+
+                      {(item.dose || item.schedule) && (
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+                          {item.dose && (
+                            <span className="text-[11px] font-bold text-[#107da8]">
+                              {item.dose}
+                            </span>
+                          )}
+                          {item.dose && item.schedule && (
+                            <span className="text-[11px] text-slate-300">·</span>
+                          )}
+                          {item.schedule && (
+                            <span className="flex items-center gap-1 text-[11px] font-medium italic text-slate-500">
+                              <Clock size={11} className="text-slate-300" />
                               {item.schedule}
-                            </p>
-                          </div>
-                        )}
-                      </div>
+                            </span>
+                          )}
+                        </div>
+                      )}
+
                       {item.observations && (
-                        <div className="p-4 rounded-2xl border flex gap-3 shadow-inner bg-amber-50 border-amber-100">
+                        <div className="mt-2.5 p-3 rounded-xl border flex gap-2.5 bg-amber-50 border-amber-100">
                           <MessageSquareQuote
                             size={16}
                             className="text-amber-500 shrink-0"
@@ -650,7 +745,31 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
             </button>
           </div>
 
-          {effectiveItems.length > 0 && !loading && (
+          {/* Terapia Oral vs Terapéutica. Solo se ofrece cuando el paciente
+              tiene ítems de ambos tipos: una pestaña vacía es ruido. */}
+          {effectiveItems.length > 0 && !loading && groupCounts.CLINICAL > 0 && (
+            <div className="flex gap-2 mt-3">
+              {(['ORAL', 'CLINICAL'] as const).map((group) => (
+                <button
+                  key={group}
+                  onClick={() => setActiveGroup(group)}
+                  aria-pressed={activeGroup === group}
+                  className={`flex-1 py-2.5 rounded-xl text-[9.5px] font-black uppercase tracking-widest border-2 transition-all ${
+                    activeGroup === group
+                      ? 'bg-[#293b64] border-[#293b64] text-white shadow-md'
+                      : 'bg-white border-slate-100 text-slate-400'
+                  }`}
+                >
+                  {THERAPY_GROUP_LABELS[group]}
+                  <span className="ml-1.5 opacity-60">{groupCounts[group]}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* El conmutador Ver Guía / Registrar Avances solo aplica a Terapia
+              Oral: la Terapéutica es de solo lectura, no se registra nada. */}
+          {groupItems.length > 0 && !loading && activeGroup === 'ORAL' && (
             <div className="bg-slate-50 p-1 rounded-2xl flex relative h-11 shadow-inner border border-slate-100 mt-2">
               <div
                 className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-xl shadow-md transition-all duration-300 border border-slate-100 ${viewMode === 'TRACK' ? 'left-[calc(50%+2px)]' : 'left-1'}`}
@@ -723,6 +842,8 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
                 Verificar Actualizaciones
               </button>
             </div>
+          ) : activeGroup === 'CLINICAL' ? (
+            renderClinicalMode()
           ) : viewMode === 'TRACK' ? (
             renderTrackMode()
           ) : (
