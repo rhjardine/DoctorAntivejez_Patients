@@ -9,6 +9,13 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 import { MEDICAL_NETWORK } from '../../data/medicalNetwork';
+import apiClient from '../../services/apiClient';
+import {
+    validatePersonName,
+    validateEmail,
+    validatePhone,
+    firstError,
+} from '../../utils/validation';
 
 /* ─── Stripe Initialization (singleton — lives outside component tree) ───
  * loadStripe is called once at module scope to avoid re-creating the Stripe
@@ -263,6 +270,19 @@ const ConsultaExploratoriaPage: React.FC = () => {
         e.preventDefault();
         if (!form.name || !form.email || !form.phone) return;
         setPaymentError(null);
+
+        // Validar ANTES de tokenizar la tarjeta: no tiene sentido cobrar por una
+        // solicitud que el backend va a rechazar por datos de contacto inválidos.
+        const nombre = validatePersonName(form.name);
+        const correo = validateEmail(form.email);
+        const telefono = validatePhone(form.phone);
+        const problema = firstError(nombre, correo, telefono);
+        if (problema) {
+            setPaymentError(problema);
+            setSubmitState('error');
+            return;
+        }
+
         setSubmitState('sending');
 
         let paymentMethodId: string | null = null;
@@ -291,9 +311,9 @@ const ConsultaExploratoriaPage: React.FC = () => {
         }
 
         const bookingData = {
-            name: form.name,
-            email: form.email,
-            phone: form.phone,
+            name: nombre.ok ? nombre.value : form.name,
+            email: correo.ok ? correo.value : form.email,
+            phone: telefono.ok ? telefono.value : form.phone,
             country: form.country,
             horario: form.horario,
             doctorId: form.doctorId || null,
@@ -310,16 +330,23 @@ const ConsultaExploratoriaPage: React.FC = () => {
         }));
 
         try {
-            await fetch('/api-render/api/booking', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bookingData),
-            });
+            // apiClient resuelve la URL según el entorno. Antes se llamaba a
+            // '/api-render/api/booking', que es SOLO el proxy del servidor de
+            // desarrollo (vite.config.ts): en producción esa ruta no existe y,
+            // en un host estático de SPA, devuelve index.html con estado 200.
+            // `fetch` no rechaza ante un 404, así que la reserva se daba por
+            // buena y la clínica no recibía nada. axios sí lanza ante no-2xx.
+            await apiClient.post('/booking', bookingData);
+            setSubmitState('confirmed');
         } catch {
-            /* Network failure — still show confirmation to user, team will contact */
+            // No se confirma una cita que no quedó registrada: el paciente debe
+            // saberlo para reintentar o llamar. Se reutiliza el canal de error
+            // que ya usa el resto del formulario.
+            setPaymentError(
+                'No pudimos registrar tu solicitud. Revisa tu conexión e inténtalo de nuevo, o escríbenos por WhatsApp.',
+            );
+            setSubmitState('error');
         }
-
-        setSubmitState('confirmed');
     };
 
     const isFormValid =

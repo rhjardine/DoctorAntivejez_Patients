@@ -10,6 +10,13 @@ import {
 } from 'lucide-react';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
+import apiClient from '../../services/apiClient';
+import {
+  validatePersonName,
+  validateEmail,
+  firstError,
+  isInvalid,
+} from '../../utils/validation';
 
 type Category = 'EXCELENTE' | 'BUENO' | 'REGULAR' | 'CRITICO';
 
@@ -117,6 +124,7 @@ const ResultadoScorePage: React.FC = () => {
 
   const [leadName, setLeadName] = useState('');
   const [leadEmail, setLeadEmail] = useState('');
+  const [leadError, setLeadError] = useState<string | null>(null);
   const [leadStatus, setLeadStatus] = useState<'idle' | 'sending' | 'sent'>(
     'idle',
   );
@@ -201,28 +209,40 @@ const ResultadoScorePage: React.FC = () => {
   const handleLead = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!leadName || !leadEmail) return;
+
+    const nombre = validatePersonName(leadName);
+    const correo = validateEmail(leadEmail);
+    const problema = firstError(nombre, correo);
+    if (problema) {
+      setLeadError(problema);
+      return;
+    }
+    setLeadError(null);
     setLeadStatus('sending');
-    sessionStorage.setItem('vx_lead_name', leadName);
-    sessionStorage.setItem('vx_lead_email', leadEmail);
+
+    const name = isInvalid(nombre) ? leadName : nombre.value;
+    const email = isInvalid(correo) ? leadEmail : correo.value;
+
+    sessionStorage.setItem('vx_lead_name', name);
+    sessionStorage.setItem('vx_lead_email', email);
 
     try {
-      const res = await fetch('/api-render/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: leadName,
-          email: leadEmail,
-          score,
-          category: result.category,
-          source: 'test_antivejez',
-        }),
+      // apiClient resuelve la URL segun el entorno. Antes apuntaba a
+      // '/api-render/api/leads', que es SOLO el proxy del servidor de
+      // desarrollo: en produccion esa ruta no existe y todos los leads
+      // acababan en localStorage sin llegar nunca a la clinica.
+      await apiClient.post('/leads', {
+        name,
+        email,
+        score,
+        category: result.category,
+        source: 'test_antivejez',
       });
-      if (!res.ok) throw new Error('API unavailable');
     } catch {
       const pending = JSON.parse(
         localStorage.getItem('da_pending_leads') || '[]',
       );
-      pending.push({ name: leadName, email: leadEmail, score, ts: Date.now() });
+      pending.push({ name, email, score, ts: Date.now() });
       localStorage.setItem('da_pending_leads', JSON.stringify(pending));
     }
 

@@ -37,12 +37,38 @@ rechazan patrones débiles conocidos (`changeme`, `test`, `password`…). Si fal
 arranca**: muestra "Error de Configuración de Seguridad". Se prefiere no arrancar antes que
 cifrar PHI con una clave predecible.
 
+## ⚠️ Corrección: la semilla NO es secreta
+
+La descripción de arriba habla de una «semilla de servidor», y eso **sobreestima la garantía**.
+`VITE_ENCRYPTION_SEED` es una variable de Vite: se compila **literalmente dentro del bundle**
+que se sirve al navegador. Verificado construyendo con una semilla marcada y encontrándola en
+`dist/assets/index-*.js`.
+
+En una aplicación de cliente esto no tiene arreglo: **no existe forma de ocultar un secreto en
+un frontend**. La consecuencia es que el único factor realmente no público es el `visitorId`
+del dispositivo, que además lo calcula el mismo código público.
+
+**Lo que este cifrado sí protege:**
+- Un volcado de `localStorage` trasladado a **otro** dispositivo: la huella difiere y el
+  descifrado falla.
+- Inspección casual del almacenamiento: el PHI no se lee a simple vista.
+
+**Lo que NO protege:**
+- A un atacante con acceso al dispositivo y capacidad de ejecutar código en el origen: puede
+  invocar `decrypt()` igual que la app.
+- A un ataque dirigido que reproduzca la derivación con la semilla pública y la huella.
+
+Es **defensa en profundidad, no confidencialidad fuerte**, y así debe describirse ante el
+comité y en cualquier evaluación de cumplimiento. El cierre real es el contrato de backend
+recogido en [ADR-005](ADR-005-ids-inestables-adherencia.md) §«Gestión de claves»: que el
+servidor entregue, tras autenticar, un secreto de envoltura por usuario que viva solo en
+memoria. Con eso el contenido cifrado deja de ser descifrable sin una sesión válida.
+
 ## Consecuencias
 
 **Positivas**
-- El PHI en reposo no es legible sin la semilla del servidor **y** el dispositivo concreto.
 - La clave es no exportable: no puede extraerse desde JS.
-- Robar el `localStorage` sin la huella del dispositivo no basta.
+- Robar el `localStorage` y llevárselo a otro dispositivo no basta.
 
 **Negativas / aceptadas**
 - **El cifrado no protege frente a un XSS en ejecución**: el atacante opera en el mismo contexto

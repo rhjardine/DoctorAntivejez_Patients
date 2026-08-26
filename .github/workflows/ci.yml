@@ -39,6 +39,9 @@ jobs:
           VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://placeholder.onrender.com' }}
           VITE_ENCRYPTION_SEED: ${{ secrets.VITE_ENCRYPTION_SEED || 'ci-build-seed-not-for-production' }}
 
+      - name: Guarda de secretos en el bundle
+        run: node scripts/check-secrets.mjs
+
       - name: Security audit (high severity)
         run: npm audit --audit-level=high
         # Allow CI to pass even if audit finds issues (advisory only — fix separately)

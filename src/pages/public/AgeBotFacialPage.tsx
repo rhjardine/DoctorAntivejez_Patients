@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle, BrainCircuit, ChevronLeft } from 'lucide-react';
 import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
+import apiClient from '../../services/apiClient';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 import { usePublicFunnelStore } from '../../store/usePublicFunnelStore';
 
@@ -21,17 +22,18 @@ async function analyzeFacialAge(imageBase64: string): Promise<FacialResult> {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos máximo
 
-        const response = await fetch('/api-render/api/vision-v1', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ imageBase64, analysisType: 'AGE_FACIAL' }),
-            signal: controller.signal
-        });
+        // apiClient resuelve la URL según el entorno. Antes se llamaba a
+        // '/api-render/api/vision-v1', que es SOLO el proxy del servidor de
+        // desarrollo: en producción esa ruta no existe.
+        const response = await apiClient.post(
+            '/vision-v1',
+            { imageBase64, analysisType: 'AGE_FACIAL' },
+            { signal: controller.signal },
+        );
 
         clearTimeout(timeoutId);
 
-        if (response.ok) return await response.json();
-        throw new Error(`API error: ${response.status}`);
+        return response.data;
 
     } catch (error) {
         // In development only: use mock to allow testing without backend

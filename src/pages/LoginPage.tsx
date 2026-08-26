@@ -5,6 +5,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useUIStore } from '../store/useUIStore';
 import { authService } from '../services/authService';
 import { useLocale } from '../hooks/useLocale';
+import { validateDocumentId, isInvalid } from '../utils/validation';
 
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
@@ -20,11 +21,22 @@ const LoginPage: React.FC = () => {
 
         setError(null);
 
+        // Validación de cliente: mensaje concreto en lugar de un 401 genérico
+        // tras esperar el arranque en frío del servidor. NO es una barrera de
+        // seguridad — el backend debe validar igual (ver utils/validation.ts).
+        const documento = validateDocumentId(documentId);
+        if (isInvalid(documento)) {
+            setError(documento.error);
+            return;
+        }
+
         // Targeted cleanup
         authService.clearSession();
 
         try {
-            await login(documentId, password);
+            // Se envía normalizado (solo dígitos): el paciente puede escribir
+            // "V-5.963.578" y el backend recibe siempre el mismo formato.
+            await login(documento.value, password);
             useUIStore.getState().setMainTab("Claves 5A" as any); // Reset to Claves 5A (MainTab.KEYS_5A)
             navigate('/');
         } catch (err: unknown) {

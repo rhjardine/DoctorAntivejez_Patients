@@ -12,7 +12,8 @@
     "test:coverage": "vitest run --coverage",
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write src",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check:secrets": "node scripts/check-secrets.mjs"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [

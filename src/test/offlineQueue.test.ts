@@ -123,6 +123,27 @@ describe('offlineQueue', () => {
             expect(await offlineQueue.dequeueForCurrentPatient()).toHaveLength(1);
         });
 
+        it('no deja el cuerpo legible en reposo, pero lo devuelve descifrado al drenar', async () => {
+            iniciarSesion('paciente-A');
+            const secreto = JSON.stringify({ notes: 'hoy me sentí ansioso' });
+
+            await offlineQueue.enqueue({
+                url: '/mobile-adherence-v1',
+                method: 'POST',
+                body: secreto,
+                headers: {},
+            });
+
+            // En reposo: marcado como cifrado y sin el texto original.
+            const [enReposo] = await offlineQueue.dequeueAll();
+            expect(enReposo.body.startsWith('enc:v1:')).toBe(true);
+            expect(enReposo.body).not.toContain('ansioso');
+
+            // Al drenar: el cuerpo vuelve a ser el original para el replay.
+            const [paraEnviar] = await offlineQueue.dequeueForCurrentPatient();
+            expect(paraEnviar.body).toBe(secreto);
+        });
+
         it('sin sesión no reproduce nada', async () => {
             iniciarSesion('paciente-A');
             await offlineQueue.enqueue({

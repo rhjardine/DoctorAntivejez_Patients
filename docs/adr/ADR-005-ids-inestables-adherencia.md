@@ -80,22 +80,127 @@ Se aplicó en su lugar el §6.3 del informe: *"la deuda queda documentada, no oc
 
 ---
 
-## Contrato pendiente del backend (bloquea Gate 1)
+## Segunda causa: el endpoint tampoco existe
 
-Para cerrar R-P0-1 de raíz, `mobile-profile-v1` debe garantizar:
+Auditando el inventario de endpoints apareció un segundo motivo, **independiente del primero**.
 
-1. **Todo ítem de protocolo lleva un identificador propio y persistente** (`id`, `_id`,
-   `protocolItemId`, `itemId` o `treatmentId` — `stableId()` ya acepta cualquiera de ellos).
-2. **El identificador sobrevive a las reediciones de la guía por parte del médico.** No puede
-   derivarse de la posición en el array ni del nombre del tratamiento.
-3. **`PATCH /protocols/{itemId}/status` existe y es idempotente**, para que el drenaje de la cola
-   offline no duplique registros.
+La adherencia de la guía escribe en `PATCH /protocols/{itemId}/status`. Esa ruta pertenece a una
+familia REST (`/patients/{id}/guide`, `/patients/{id}/metrics`, `/protocols/...`) que **el
+backend no expone**: en la PWA, todo lo que funciona usa la familia `mobile-*-v1`.
 
-Cuando se cumpla, `stableId()` dejará de emitir el prefijo `UNSTABLE_HASH_` por sí solo, la rama
-de rechazo quedará inerte y podrá eliminarse junto con este ADR.
+Prueba de ello es que las 5A sí registran actividad, y lo hacen contra otro endpoint:
 
-**Verificación de cierre:** la métrica `adherence_rejected_unstable_id` debe caer a cero en el
-piloto durante dos semanas consecutivas.
+```ts
+// ActivityView.tsx y AttitudeView.tsx — este SÍ funciona
+await apiClient.post('/mobile-adherence-v1', { type, points, notes, metadata });
+```
+
+**Implicación práctica:** aunque mañana el backend empezara a emitir IDs estables, la adherencia
+de la guía **seguiría sin registrarse**, porque apunta a una ruta inexistente. Son dos arreglos,
+no uno, y conviene planificarlos juntos.
+
+---
+
+## Especificación para el Backend Lead
+
+### 1. Identificadores estables en el protocolo
+
+`GET /mobile-profile-v1` debe garantizar, para cada ítem dentro de `guides[].selections`:
+
+```jsonc
+{
+  "id": "uuid-o-id-persistente",   // obligatorio
+  "nombre": "Complejo B Avanzado",
+  "dosis": "1 cápsula",
+  "frecuencia": "Después del desayuno"
+}
+```
+
+- El `id` **sobrevive a las reediciones de la guía**. No puede derivarse de la posición en el
+  array ni del nombre del tratamiento: si el médico reordena o renombra, el histórico de
+  adherencia debe seguir apuntando al mismo ítem.
+- `stableId()` ya acepta `id`, `_id`, `protocolItemId`, `itemId` o `treatmentId`; cualquiera vale.
+
+### 2. Registrar la adherencia de un ítem
+
+**Recomendación: extender `mobile-adherence-v1`** en lugar de construir la familia REST entera.
+Ya existe, ya está autenticado y ya lo consume la app.
+
+```jsonc
+POST /mobile-adherence-v1
+{
+  "type": "protocol_item",
+  "status": "completed",           // | "pending"
+  "metadata": { "itemId": "<id estable del paso 1>" }
+}
+```
+
+Requisitos:
+- **Idempotente por `(patientId, itemId, día)`**: la cola offline reintenta, y un reintento no
+  debe duplicar el registro. Devolver `409` ante un duplicado ya aplicado — el drenaje ya trata
+  el `409` como éxito (`useSyncQueue.ts`).
+- **Derivar el paciente del token, nunca del cuerpo.** Un `patientId` enviado por el cliente es
+  una vía directa a escribir en la historia de otra persona.
+- Responder `404` si el `itemId` no pertenece a ese paciente.
+
+Si se prefiere la ruta REST, el contrato equivalente es `PATCH /protocols/{itemId}/status` con
+las mismas garantías. Lo que no puede quedar es la situación actual: una ruta declarada en el
+cliente que el servidor no atiende.
+
+### 3. Autorización a nivel de fila (RLS)
+
+La PWA **no accede a la base de datos**: no hay Supabase ni cliente SQL, solo la API REST
+(verificado). Por tanto **RLS no se configura ni se activa desde este repositorio** — vive
+íntegramente en el backend, y allí debe verificarse:
+
+- Toda consulta de datos clínicos filtra por el paciente derivado **del token**, no de un
+  parámetro de la petición.
+- Si la base es PostgreSQL/Supabase, activar RLS en las tablas de pacientes, protocolos,
+  adherencia, biometrías y consentimiento, con políticas basadas en el id autenticado.
+- Probar explícitamente el caso negativo: con el token del paciente A, pedir el recurso del
+  paciente B debe devolver `403`/`404`, nunca datos.
+- La clave `service_role` (u equivalente) **jamás** puede salir al cliente. El CI ya falla si
+  aparece en el bundle (`scripts/check-secrets.mjs`).
+
+### 4. Gestión de claves de cifrado
+
+Cierra la limitación descrita en [ADR-001](ADR-001-cifrado-phi-device-bound.md): la semilla de
+cifrado viaja en el bundle y es pública.
+
+Propuesta: tras autenticar, devolver un **secreto de envoltura por usuario** que la PWA
+mantenga **solo en memoria** y use para derivar la clave del caché local.
+
+```jsonc
+POST /mobile-auth-v1
+{ "token": "...", "refreshToken": "...", "patient": {...},
+  "encryptionKey": "<secreto de 32+ bytes, por usuario>" }
+```
+
+Efecto: el contenido cifrado en el dispositivo deja de ser descifrable sin una sesión válida,
+que es la garantía que ADR-001 describía y hoy no ofrece.
+
+### 5. Rate limiting en autenticación
+
+`POST /mobile-auth-v1` recibe cédulas numéricas cortas. Sin limitación es enumerable por fuerza
+bruta. Aplicar límite por IP **y** por documento, con bloqueo temporal progresivo.
+
+### 6. Validar en el servidor
+
+`src/utils/validation.ts` define las reglas de cliente (documento, correo, teléfono, nombre,
+texto libre) con sus límites en la constante `LIMITS`. **Son de experiencia de usuario, no una
+barrera**: cualquiera puede saltárselas. El servidor debe aplicar las mismas y rechazar lo que
+no cumpla.
+
+---
+
+## Verificación de cierre
+
+1. La métrica `adherence_rejected_unstable_id` cae a cero durante dos semanas del piloto.
+2. Un paciente marca un ítem, recarga la app y el estado persiste.
+3. El médico ve esa adherencia en su panel.
+
+Hasta que los tres se cumplan, el porcentaje de adherencia del panel
+(`HomePage.tsx`) sub-reporta y no debe leerse como indicador clínico.
 
 ---
 

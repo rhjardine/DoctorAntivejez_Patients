@@ -1,4 +1,6 @@
 // src/services/offlineQueue.ts
+import { cryptoService } from './cryptoService';
+import { logger } from '../utils/logger';
 const DB_NAME = 'rejuvenate-offline-queue';
 const STORE_NAME = 'pending-writes';
 const DB_VERSION = 1;
@@ -23,6 +25,43 @@ export interface QueuedWrite {
      */
     patientId: string;
 }
+
+/**
+ * Prefijo que marca un cuerpo cifrado.
+ *
+ * El cuerpo de una escritura encolada puede contener información de salud —el
+ * diario de gratitud viaja como `notes`—, así que se cifra en reposo con
+ * AES-GCM igual que el perfil clínico (ADR-001). El prefijo permite convivir
+ * con entradas de versiones anteriores, guardadas en claro, sin perderlas.
+ */
+const ENC_PREFIX = 'enc:v1:';
+
+const encryptBody = async (body: string): Promise<string> => {
+    if (!body) return body;
+    try {
+        return ENC_PREFIX + (await cryptoService.encrypt(body));
+    } catch {
+        // Si el cifrado no está disponible, encolar en claro es preferible a
+        // perder el registro clínico del paciente. Queda constancia.
+        logger.warn('[offlineQueue] No se pudo cifrar el cuerpo; se encola en claro', {
+            reason: 'QUEUE_ENCRYPT_UNAVAILABLE',
+        });
+        return body;
+    }
+};
+
+const decryptBody = async (body: string): Promise<string> => {
+    if (!body || !body.startsWith(ENC_PREFIX)) return body; // entrada legada
+    try {
+        const plain = await cryptoService.decrypt(body.slice(ENC_PREFIX.length));
+        return typeof plain === 'string' ? plain : JSON.stringify(plain);
+    } catch {
+        logger.warn('[offlineQueue] No se pudo descifrar una escritura encolada', {
+            reason: 'QUEUE_DECRYPT_FAILED',
+        });
+        return '';
+    }
+};
 
 const SESSION_KEY = 'rejuvenate_session_v1';
 
@@ -64,6 +103,10 @@ class OfflineQueue {
     async enqueue(
         write: Omit<QueuedWrite, 'id' | 'timestamp' | 'retryCount' | 'patientId'>,
     ): Promise<void> {
+        // Cifrar ANTES de abrir la transacción: IndexedDB cierra las
+        // transacciones al ceder el hilo, y `encrypt` es asíncrono.
+        const body = await encryptBody(write.body);
+
         const db = await this.openDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction(STORE_NAME, 'readwrite');
@@ -76,6 +119,7 @@ class OfflineQueue {
 
             const fullWrite: QueuedWrite = {
                 ...write,
+                body,
                 headers: safeHeaders,
                 timestamp: Date.now(),
                 retryCount: 0,
@@ -139,7 +183,16 @@ class OfflineQueue {
         if (!patientId) return [];
 
         const all = await this.dequeueAll();
-        return all.filter((item) => item.patientId === patientId);
+        const mine = all.filter((item) => item.patientId === patientId);
+
+        // El cuerpo se descifra solo aquí, justo antes del replay: en reposo
+        // nunca queda legible en IndexedDB.
+        return Promise.all(
+            mine.map(async (item) => ({
+                ...item,
+                body: await decryptBody(item.body),
+            })),
+        );
     }
 
     /** Número de pendientes del paciente actual (para el indicador de la UI). */
