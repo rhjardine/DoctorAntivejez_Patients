@@ -69,9 +69,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     useEffect(() => {
         if (!isOnline) {
-            offlineQueue.count().then(setPendingCount);
+            offlineQueue.countForCurrentPatient().then(setPendingCount);
             const interval = setInterval(() => {
-                offlineQueue.count().then(setPendingCount);
+                offlineQueue.countForCurrentPatient().then(setPendingCount);
             }, 2000);
             return () => clearInterval(interval);
         } else {
