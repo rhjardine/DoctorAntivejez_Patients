@@ -1,9 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   buildNutrigenomicPlan,
   normalizeAlimentacion,
   normalizePatientProtocol,
 } from '../services/clinicalPayloadNormalizer';
+import { logger } from '../utils/logger';
 
 describe('clinicalPayloadNormalizer', () => {
   it('normaliza todas las categorías de selections enviadas desde la webapp médica', () => {
@@ -180,15 +181,77 @@ describe('clinicalPayloadNormalizer', () => {
         ],
       })[0].itemName;
 
-    it('humaniza una clave técnica en lugar de mostrarla cruda', () => {
-      const name = nombreDe('am_bioterapico');
+    it('usa el nombre legible cuando la clave está mapeada', () => {
+      // Mapeo aportado por la especificación del sprint.
+      expect(nombreDe('am_bioterapico')).toBe('Bioterápico');
+    });
+
+    it('humaniza una clave desconocida en lugar de mostrarla cruda', () => {
+      const name = nombreDe('xx_producto_desconocido');
 
       expect(name).not.toContain('_');
-      expect(name).toBe('Am Bioterapico');
+      expect(name).toBe('Xx Producto Desconocido');
     });
 
     it('respeta un nombre que ya viene legible', () => {
       expect(nombreDe('Aceite de ricino')).toBe('Aceite de ricino');
+    });
+
+    it('registra un aviso cuando la clave no está mapeada', () => {
+      const warn = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+
+      nombreDe('zz_clave_sin_mapear');
+
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('sin mapear'),
+        expect.objectContaining({ reason: 'UNMAPPED_ITEM_KEY' }),
+      );
+      warn.mockRestore();
+    });
+
+    it('no avisa de clave sin mapear cuando la clave sí está mapeada', () => {
+      const warn = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+
+      nombreDe('am_bioterapico');
+
+      // Se comprueba el motivo concreto, no la ausencia total de avisos: el
+      // fixture no trae `id`, así que stableId() emite su propio
+      // MISSING_BACKEND_ID, que es correcto y esperado.
+      const motivos = warn.mock.calls.map((c) => (c[1] as any)?.reason);
+      expect(motivos).not.toContain('UNMAPPED_ITEM_KEY');
+
+      warn.mockRestore();
+    });
+
+    // ⚠️ El log no puede filtrar información del paciente. Antes de esta guarda,
+    // stableId() volcaba el ítem completo —nombre del tratamiento y dosis— a la
+    // consola del navegador.
+    it('no incluye PHI en el registro: solo la clave técnica y metadatos', () => {
+      const warn = vi.spyOn(logger, 'warn').mockImplementation(() => {});
+
+      normalizePatientProtocol({
+        guides: [
+          {
+            createdAt: '2026-05-01T10:00:00.000Z',
+            selections: {
+              PRIMARY_NUTRACEUTICALS: [
+                {
+                  nombre: 'yy_clave_tecnica',
+                  dosis: '5 gotas sublinguales',
+                  observaciones: 'Paciente con hipertensión controlada',
+                },
+              ],
+            },
+          },
+        ],
+      });
+
+      const registrado = JSON.stringify(warn.mock.calls);
+      expect(registrado).toContain('yy_clave_tecnica'); // la clave sí, es técnica
+      expect(registrado).not.toContain('5 gotas sublinguales'); // la dosis no
+      expect(registrado).not.toContain('hipertensión'); // la observación clínica tampoco
+
+      warn.mockRestore();
     });
   });
 });

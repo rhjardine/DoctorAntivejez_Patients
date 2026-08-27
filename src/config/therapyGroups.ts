@@ -10,9 +10,12 @@ import { logger } from '../utils/logger';
  *               shots, quelaciones, nebulizaciones, pediluvio, terapia celular).
  *               Es solo lectura: funciona como receta médica oficial.
  *
- * ⚠️ ESTA ES UNA CLASIFICACIÓN CLÍNICA, NO UNA DECISIÓN DE INTERFAZ.
- * Debe validarla el médico. Está aislada en este archivo justamente para que
- * corregirla sea cambiar una línea, sin tocar componentes.
+ * ⚠️ CLINICAL CLASSIFICATION PENDING PHYSICIAN CONFIRMATION.
+ *
+ * Es una clasificación clínica, no una decisión de interfaz, y **no ha sido
+ * confirmada formalmente por el médico**. Está aislada en este archivo justo
+ * para que corregirla tras la validación sea cambiar una línea, sin tocar
+ * ningún componente.
  */
 
 export type TherapyGroup = 'ORAL' | 'CLINICAL';

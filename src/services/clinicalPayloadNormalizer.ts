@@ -127,8 +127,13 @@ const pickText = (...values: unknown[]): string => {
  * se registra en el log para poder recopilarlas a partir de datos reales.
  */
 const ITEM_NAME_LABELS: Record<string, string> = {
-  // Ejemplo de formato — añadir aquí las claves confirmadas por el médico:
-  // am_bioterapico: 'Bioterápico de la mañana',
+  // Clinical naming pending physician confirmation.
+  //
+  // Este mapeo lo aporta la especificación del sprint, no se dedujo aquí: se
+  // desconoce qué denota el prefijo `am_`. Si resultara ser un marcador horario
+  // ("mañana"), el nombre no pierde información clínica, porque el momento de
+  // toma viaja aparte en `timeSlot`.
+  am_bioterapico: 'Bioterápico',
 };
 
 /** Una clave técnica: sin espacios y con separadores de código. */
