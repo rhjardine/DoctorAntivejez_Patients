@@ -26,26 +26,83 @@ import { logger } from '../utils/logger';
  * al cierre de sesión en un dispositivo compartido.
  */
 
-const STORAGE_KEY = 'da_meal_notes_v1';
+/**
+ * Prefijo de la clave. La clave real incluye el id del paciente.
+ *
+ * ⚠️ AISLAMIENTO ENTRE PACIENTES. Antes era una única clave global
+ * (`da_meal_notes_v1`) y la protección dependía por completo de que el paciente
+ * pulsara «cerrar sesión». La clave AES se deriva de la semilla + la huella del
+ * DISPOSITIVO, sin componente de paciente, así que en una tablet compartida:
+ *
+ *   A escribe una nota → A cierra la app sin hacer logout → B inicia sesión
+ *   → B lee la nota de A.
+ *
+ * `authService.clearSession()`, que sí corre en cada login, no tocaba esa clave.
+ * Ahora cada paciente tiene su propio espacio y, además, el contenido lleva
+ * dentro el paciente al que pertenece (ver `readAll`).
+ */
+const STORAGE_PREFIX = 'da_meal_notes_v1_';
+const SESSION_KEY = 'rejuvenate_session_v1';
 
 export type MealNotes = Record<string, string>;
 
-const readAll = async (): Promise<MealNotes> => {
+/** Sobre cifrado: las notas van acompañadas del paciente que las escribió. */
+interface NotesEnvelope {
+  patientId: string;
+  notes: MealNotes;
+}
+
+/**
+ * Id del paciente con sesión abierta.
+ *
+ * Se lee directamente de localStorage para no importar authService: eso
+ * formaría el ciclo authService → ProtocolService → … → patientNotesService.
+ */
+const currentPatientId = (): string => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (!raw) return '';
+    return String(JSON.parse(raw)?.id ?? '');
+  } catch {
+    return '';
+  }
+};
+
+const storageKeyFor = (patientId: string): string => STORAGE_PREFIX + patientId;
+
+const readAll = async (): Promise<MealNotes> => {
+  const patientId = currentPatientId();
+  if (!patientId) return {}; // sin sesión no hay notas que mostrar
+
+  const key = storageKeyFor(patientId);
+  try {
+    const raw = localStorage.getItem(key);
     if (!raw || raw.trim() === '') return {};
 
     // Restos de una versión anterior sin cifrar, o valor corrupto: descartar en
     // vez de intentar interpretarlo.
     if (raw.startsWith('{') || !raw.includes(':')) {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(key);
       return {};
     }
 
     const decrypted = await cryptoService.decrypt(raw);
-    if (decrypted && typeof decrypted === 'object') return decrypted as MealNotes;
+    const envelope = decrypted as NotesEnvelope | null;
 
-    localStorage.removeItem(STORAGE_KEY);
+    // Segunda barrera, independiente del nombre de la clave: aunque alguien
+    // moviera o renombrara el contenido, solo se devuelve si pertenece al
+    // paciente que tiene la sesión abierta.
+    if (
+      envelope &&
+      typeof envelope === 'object' &&
+      envelope.patientId === patientId &&
+      envelope.notes &&
+      typeof envelope.notes === 'object'
+    ) {
+      return envelope.notes;
+    }
+
+    localStorage.removeItem(key);
     return {};
   } catch {
     // El descifrado falla si cambia la huella del dispositivo. No propagar:
@@ -58,9 +115,13 @@ const readAll = async (): Promise<MealNotes> => {
 };
 
 const writeAll = async (notes: MealNotes): Promise<void> => {
+  const patientId = currentPatientId();
+  if (!patientId) return; // sin sesión no se escribe nada
+
   try {
-    const encrypted = await cryptoService.encrypt(notes);
-    localStorage.setItem(STORAGE_KEY, encrypted);
+    const envelope: NotesEnvelope = { patientId, notes };
+    const encrypted = await cryptoService.encrypt(envelope);
+    localStorage.setItem(storageKeyFor(patientId), encrypted);
   } catch {
     logger.warn('[patientNotes] No se pudieron guardar las notas locales', {
       reason: 'NOTES_WRITE_FAILED',

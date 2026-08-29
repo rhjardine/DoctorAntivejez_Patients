@@ -14,11 +14,22 @@ import { logger } from '../utils/logger';
  *  - no filtran contenido del paciente al log.
  */
 
-const STORAGE_KEY = 'da_meal_notes_v1';
+const SESSION_KEY = 'rejuvenate_session_v1';
+const keyFor = (id: string) => `da_meal_notes_v1_${id}`;
+
+const iniciarSesion = (patientId: string) =>
+    localStorage.setItem(
+        SESSION_KEY,
+        JSON.stringify({ id: patientId, name: 'Test', role: 'PATIENT' }),
+    );
+
+/** Cierre de app SIN logout: la sesión desaparece, el almacenamiento no se limpia. */
+const cerrarAppSinLogout = () => localStorage.removeItem(SESSION_KEY);
 
 beforeEach(() => {
     localStorage.clear();
     sessionStorage.clear();
+    iniciarSesion('paciente-A');
 });
 
 describe('patientNotesService', () => {
@@ -63,26 +74,30 @@ describe('patientNotesService', () => {
     // al alcance del siguiente.
     it('el logout elimina las notas del paciente anterior', async () => {
         await patientNotesService.set('desayuno', 'Contenido privado del paciente A');
-        expect(localStorage.getItem(STORAGE_KEY)).not.toBeNull();
+        expect(localStorage.getItem(keyFor('paciente-A'))).not.toBeNull();
 
         clearPatientScopedStorage();
 
-        expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+        expect(localStorage.getItem(keyFor('paciente-A'))).toBeNull();
         expect(await patientNotesService.get('desayuno')).toBe('');
     });
 
     it('no persiste fuera del namespace da_', async () => {
         await patientNotesService.set('desayuno', 'Contenido');
 
-        const claves = Object.keys(localStorage);
-        expect(claves).toContain(STORAGE_KEY);
-        expect(claves.every((k) => k.startsWith('da_'))).toBe(true);
+        // Solo se consideran las claves que escribe ESTE servicio: la de sesión
+        // la pone authService y no forma parte de su contrato.
+        const escritasPorElServicio = Object.keys(localStorage).filter(
+            (k) => k !== SESSION_KEY,
+        );
+        expect(escritasPorElServicio).toContain(keyFor('paciente-A'));
+        expect(escritasPorElServicio.every((k) => k.startsWith('da_'))).toBe(true);
     });
 
     it('no deja la nota legible en reposo', async () => {
         await patientNotesService.set('desayuno', 'hoy tuve náuseas');
 
-        const enReposo = localStorage.getItem(STORAGE_KEY) ?? '';
+        const enReposo = localStorage.getItem(keyFor('paciente-A')) ?? '';
         expect(enReposo).not.toContain('náuseas');
     });
 
@@ -100,6 +115,64 @@ describe('patientNotesService', () => {
         } finally {
             globalThis.fetch = original;
         }
+    });
+
+    // ⚠️ AISLAMIENTO ENTRE PACIENTES — el escenario que motivó este sprint.
+    describe('aislamiento A → B en el mismo dispositivo', () => {
+        it('B NO lee la nota de A cuando A cerró la app SIN hacer logout', async () => {
+            await patientNotesService.set('desayuno', 'A: hoy tuve náuseas');
+
+            // A cierra la app: la sesión se va, el almacenamiento permanece.
+            cerrarAppSinLogout();
+            iniciarSesion('paciente-B');
+
+            expect(await patientNotesService.get('desayuno')).toBe('');
+            expect(await patientNotesService.getAll()).toEqual({});
+        });
+
+        it('B NO lee la nota de A tras un logout explícito', async () => {
+            await patientNotesService.set('desayuno', 'A: hoy tuve náuseas');
+
+            clearPatientScopedStorage(); // logout
+            iniciarSesion('paciente-B');
+
+            expect(await patientNotesService.get('desayuno')).toBe('');
+        });
+
+        it('cada paciente conserva las suyas: el espacio está separado por paciente', async () => {
+            await patientNotesService.set('desayuno', 'nota de A');
+
+            cerrarAppSinLogout();
+            iniciarSesion('paciente-B');
+            await patientNotesService.set('desayuno', 'nota de B');
+
+            expect(await patientNotesService.get('desayuno')).toBe('nota de B');
+
+            cerrarAppSinLogout();
+            iniciarSesion('paciente-A');
+            expect(await patientNotesService.get('desayuno')).toBe('nota de A');
+        });
+
+        it('el contenido cifrado va ligado al paciente, no solo al nombre de la clave', async () => {
+            await patientNotesService.set('desayuno', 'nota de A');
+            const cifradoDeA = localStorage.getItem(keyFor('paciente-A'))!;
+
+            // Se copia el contenido de A al espacio de B (clave renombrada).
+            cerrarAppSinLogout();
+            iniciarSesion('paciente-B');
+            localStorage.setItem(keyFor('paciente-B'), cifradoDeA);
+
+            // El sobre lleva dentro el paciente: B sigue sin poder leerlo.
+            expect(await patientNotesService.get('desayuno')).toBe('');
+        });
+
+        it('sin sesión no se lee ni se escribe nada', async () => {
+            cerrarAppSinLogout();
+
+            await patientNotesService.set('desayuno', 'huérfana');
+            expect(await patientNotesService.getAll()).toEqual({});
+            expect(Object.keys(localStorage).some((k) => k.startsWith('da_meal_notes'))).toBe(false);
+        });
     });
 
     it('no filtra el contenido de la nota al log', async () => {

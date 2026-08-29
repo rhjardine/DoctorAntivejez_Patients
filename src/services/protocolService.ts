@@ -39,6 +39,16 @@ const clearSessionCache = (): void => {
   sessionStorage.removeItem(NUTRITION_CACHE_KEY);
 };
 
+/**
+ * Resultado de registrar adherencia.
+ *
+ * `confirmed` es el ÚNICO valor que autoriza a mostrar la marca como registrada.
+ * Un booleano no bastaba: obligaba a colapsar «encolado sin conexión» y
+ * «rechazado por el servidor» en el mismo valor, y ahí nacía la falsa
+ * confirmación.
+ */
+export type AdherenceResult = 'confirmed' | 'pending' | 'failed';
+
 // ─── ProtocolService ─────────────────────────────────────────────────────────
 
 export const ProtocolService = {
@@ -99,7 +109,7 @@ export const ProtocolService = {
     patientId: string,
     itemId: string,
     status: 'pending' | 'completed',
-  ): Promise<boolean> => {
+  ): Promise<AdherenceResult> => {
     // ⚠️ SEGURIDAD CLÍNICA: el guard va ANTES de tocar el caché.
     // Un ítem sin ID estable NO puede sincronizarse con el backend, así que
     // tampoco debe quedar marcado como completado en el caché local: dejaría al
@@ -111,7 +121,7 @@ export const ProtocolService = {
         { reason: 'UNSTABLE_ITEM_ID', status },
       );
       logger.audit('adherence_rejected_unstable_id', { status });
-      return false;
+      return 'failed';
     }
 
     // Actualización optimista en caché (solo para ítems sincronizables)
@@ -124,17 +134,38 @@ export const ProtocolService = {
     }
 
     try {
-      // Intentar sincronizar con backend
-      // Si el endpoint no existe aún, falla silenciosamente (local-first)
       const response = await apiClient.patch(`/protocols/${itemId}/status`, {
         status,
       });
-      return response.status === 200 || response.status === 204;
-    } catch {
-      // El caché local ya está actualizado — encolar en background sync
-      console.warn(
-        '[ProtocolService] Network failed, enqueueing protocol status update offline',
-      );
+      return response.status === 200 || response.status === 204
+        ? 'confirmed'
+        : 'failed';
+    } catch (error) {
+      // ⚠️ Distinción crítica: NO todo fallo es «sin conexión».
+      //
+      // Si el servidor RESPONDIÓ con un error (4xx/5xx), la petición llegó y fue
+      // rechazada: reintentarla no la va a arreglar. Es el caso real hoy, porque
+      // /protocols/{id}/status no existe en el backend y devuelve 404 — antes se
+      // encolaba y se devolvía `true`, de modo que el paciente veía un check
+      // confirmado por una adherencia que nadie iba a registrar nunca y que la
+      // cola descartaba en silencio tras 3 reintentos.
+      // El interceptor de apiClient normaliza el error de axios a un Error
+      // plano y traslada el código a `.status` (apiClient.ts:78-79); `.response`
+      // no sobrevive. Se contemplan ambas formas para que esto siga siendo
+      // correcto si alguien llama sin pasar por el interceptor.
+      const httpStatus =
+        (error as any)?.status ?? (error as any)?.response?.status;
+
+      if (typeof httpStatus === 'number') {
+        logger.warn('[ProtocolService] El servidor rechazó la adherencia', {
+          reason: 'ADHERENCE_REJECTED_BY_SERVER',
+          status: httpStatus,
+        });
+        return 'failed';
+      }
+
+      // Sin respuesta del servidor: falta de red. Encolar es legítimo, pero
+      // sigue SIN ser una confirmación — se informa como 'pending'.
       const baseUrl = apiClient.defaults.baseURL || '';
       const fullUrl = baseUrl.endsWith('/')
         ? `${baseUrl}protocols/${itemId}/status`
@@ -147,13 +178,13 @@ export const ProtocolService = {
         headers: {
           'Content-Type': 'application/json',
           // NOTA: offlineQueue elimina este header inmediatamente por seguridad para no guardarlo en IndexedDB.
-          // Se pasa aquí para mantener la firma completa de la petición. Cuando useSyncQueue hace el replay, 
+          // Se pasa aquí para mantener la firma completa de la petición. Cuando useSyncQueue hace el replay,
           // inyecta un token fresco desde tokenStore/localStorage justo antes de enviar la petición.
           Authorization: `Bearer ${tokenStore.getAccessToken() || ''}`,
         },
       });
 
-      return true;
+      return 'pending';
     }
   },
 

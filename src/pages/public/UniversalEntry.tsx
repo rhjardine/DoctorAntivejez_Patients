@@ -7,9 +7,29 @@ const UniversalEntry: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Pre-warming para mitigar el cold start en Render.com
+  // Pre-warming para mitigar el cold start en Render.com.
+  //
+  // Antes apuntaba a '<dominio-prod>/api-render/ping': `/api-render` es SOLO el
+  // prefijo del proxy del servidor de desarrollo (vite.config.ts), así que en
+  // producción esa ruta no existe. El fallo se tragaba en el catch, de modo que
+  // el precalentamiento nunca ocurría y el primer login seguía pagando el
+  // arranque en frío.
+  //
+  // Se usa la URL de API ya configurada y se golpea su ORIGEN, no una ruta:
+  // cualquier petición entrante despierta la instancia, y así no se inventa
+  // ningún endpoint que el backend no haya declarado.
   useEffect(() => {
-    fetch('https://doctor-antivejez-web.onrender.com/api-render/ping', {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (!apiUrl) return; // en desarrollo se usa el proxy: no hay cold start
+
+    let origin: string;
+    try {
+      origin = new URL(apiUrl).origin;
+    } catch {
+      return; // URL mal configurada: no arriesgar una petición a ninguna parte
+    }
+
+    fetch(origin, {
       mode: 'no-cors',
       priority: 'low',
     } as RequestInit).catch(() => {

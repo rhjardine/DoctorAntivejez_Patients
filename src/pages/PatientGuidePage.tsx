@@ -40,14 +40,22 @@ const PatientGuidePage: React.FC = () => {
         // Optimistic update
         setItems(prev => prev.map(i => i.id === id ? { ...i, status: newStatus } : i));
 
-        const synced = await ProtocolService.updateItemStatus(session.id, id, newStatus);
+        const result = await ProtocolService.updateItemStatus(session.id, id, newStatus);
 
-        // ⚠️ SEGURIDAD CLÍNICA: si no se pudo registrar, revertir el estado visual.
+        // ⚠️ SEGURIDAD CLÍNICA: solo 'confirmed' autoriza a dejar la marca puesta.
         // Nunca dejar al paciente creyendo que registró una toma que su médico no verá.
-        if (!synced) {
+        if (result === 'failed') {
+            // El servidor rechazó la operación, o el ítem no tiene ID estable.
+            // Reintentar no lo arregla: se revierte y se informa.
             setItems(prev => prev.map(i => i.id === id ? { ...i, status: previousStatus } : i));
             setSyncError(
                 'No pudimos registrar este cambio. Tu médico no lo verá todavía — por favor coméntaselo en tu próxima consulta.'
+            );
+        } else if (result === 'pending') {
+            // Sin conexión: quedó encolado y se enviará al recuperar la red.
+            // Se mantiene la marca, pero NO se presenta como confirmada.
+            setSyncError(
+                'Sin conexión: guardamos tu cambio y lo enviaremos automáticamente cuando vuelvas a tener red. Todavía no está registrado.'
             );
         }
     };

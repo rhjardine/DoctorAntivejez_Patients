@@ -67,9 +67,12 @@ describe('authService', () => {
         expect(user!.id).toBe('p1');
     });
 
-    it('updateItemStatus retorna false y no hace llamadas de red si el itemId es inestable', async () => {
+    it('updateItemStatus no confirma ni hace llamadas de red si el itemId es inestable', async () => {
+        // El contrato pasó de boolean a AdherenceResult: solo 'confirmed'
+        // autoriza a presentar la marca como registrada.
         const result = await ProtocolService.updateItemStatus('p1', 'UNSTABLE_HASH_guide_123', 'completed');
-        expect(result).toBe(false);
+        expect(result).toBe('failed');
+        expect(result).not.toBe('confirmed');
     });
 
     // ⚠️ SEGURIDAD CLÍNICA — R-P0-1
@@ -85,7 +88,7 @@ describe('authService', () => {
 
         const result = await ProtocolService.updateItemStatus('p1', unstableId, 'completed');
 
-        expect(result).toBe(false);
+        expect(result).toBe('failed');
         const cached = JSON.parse(sessionStorage.getItem('rejuvenate_protocol_cache')!);
         expect(cached[0].status).toBe('pending');
     });
