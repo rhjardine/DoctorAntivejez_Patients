@@ -54,6 +54,16 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [showUpdateBanner, setShowUpdateBanner] = useState(false);
     const [showTimeoutWarning, setShowTimeoutWarning] = useState(false);
 
+    // Accesos de la barra inferior que no entran en la Beta. Antes eran <div>
+    // con un tooltip en :hover, que en un móvil no existe: el paciente tocaba y
+    // no pasaba nada. Ahora responden con un aviso explícito.
+    const [avisoConstruccion, setAvisoConstruccion] = useState<string | null>(null);
+
+    const avisarEnConstruccion = (seccion: string) => {
+        setAvisoConstruccion(seccion);
+        setTimeout(() => setAvisoConstruccion(null), 2600);
+    };
+
     const { resetTimer } = useSessionTimeout({
         timeoutMs: 30 * 60 * 1000,
         warningMs: 5 * 60 * 1000,
@@ -233,6 +243,27 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 )}
             </AnimatePresence>
 
+            {/* Aviso de sección no disponible en la Beta. */}
+            <AnimatePresence>
+                {avisoConstruccion && (
+                    <motion.div
+                        role="status"
+                        aria-live="polite"
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 16 }}
+                        className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-[#293b64] text-white shadow-xl max-w-[85vw]"
+                    >
+                        <p className="text-[11px] font-black uppercase tracking-widest text-center">
+                            {avisoConstruccion}
+                        </p>
+                        <p className="text-[11px] font-medium text-center text-white/80 mt-0.5">
+                            En construcción: Pronto estará disponible
+                        </p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {showHeaderFooter && (
                 <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 pb-safe-bottom shrink-0">
                     <div className="flex justify-around items-center py-3.5 px-4">
@@ -240,29 +271,35 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             <LayoutDashboard size={24} strokeWidth={isHome ? 2.5 : 2} /><span className="text-[9px] font-black uppercase tracking-widest">Inicio</span>
                         </button>
                         
-                        <div className="flex flex-col items-center justify-center py-2 text-slate-300 opacity-40 cursor-not-allowed select-none relative group">
+                        <button
+                            type="button"
+                            onClick={() => avisarEnConstruccion('Logros')}
+                            aria-label="Logros — en construcción"
+                            className="flex flex-col items-center justify-center py-2 text-slate-300 select-none active:scale-95 transition-transform"
+                        >
                             <Trophy size={24} strokeWidth={2} />
                             <span className="text-[9px] font-black uppercase tracking-widest mt-1">Logros</span>
-                            <span className="absolute -top-6 bg-[#293b64] text-white text-[9px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                Pronto
-                            </span>
-                        </div>
+                        </button>
                         
-                        <div className="flex flex-col items-center justify-center py-2 text-slate-300 opacity-40 cursor-not-allowed select-none relative group">
+                        <button
+                            type="button"
+                            onClick={() => avisarEnConstruccion('Biomics')}
+                            aria-label="Biomics — en construcción"
+                            className="flex flex-col items-center justify-center py-2 text-slate-300 select-none active:scale-95 transition-transform"
+                        >
                             <Dna size={24} strokeWidth={2} />
                             <span className="text-[9px] font-black uppercase tracking-widest mt-1">Biomics</span>
-                            <span className="absolute -top-6 bg-[#293b64] text-white text-[9px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                Pronto
-                            </span>
-                        </div>
+                        </button>
                         
-                        <div className="flex flex-col items-center justify-center py-2 text-slate-300 opacity-40 cursor-not-allowed select-none relative group">
+                        <button
+                            type="button"
+                            onClick={() => avisarEnConstruccion('Tienda')}
+                            aria-label="Tienda — en construcción"
+                            className="flex flex-col items-center justify-center py-2 text-slate-300 select-none active:scale-95 transition-transform"
+                        >
                             <Store size={24} strokeWidth={2} />
                             <span className="text-[9px] font-black uppercase tracking-widest mt-1">Tienda</span>
-                            <span className="absolute -top-6 bg-[#293b64] text-white text-[9px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                Pronto
-                            </span>
-                        </div>
+                        </button>
                     </div>
                 </footer>
             )}
