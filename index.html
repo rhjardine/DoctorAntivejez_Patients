@@ -20,18 +20,111 @@
   <meta property="og:type" content="website" />
 
   <link rel="manifest" href="/manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="/Icono_app.jpeg" />
-  <link rel="apple-touch-icon" sizes="192x192" href="/Icono_app.jpeg" />
-  <link rel="apple-touch-icon" sizes="512x512" href="/Icono_app.jpeg" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
+
+  <!--
+    Pantalla de carga de marca.
+    Va inline en el HTML —sin CSS ni JS externo— para pintar en el primer frame,
+    antes de que descargue el bundle. Usa exactamente el mismo navy que
+    `background_color` del manifest, de modo que el splash del sistema y la app
+    se funden sin parpadeo ni cambio de color.
+  -->
+  <style>
+    :root { --da-navy: #293B64; --da-cyan: #23BCEF; }
+
+    html, body { margin: 0; padding: 0; background: var(--da-navy); }
+
+    #da-splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.25rem;
+      /* Degradado radial descentrado: da profundidad y evita el plano muerto. */
+      background:
+        radial-gradient(120% 90% at 50% 32%, #34497a 0%, var(--da-navy) 55%, #1d2b4b 100%);
+      opacity: 1;
+      transition: opacity .45s ease;
+    }
+
+    #da-splash.da-hide { opacity: 0; pointer-events: none; }
+
+    .da-mark {
+      width: 96px;
+      height: auto;
+      /* Halo cian tenue: separa el isotipo del fondo sin recuadro. */
+      filter: drop-shadow(0 0 28px rgba(35, 188, 239, .28));
+      animation: da-breathe 3.2s ease-in-out infinite;
+    }
+
+    .da-wordmark {
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .38em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .62);
+      margin: 0;
+      padding-left: .38em; /* compensa el tracking del último carácter */
+    }
+
+    /* Barra indeterminada: comunica progreso sin fingir un porcentaje. */
+    .da-track {
+      width: 132px;
+      height: 2px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, .13);
+      overflow: hidden;
+    }
+
+    .da-track::after {
+      content: '';
+      display: block;
+      width: 42%;
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, transparent, var(--da-cyan), transparent);
+      animation: da-slide 1.45s ease-in-out infinite;
+    }
+
+    @keyframes da-breathe {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.045); }
+    }
+
+    @keyframes da-slide {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(338%); }
+    }
+
+    /* Accesibilidad: sin movimiento para quien lo haya desactivado. */
+    @media (prefers-reduced-motion: reduce) {
+      .da-mark { animation: none; }
+      .da-track::after { animation: none; width: 100%; opacity: .55; }
+      #da-splash { transition: none; }
+    }
+  </style>
 </head>
 
 <body>
   <div id="root"></div>
+
+  <div id="da-splash" role="status" aria-live="polite" aria-label="Cargando Doctor Antivejez">
+    <img class="da-mark" src="/isotipo-claro.png" alt="" fetchpriority="high" decoding="async" />
+    <p class="da-wordmark">Doctor Antivejez</p>
+    <div class="da-track"></div>
+  </div>
+
   <script type="module" src="/src/index.tsx"></script>
 </body>
 

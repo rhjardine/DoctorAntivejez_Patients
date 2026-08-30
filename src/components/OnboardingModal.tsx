@@ -115,8 +115,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete }) => {
                             <div className="w-full space-y-2 mb-4">
                                 {slide.extras.map(item => (
                                     <div key={item} className="flex items-center gap-2.5">
-                                        <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-                                            <Check size={12} className="text-emerald-500" strokeWidth={2.5} />
+                                        <div className="w-5 h-5 rounded-full bg-[#23bcef]/10 flex items-center justify-center shrink-0">
+                                            <Check size={12} className="text-[#107da8]" strokeWidth={2.5} />
                                         </div>
                                         <span className="text-[11px] font-black text-[#0D2137] uppercase tracking-widest">
                                             {item}

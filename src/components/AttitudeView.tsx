@@ -105,7 +105,7 @@ const AttitudeView: React.FC = () => {
       {/* Success Toast Notification */}
       {successMessage && (
         <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="bg-green-600 text-white px-6 py-2.5 rounded-full shadow-lg flex items-center gap-2">
+          <div className="bg-[#107da8] text-white px-6 py-2.5 rounded-full shadow-lg flex items-center gap-2">
             <CheckCircle size={16} />
             <span className="text-xs font-bold">{successMessage}</span>
           </div>

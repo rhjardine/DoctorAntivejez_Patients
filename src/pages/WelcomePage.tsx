@@ -8,8 +8,8 @@ const WelcomePage: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen w-full bg-[#f8fafc] px-8 pt-safe-top pb-safe-bottom items-center justify-between overflow-hidden relative">
       {/* Background elements for premium feel */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-[#14b8a6]/5 blur-3xl -mr-32 -mt-32" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#14b8a6]/5 blur-3xl -ml-32 -mb-32" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#23bcef]/5 blur-3xl -mr-32 -mt-32" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#23bcef]/5 blur-3xl -ml-32 -mb-32" />
 
       <div className="flex-1 flex flex-col justify-center items-center w-full max-w-[420px] z-10">
         {/* Branding */}
@@ -21,7 +21,7 @@ const WelcomePage: React.FC = () => {
           <span className="font-extrabold tracking-[0.5em] text-[24px] text-[#293b64] block">
             VYTALIX
           </span>
-          <span className="text-[10px] font-black tracking-[0.3em] text-[#14b8a6] uppercase mt-3 block">
+          <span className="text-[10px] font-black tracking-[0.3em] text-[#107da8] uppercase mt-3 block">
             Precision Longevity Suite
           </span>
         </motion.div>
@@ -36,7 +36,7 @@ const WelcomePage: React.FC = () => {
           <h1 className="text-5xl font-black leading-[1.1] tracking-tighter text-[#293b64]">
             Tu vitalidad,
             <br />
-            <span className="text-[#14b8a6]">en tus manos.</span>
+            <span className="text-[#107da8]">en tus manos.</span>
           </h1>
           <p className="text-lg font-medium text-[#293b64]/40 leading-relaxed max-w-[280px] mx-auto">
             Protocolos de bio-optimización basados en ciencia de vanguardia.
@@ -52,7 +52,7 @@ const WelcomePage: React.FC = () => {
         >
           <button
             onClick={() => navigate('/longevidad')}
-            className="w-full bg-[#14b8a6] text-white py-5 rounded-[2rem] font-black text-lg uppercase tracking-widest shadow-xl shadow-[#14b8a6]/20 transition-all active:scale-95 hover:brightness-110"
+            className="w-full bg-[#23bcef] text-white py-5 rounded-[2rem] font-black text-lg uppercase tracking-widest shadow-xl shadow-[#23bcef]/20 transition-all active:scale-95 hover:brightness-110"
           >
             Comenzar ahora
           </button>
@@ -71,7 +71,7 @@ const WelcomePage: React.FC = () => {
             ¿Ya formas parte?{' '}
             <button
               onClick={() => navigate('/login')}
-              className="text-[#293b64] font-black underline decoration-[#14b8a6]/30 underline-offset-4"
+              className="text-[#293b64] font-black underline decoration-[#23bcef]/30 underline-offset-4"
             >
               Ingresar
             </button>

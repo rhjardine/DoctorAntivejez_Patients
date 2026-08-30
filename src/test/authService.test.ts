@@ -26,6 +26,7 @@ beforeAll(() => server.listen());
 afterEach(() => {
     server.resetHandlers();
     localStorage.clear();
+    sessionStorage.clear();
 });
 afterAll(() => server.close());
 
@@ -66,8 +67,42 @@ describe('authService', () => {
         expect(user!.id).toBe('p1');
     });
 
-    it('updateItemStatus retorna false y no hace llamadas de red si el itemId es inestable', async () => {
+    it('updateItemStatus no confirma ni hace llamadas de red si el itemId es inestable', async () => {
+        // El contrato pasó de boolean a AdherenceResult: solo 'confirmed'
+        // autoriza a presentar la marca como registrada.
         const result = await ProtocolService.updateItemStatus('p1', 'UNSTABLE_HASH_guide_123', 'completed');
-        expect(result).toBe(false);
+        expect(result).toBe('failed');
+        expect(result).not.toBe('confirmed');
+    });
+
+    // ⚠️ SEGURIDAD CLÍNICA — R-P0-1
+    // Un ítem sin ID estable no puede llegar al médico. Si además se marcara como
+    // 'completed' en el caché, el paciente vería un check por una toma que nadie
+    // registró. El caché debe quedar intacto.
+    it('updateItemStatus NO marca el ítem como completado en caché si el ID es inestable', async () => {
+        const unstableId = 'UNSTABLE_HASH_guide_123';
+        sessionStorage.setItem(
+            'rejuvenate_protocol_cache',
+            JSON.stringify([{ id: unstableId, itemName: 'Aceite de ricino', status: 'pending' }])
+        );
+
+        const result = await ProtocolService.updateItemStatus('p1', unstableId, 'completed');
+
+        expect(result).toBe('failed');
+        const cached = JSON.parse(sessionStorage.getItem('rejuvenate_protocol_cache')!);
+        expect(cached[0].status).toBe('pending');
+    });
+
+    it('updateItemStatus sí actualiza el caché cuando el ID es estable', async () => {
+        const stableId = 'protocol-item-42';
+        sessionStorage.setItem(
+            'rejuvenate_protocol_cache',
+            JSON.stringify([{ id: stableId, itemName: 'Complejo B', status: 'pending' }])
+        );
+
+        await ProtocolService.updateItemStatus('p1', stableId, 'completed');
+
+        const cached = JSON.parse(sessionStorage.getItem('rejuvenate_protocol_cache')!);
+        expect(cached[0].status).toBe('completed');
     });
 });

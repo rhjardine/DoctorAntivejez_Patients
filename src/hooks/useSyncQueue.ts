@@ -6,7 +6,10 @@ export const useSyncQueue = () => {
     useEffect(() => {
         const drain = async () => {
             try {
-                const pending = await offlineQueue.dequeueAll();
+                // Solo las del paciente con sesión abierta. `dequeueAll()` incluiría
+                // las de sesiones anteriores en el mismo dispositivo, y la línea de
+                // abajo las reenviaría con el token del paciente actual.
+                const pending = await offlineQueue.dequeueForCurrentPatient();
                 if (pending.length === 0) return;
 
                 console.log(`[SyncQueue] Drain triggered. Found ${pending.length} pending items.`);

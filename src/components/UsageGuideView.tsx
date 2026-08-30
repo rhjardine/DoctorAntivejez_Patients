@@ -14,7 +14,7 @@ const UsageGuideView: React.FC = () => {
       title: "2. Las Claves 5A y 4R",
       desc: "Sigue tu plan diario dividido en alimentación, actividad, actitud, entorno y descanso (5A), junto a las terapias regenerativas (4R).",
       icon: <ClipboardList size={24} />,
-      color: "bg-emerald-100 text-emerald-600"
+      color: "bg-[#23bcef]/15 text-[#107da8]"
     },
     {
       title: "3. Registra tus Avances",
@@ -79,13 +79,13 @@ const UsageGuideView: React.FC = () => {
           </div>
 
           {/* GREEN */}
-          <div className="flex items-start gap-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-100">
-            <div className="w-12 h-12 rounded-full border-4 border-emerald-500 bg-white flex items-center justify-center shrink-0 shadow-sm">
-              <span className="text-[10px] font-black text-emerald-500">80-100%</span>
+          <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#23bcef]/10 border border-[#23bcef]/20">
+            <div className="w-12 h-12 rounded-full border-4 border-[#23bcef] bg-white flex items-center justify-center shrink-0 shadow-sm">
+              <span className="text-[10px] font-black text-[#107da8]">80-100%</span>
             </div>
             <div>
-              <p className="text-xs font-black text-emerald-700 uppercase tracking-wide mb-1">Hito de Salud</p>
-              <p className="text-[11px] text-emerald-800 font-bold leading-relaxed">
+              <p className="text-xs font-black text-[#107da8] uppercase tracking-wide mb-1">Hito de Salud</p>
+              <p className="text-[11px] text-[#107da8] font-bold leading-relaxed">
                 Adherencia elevada. En el camino óptimo hacia tu rejuvenecimiento celular. ¡Excelente!
               </p>
             </div>
@@ -105,7 +105,7 @@ const UsageGuideView: React.FC = () => {
             { label: 'Alimentación Sana', desc: 'Seguimiento de tu plan nutrigenómico personalizado.', color: 'bg-orange-100', textColor: 'text-orange-700' },
             { label: 'Actividad Física', desc: 'Registro de tus ejercicios diarios y movimiento.', color: 'bg-red-100', textColor: 'text-red-700' },
             { label: 'Actitud Mental', desc: 'Meditaciones, diario de gratitud y bienestar emocional.', color: 'bg-pink-100', textColor: 'text-pink-700' },
-            { label: 'Ambiente', desc: 'Calidad de tu entorno y reducción de tóxicos.', color: 'bg-green-100', textColor: 'text-green-700' },
+            { label: 'Ambiente', desc: 'Calidad de tu entorno y reducción de tóxicos.', color: 'bg-[#23bcef]/15', textColor: 'text-[#107da8]' },
             { label: 'Asueto (Descanso)', desc: 'Calidad y duración de tu sueño reparador.', color: 'bg-indigo-100', textColor: 'text-indigo-700' },
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">

@@ -322,7 +322,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
       <div className="fixed bottom-24 right-4 z-30">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="w-14 h-14 bg-[#14b8a6] hover:bg-[#0d9488] transition-all rounded-full shadow-lg flex items-center justify-center text-white transform hover:scale-105"
+          className="w-14 h-14 bg-[#23bcef] hover:bg-[#0d9488] transition-all rounded-full shadow-lg flex items-center justify-center text-white transform hover:scale-105"
         >
           <Plus size={28} />
         </button>
@@ -425,7 +425,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
               <button
                 type="submit"
                 disabled={!newValue || isSubmitting}
-                className="w-full bg-[#14b8a6] hover:bg-[#0d9488] text-white py-4 rounded-xl font-bold shadow-md active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2"
+                className="w-full bg-[#23bcef] hover:bg-[#0d9488] text-white py-4 rounded-xl font-bold shadow-md active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>

@@ -23,7 +23,7 @@ const LandingPublicaPage: React.FC = () => {
             <div className="pt-6 px-6 relative z-20">
                 <button
                     onClick={() => navigate('/acceso', { replace: true })}
-                    className="w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-slate-200 text-slate-500 hover:text-[#14b8a6] transition-colors"
+                    className="w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-slate-200 text-slate-500 hover:text-[#107da8] transition-colors"
                 >
                     <ChevronLeft size={24} />
                 </button>
@@ -36,8 +36,12 @@ const LandingPublicaPage: React.FC = () => {
                 animate="show"
             >
 
-                {/* HERO SECTION (Gradiente Terracota) */}
-                <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-[#293b64] to-[#14b8a6] rounded-[2.5rem] p-8 text-white shadow-2xl shadow-[#293b64]/20 text-center">
+                {/* HERO — degradado corporativo navy → cian (#293B64 → #23BCEF).
+                    Antes iba a un turquesa #14B8A6 heredado de la paleta
+                    "Longevidad Orgánica"; de ahí el comentario "Terracota" que
+                    ya no describía nada. Sobre este fondo el cian rinde 5.00:1,
+                    así que el texto blanco y los acentos cumplen AA. */}
+                <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-[#293b64] to-[#23bcef] rounded-[2.5rem] p-8 text-white shadow-2xl shadow-[#293b64]/20 text-center">
                     <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                         <Activity className="w-48 h-48" />
                     </div>
@@ -65,12 +69,12 @@ const LandingPublicaPage: React.FC = () => {
                         {/* Opción 1: Test Directo */}
                         <button
                             onClick={() => navigate('/test')}
-                            className="w-full bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-md shadow-slate-200/50 border border-slate-200 flex flex-col items-start gap-4 transition-transform active:scale-[0.98] hover:border-[#14b8a6] relative overflow-hidden group"
+                            className="w-full bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-md shadow-slate-200/50 border border-slate-200 flex flex-col items-start gap-4 transition-transform active:scale-[0.98] hover:border-[#23bcef] relative overflow-hidden group"
                         >
-                            <div className="absolute right-0 top-0 h-full w-2 bg-[#14b8a6] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div className="absolute right-0 top-0 h-full w-2 bg-[#23bcef] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div className="flex items-center gap-4 w-full">
                                 <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0">
-                                    <LineChart className="w-7 h-7 text-[#14b8a6]" />
+                                    <LineChart className="w-7 h-7 text-[#107da8]" />
                                 </div>
                                 <div className="flex-1 text-left">
                                     <h4 className="text-lg font-black text-[#293b64] leading-none mb-1">Cuestionario Clínico</h4>
@@ -102,7 +106,7 @@ const LandingPublicaPage: React.FC = () => {
                 <motion.div variants={itemVariants} className="pt-8 text-center">
                     <p className="text-sm text-slate-500 font-medium">
                         ¿Ya tienes tus resultados?{' '}
-                        <button onClick={() => navigate('/medicos')} className="text-[#14b8a6] font-bold hover:underline">
+                        <button onClick={() => navigate('/medicos')} className="text-[#107da8] font-bold hover:underline">
                             Contacta a un especialista
                         </button>
                     </p>

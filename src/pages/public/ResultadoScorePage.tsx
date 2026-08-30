@@ -10,6 +10,13 @@ import {
 } from 'lucide-react';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
+import apiClient from '../../services/apiClient';
+import {
+  validatePersonName,
+  validateEmail,
+  firstError,
+  isInvalid,
+} from '../../utils/validation';
 
 type Category = 'EXCELENTE' | 'BUENO' | 'REGULAR' | 'CRITICO';
 
@@ -28,18 +35,18 @@ const CAT: Record<
   { color: string; bg: string; border: string; label: string; text: string }
 > = {
   EXCELENTE: {
-    color: '#14b8a6',
+    color: '#23bcef',
     bg: 'rgba(20,184,166,0.1)',
     border: 'rgba(20,184,166,0.3)',
     label: 'Excelente Vitalidad',
-    text: 'text-[#14b8a6]',
+    text: 'text-[#107da8]',
   },
   BUENO: {
-    color: '#14b8a6',
+    color: '#23bcef',
     bg: 'rgba(20,184,166,0.1)',
     border: 'rgba(20,184,166,0.3)',
     label: 'Buena Condición',
-    text: 'text-[#14b8a6]',
+    text: 'text-[#107da8]',
   },
   REGULAR: {
     color: '#293b64',
@@ -104,7 +111,7 @@ const SemiGauge: React.FC<{ score: number; color: string }> = ({
 
 /* ─── Dimension bar color ───────────────────────────────────────────── */
 function barColor(v: number) {
-  if (v >= 60) return '#14b8a6'; // Teal
+  if (v >= 60) return '#23bcef'; // Teal
   return '#293b64'; // Navy
 }
 
@@ -117,6 +124,7 @@ const ResultadoScorePage: React.FC = () => {
 
   const [leadName, setLeadName] = useState('');
   const [leadEmail, setLeadEmail] = useState('');
+  const [leadError, setLeadError] = useState<string | null>(null);
   const [leadStatus, setLeadStatus] = useState<'idle' | 'sending' | 'sent'>(
     'idle',
   );
@@ -188,7 +196,7 @@ const ResultadoScorePage: React.FC = () => {
             'Una evaluación clínica puede identificar exactamente cuáles son tus prioridades de mayor impacto vital.',
         }
       : {
-          color: '#14b8a6',
+          color: '#23bcef',
           icon: <ShieldCheck size={20} />,
           title: 'Tu score refleja una base sólida de vitalidad',
           rangeBadge: 'Rango de Excelencia',
@@ -201,28 +209,40 @@ const ResultadoScorePage: React.FC = () => {
   const handleLead = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!leadName || !leadEmail) return;
+
+    const nombre = validatePersonName(leadName);
+    const correo = validateEmail(leadEmail);
+    const problema = firstError(nombre, correo);
+    if (problema) {
+      setLeadError(problema);
+      return;
+    }
+    setLeadError(null);
     setLeadStatus('sending');
-    sessionStorage.setItem('vx_lead_name', leadName);
-    sessionStorage.setItem('vx_lead_email', leadEmail);
+
+    const name = isInvalid(nombre) ? leadName : nombre.value;
+    const email = isInvalid(correo) ? leadEmail : correo.value;
+
+    sessionStorage.setItem('vx_lead_name', name);
+    sessionStorage.setItem('vx_lead_email', email);
 
     try {
-      const res = await fetch('/api-render/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: leadName,
-          email: leadEmail,
-          score,
-          category: result.category,
-          source: 'test_antivejez',
-        }),
+      // apiClient resuelve la URL segun el entorno. Antes apuntaba a
+      // '/api-render/api/leads', que es SOLO el proxy del servidor de
+      // desarrollo: en produccion esa ruta no existe y todos los leads
+      // acababan en localStorage sin llegar nunca a la clinica.
+      await apiClient.post('/leads', {
+        name,
+        email,
+        score,
+        category: result.category,
+        source: 'test_antivejez',
       });
-      if (!res.ok) throw new Error('API unavailable');
     } catch {
       const pending = JSON.parse(
         localStorage.getItem('da_pending_leads') || '[]',
       );
-      pending.push({ name: leadName, email: leadEmail, score, ts: Date.now() });
+      pending.push({ name, email, score, ts: Date.now() });
       localStorage.setItem('da_pending_leads', JSON.stringify(pending));
     }
 
@@ -241,7 +261,7 @@ const ResultadoScorePage: React.FC = () => {
           <div className="relative flex flex-col items-center mb-4">
             <SemiGauge
               score={score}
-              color={score >= 60 ? '#14b8a6' : '#293b64'}
+              color={score >= 60 ? '#23bcef' : '#293b64'}
             />
             <div className="absolute inset-x-0 bottom-2 flex flex-col items-center">
               <motion.span
@@ -273,12 +293,12 @@ const ResultadoScorePage: React.FC = () => {
           </motion.div>
 
           {sessionStorage.getItem('da_result_source') === 'agebot' && (
-            <div className="mt-8 p-5 bg-white rounded-3xl border border-[#14b8a6]/20 animate-pulse-subtle">
+            <div className="mt-8 p-5 bg-white rounded-3xl border border-[#23bcef]/20 animate-pulse-subtle">
               <div className="flex items-start gap-4 mb-4">
-                <Info className="w-6 h-6 shrink-0 text-[#14b8a6]" />
+                <Info className="w-6 h-6 shrink-0 text-[#107da8]" />
                 <p className="text-[13px] font-medium leading-relaxed text-[#293b64]/70">
                   Este score es una{' '}
-                  <strong className="text-[#14b8a6]">
+                  <strong className="text-[#107da8]">
                     estimación biométrica facial
                   </strong>
                   . Realiza el test clínico para precisión total.
@@ -286,7 +306,7 @@ const ResultadoScorePage: React.FC = () => {
               </div>
               <button
                 onClick={() => navigate('/test')}
-                className="w-full py-3 bg-[#f8fafc] text-[#14b8a6] font-black text-[11px] uppercase tracking-widest rounded-xl border border-[#14b8a6]/30"
+                className="w-full py-3 bg-[#f8fafc] text-[#107da8] font-black text-[11px] uppercase tracking-widest rounded-xl border border-[#23bcef]/30"
               >
                 Iniciar Test Completo →
               </button>
@@ -337,7 +357,7 @@ const ResultadoScorePage: React.FC = () => {
           transition={{ delay: 0.6 }}
           className="bg-white rounded-[2rem] p-8 border border-[#293b64]/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)] mb-8"
         >
-          <p className="text-[11px] font-black uppercase tracking-[0.25em] text-[#14b8a6] mb-8">
+          <p className="text-[11px] font-black uppercase tracking-[0.25em] text-[#107da8] mb-8">
             Mapa de Biomarcadores
           </p>
           <div className="space-y-6">
@@ -383,7 +403,7 @@ const ResultadoScorePage: React.FC = () => {
           transition={{ delay: 0.8 }}
           className="bg-[#293b64] text-white rounded-[2rem] p-8 shadow-xl shadow-[#293b64]/20 mb-10 overflow-hidden relative"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#14b8a6]/20 blur-3xl -mr-16 -mt-16" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#23bcef]/20 blur-3xl -mr-16 -mt-16" />
 
           <AnimatePresence mode="wait">
             {!alreadyCaptured && leadStatus !== 'sent' ? (
@@ -409,7 +429,7 @@ const ResultadoScorePage: React.FC = () => {
                     required
                     value={leadName}
                     onChange={(e) => setLeadName(e.target.value)}
-                    className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 text-xs font-black uppercase tracking-widest outline-none focus:border-[#14b8a6] transition-all placeholder:text-white/30"
+                    className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 text-xs font-black uppercase tracking-widest outline-none focus:border-[#23bcef] transition-all placeholder:text-white/30"
                   />
                   <input
                     type="email"
@@ -417,13 +437,13 @@ const ResultadoScorePage: React.FC = () => {
                     required
                     value={leadEmail}
                     onChange={(e) => setLeadEmail(e.target.value)}
-                    className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 text-xs font-black uppercase tracking-widest outline-none focus:border-[#14b8a6] transition-all placeholder:text-white/30"
+                    className="w-full bg-white/10 border border-white/10 rounded-xl px-5 py-4 text-xs font-black uppercase tracking-widest outline-none focus:border-[#23bcef] transition-all placeholder:text-white/30"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={leadStatus === 'sending'}
-                  className="w-full py-5 bg-[#14b8a6] text-white font-black text-[13px] uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-[#14b8a6]/20 transition-all active:scale-95 disabled:opacity-50"
+                  className="w-full py-5 bg-[#23bcef] text-white font-black text-[13px] uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-[#23bcef]/20 transition-all active:scale-95 disabled:opacity-50"
                 >
                   {leadStatus === 'sending' ? (
                     <Loader2 className="animate-spin mx-auto" />
@@ -441,7 +461,7 @@ const ResultadoScorePage: React.FC = () => {
               >
                 <CheckCircle
                   size={56}
-                  className="text-[#14b8a6] mx-auto mb-6"
+                  className="text-[#107da8] mx-auto mb-6"
                 />
                 <p className="text-xl font-black mb-2 uppercase tracking-tighter">
                   Acceso Concedido
@@ -469,7 +489,7 @@ const ResultadoScorePage: React.FC = () => {
               onClick={() => setSelectedTier('basica')}
               className={`w-full text-left p-6 rounded-[2rem] transition-all border-2 ${
                 selectedTier === 'basica'
-                  ? 'border-[#14b8a6] bg-[#14b8a6]/5'
+                  ? 'border-[#23bcef] bg-[#23bcef]/5'
                   : 'border-[#293b64]/5 bg-white'
               }`}
             >
@@ -478,7 +498,7 @@ const ResultadoScorePage: React.FC = () => {
                   Inversión: $0
                 </span>
                 {selectedTier === 'basica' && (
-                  <CheckCircle className="text-[#14b8a6]" size={20} />
+                  <CheckCircle className="text-[#107da8]" size={20} />
                 )}
               </div>
               <p className="text-base font-black text-[#293b64] tracking-tight">
@@ -497,7 +517,7 @@ const ResultadoScorePage: React.FC = () => {
                     e.stopPropagation();
                     navigate('/consulta?tipo=basica');
                   }}
-                  className="w-full mt-6 py-4 bg-[#14b8a6] text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-md"
+                  className="w-full mt-6 py-4 bg-[#23bcef] text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-md"
                 >
                   Agendar Sesión →
                 </motion.button>
@@ -508,19 +528,19 @@ const ResultadoScorePage: React.FC = () => {
               onClick={() => setSelectedTier('profunda')}
               className={`w-full text-left p-6 rounded-[2rem] transition-all border-2 relative overflow-hidden ${
                 selectedTier === 'profunda'
-                  ? 'border-[#14b8a6] bg-[#14b8a6]/5'
+                  ? 'border-[#23bcef] bg-[#23bcef]/5'
                   : 'border-[#293b64]/5 bg-white'
               }`}
             >
-              <div className="absolute top-0 right-0 py-1 px-4 bg-[#14b8a6] text-white text-[8px] font-black uppercase tracking-[0.3em] rounded-bl-xl">
+              <div className="absolute top-0 right-0 py-1 px-4 bg-[#23bcef] text-white text-[8px] font-black uppercase tracking-[0.3em] rounded-bl-xl">
                 Protocolo Full
               </div>
               <div className="flex justify-between items-center mb-4">
-                <span className="text-[9px] font-black uppercase px-2 py-1 rounded bg-[#14b8a6]/10 text-[#14b8a6] tracking-widest">
+                <span className="text-[9px] font-black uppercase px-2 py-1 rounded bg-[#23bcef]/10 text-[#107da8] tracking-widest">
                   Vytalix Premium
                 </span>
                 {selectedTier === 'profunda' && (
-                  <CheckCircle className="text-[#14b8a6]" size={20} />
+                  <CheckCircle className="text-[#107da8]" size={20} />
                 )}
               </div>
               <p className="text-base font-black text-[#293b64] tracking-tight">
@@ -538,7 +558,7 @@ const ResultadoScorePage: React.FC = () => {
                     e.stopPropagation();
                     navigate('/consulta?tipo=profunda');
                   }}
-                  className="w-full mt-6 py-4 bg-[#14b8a6] text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-md"
+                  className="w-full mt-6 py-4 bg-[#23bcef] text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-md"
                 >
                   Comenzar Programa →
                 </motion.button>

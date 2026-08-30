@@ -1,3 +1,25 @@
+# ─── Cabeceras de seguridad (todas las rutas) ────────────────────────────────
+# La app maneja PHI. Sin estas cabeceras, el navegador no aplica ninguna de las
+# defensas que sí sabe aplicar.
+/*
+  # Fuerza HTTPS durante un año, incluidos subdominios. Sin esto, un primer
+  # acceso por http podría degradarse y exponer datos clínicos en claro.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  # Clickjacking: nadie debe poder embeber la app del paciente en un iframe.
+  X-Frame-Options: DENY
+  # Evita que el navegador reinterprete el tipo declarado de un recurso.
+  X-Content-Type-Options: nosniff
+  # No filtrar la ruta completa (que puede llevar ids) a destinos externos.
+  Referrer-Policy: strict-origin-when-cross-origin
+  # La app usa cámara (AgeBot, escáner de alimentos); el resto se deniega.
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(), payment=(), usb=()
+  # CSP: principal mitigación de XSS, que es el modelo de amenaza que motivó
+  # mantener el access token solo en memoria (ADR-002).
+  #   'unsafe-inline' en style-src es necesario para los estilos en línea de
+  #   React/Tailwind; en script-src NO se concede.
+  #   connect-src debe incluir el backend real: ajustar al dominio de producción.
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://doctor-antivejez-web.onrender.com https://*.ingest.sentry.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+
 /sw.js
   Cache-Control: no-cache, no-store, must-revalidate
   Pragma: no-cache

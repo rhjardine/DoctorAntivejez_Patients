@@ -1,4 +1,6 @@
 // src/services/offlineQueue.ts
+import { cryptoService } from './cryptoService';
+import { logger } from '../utils/logger';
 const DB_NAME = 'rejuvenate-offline-queue';
 const STORE_NAME = 'pending-writes';
 const DB_VERSION = 1;
@@ -11,7 +13,73 @@ export interface QueuedWrite {
     headers: Record<string, string>;  // include Authorization header
     timestamp: number;    // Date.now() — for TTL enforcement
     retryCount: number;   // increment on each failed retry
+    /**
+     * Paciente que originó la escritura.
+     *
+     * ⚠️ Crítico para la integridad clínica. El replay (useSyncQueue) inyecta el
+     * token de la sesión ACTUAL, y esta cola vive en IndexedDB, que no se borra
+     * al cerrar sesión. Sin este campo, en un dispositivo compartido una entrada
+     * encolada por el paciente A se reenviaría con las credenciales de B: el
+     * texto de A saldría bajo la sesión de B y acabaría en la historia clínica
+     * de B. Solo se reproducen las entradas cuyo paciente coincide.
+     */
+    patientId: string;
 }
+
+/**
+ * Prefijo que marca un cuerpo cifrado.
+ *
+ * El cuerpo de una escritura encolada puede contener información de salud —el
+ * diario de gratitud viaja como `notes`—, así que se cifra en reposo con
+ * AES-GCM igual que el perfil clínico (ADR-001). El prefijo permite convivir
+ * con entradas de versiones anteriores, guardadas en claro, sin perderlas.
+ */
+const ENC_PREFIX = 'enc:v1:';
+
+const encryptBody = async (body: string): Promise<string> => {
+    if (!body) return body;
+    try {
+        return ENC_PREFIX + (await cryptoService.encrypt(body));
+    } catch {
+        // Si el cifrado no está disponible, encolar en claro es preferible a
+        // perder el registro clínico del paciente. Queda constancia.
+        logger.warn('[offlineQueue] No se pudo cifrar el cuerpo; se encola en claro', {
+            reason: 'QUEUE_ENCRYPT_UNAVAILABLE',
+        });
+        return body;
+    }
+};
+
+const decryptBody = async (body: string): Promise<string> => {
+    if (!body || !body.startsWith(ENC_PREFIX)) return body; // entrada legada
+    try {
+        const plain = await cryptoService.decrypt(body.slice(ENC_PREFIX.length));
+        return typeof plain === 'string' ? plain : JSON.stringify(plain);
+    } catch {
+        logger.warn('[offlineQueue] No se pudo descifrar una escritura encolada', {
+            reason: 'QUEUE_DECRYPT_FAILED',
+        });
+        return '';
+    }
+};
+
+const SESSION_KEY = 'rejuvenate_session_v1';
+
+/**
+ * Id del paciente de la sesión actual, leído directamente de localStorage.
+ *
+ * Se evita importar authService a propósito: authService -> ProtocolService ->
+ * offlineQueue formaría un ciclo de imports.
+ */
+const currentPatientId = (): string => {
+    try {
+        const raw = localStorage.getItem(SESSION_KEY);
+        if (!raw) return '';
+        return String(JSON.parse(raw)?.id ?? '');
+    } catch {
+        return '';
+    }
+};
 
 class OfflineQueue {
     private async openDB(): Promise<IDBDatabase> {
@@ -32,7 +100,13 @@ class OfflineQueue {
         });
     }
 
-    async enqueue(write: Omit<QueuedWrite, 'id' | 'timestamp' | 'retryCount'>): Promise<void> {
+    async enqueue(
+        write: Omit<QueuedWrite, 'id' | 'timestamp' | 'retryCount' | 'patientId'>,
+    ): Promise<void> {
+        // Cifrar ANTES de abrir la transacción: IndexedDB cierra las
+        // transacciones al ceder el hilo, y `encrypt` es asíncrono.
+        const body = await encryptBody(write.body);
+
         const db = await this.openDB();
         return new Promise((resolve, reject) => {
             const transaction = db.transaction(STORE_NAME, 'readwrite');
@@ -45,9 +119,13 @@ class OfflineQueue {
 
             const fullWrite: QueuedWrite = {
                 ...write,
+                body,
                 headers: safeHeaders,
                 timestamp: Date.now(),
                 retryCount: 0,
+                // Se sella aquí, no en cada punto de llamada: así ninguna escritura
+                // futura puede olvidarse de identificar a su paciente.
+                patientId: currentPatientId(),
             };
 
             const request = store.add(fullWrite);
@@ -88,6 +166,38 @@ class OfflineQueue {
             request.onsuccess = () => resolve(request.result || []);
             request.onerror = () => reject(request.error);
         });
+    }
+
+    /**
+     * Escrituras pendientes **del paciente con la sesión abierta**.
+     *
+     * Es la que debe usar el drenaje. Reproducir la cola completa enviaría las
+     * escrituras de un paciente anterior con el token del actual, atribuyendo
+     * datos clínicos a la persona equivocada.
+     *
+     * Las entradas de otros pacientes se conservan —su dueño puede volver a
+     * entrar en este dispositivo— y caducan por el TTL de 7 días.
+     */
+    async dequeueForCurrentPatient(): Promise<QueuedWrite[]> {
+        const patientId = currentPatientId();
+        if (!patientId) return [];
+
+        const all = await this.dequeueAll();
+        const mine = all.filter((item) => item.patientId === patientId);
+
+        // El cuerpo se descifra solo aquí, justo antes del replay: en reposo
+        // nunca queda legible en IndexedDB.
+        return Promise.all(
+            mine.map(async (item) => ({
+                ...item,
+                body: await decryptBody(item.body),
+            })),
+        );
+    }
+
+    /** Número de pendientes del paciente actual (para el indicador de la UI). */
+    async countForCurrentPatient(): Promise<number> {
+        return (await this.dequeueForCurrentPatient()).length;
     }
 
     async remove(id: number): Promise<void> {

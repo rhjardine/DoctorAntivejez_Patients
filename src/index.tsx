@@ -35,9 +35,30 @@ import './index.css'; // Assuming styles are imported here or in App.tsx
 
 const container = document.getElementById('root');
 
+/**
+ * Retira la pantalla de carga de index.html una vez que React ya pintó.
+ * Se espera un frame para que el primer render exista antes de desvanecer:
+ * sin esa espera se vería un parpadeo en blanco entre splash y app.
+ * Idempotente — puede llamarse más de una vez sin efecto adicional.
+ */
+const dismissSplash = () => {
+  const splash = document.getElementById('da-splash');
+  if (!splash) return;
+  requestAnimationFrame(() => {
+    splash.classList.add('da-hide');
+    splash.addEventListener('transitionend', () => splash.remove(), { once: true });
+    // Red de seguridad: si la transición no dispara (pestaña en segundo plano,
+    // prefers-reduced-motion), retirarlo igualmente.
+    setTimeout(() => splash.remove(), 800);
+  });
+};
+
 async function main() {
   if (!container) {
     console.error("No se pudo encontrar el elemento root.");
+    // Retirar el splash aunque no haya nada que montar: una página en blanco
+    // es honesta, un cargador eterno afirma que algo sigue en marcha.
+    dismissSplash();
     return;
   }
 
@@ -83,6 +104,9 @@ async function main() {
           </div>
         </div>
       );
+      // Imprescindible: sin esto la pantalla de error quedaría oculta tras el
+      // splash y el paciente vería una carga infinita en lugar del mensaje.
+      dismissSplash();
       return; // Detener el arranque
     }
 
@@ -97,6 +121,7 @@ async function main() {
       <App />
     </React.StrictMode>
   );
+  dismissSplash();
 }
 
 main();

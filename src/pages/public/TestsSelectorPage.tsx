@@ -4,13 +4,16 @@ import { ClipboardList, Camera } from 'lucide-react';
 import { motion } from 'framer-motion';
 import PublicHeader from '../../components/public/PublicHeader';
 
+// Paleta corporativa. Los nombres anteriores (EARTH, SAGE, TERRA) venían de la
+// paleta "Longevidad Orgánica" de una etapa previa y apuntaban los tres al
+// mismo turquesa fuera de marca.
 const BG = '#f8fafc';
 const BG_CARD = '#ffffff';
-const EARTH = '#14b8a6';
-const EARTH_DK = '#293b64';
-const SAGE = '#14b8a6';
-const TERRA = '#14b8a6';
-const TXT_PRI = '#293b64';
+const NAVY = '#293b64';
+/** Cian corporativo oscurecido a AA (4.65:1) — texto e iconos sobre claro. */
+const CYAN_INK = '#107da8';
+/** Tinte cian para fondos de pastilla e icono. */
+const CYAN_TINT = 'rgba(35,188,239,0.12)';
 const TXT_SEC = '#64748b';
 
 const TestsSelectorPage: React.FC = () => {
@@ -39,7 +42,7 @@ const TestsSelectorPage: React.FC = () => {
                     style={{ paddingTop: 24, textAlign: 'center', marginBottom: 32 }}
                 >
                     <p style={{
-                        fontSize: 16, letterSpacing: 1, color: EARTH,
+                        fontSize: 16, letterSpacing: 1, color: CYAN_INK,
                         textTransform: 'uppercase', opacity: 0.9, fontWeight: 600
                     }}>
                         Plataforma Digital de Longevidad
@@ -65,22 +68,22 @@ const TestsSelectorPage: React.FC = () => {
                     {/* Ícono */}
                     <div style={{
                         width: 48, height: 48, borderRadius: '50%',
-                        background: 'rgba(124,154,126,0.15)',
+                        background: CYAN_TINT,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         marginBottom: 14
                     }}>
-                        <ClipboardList size={22} color={SAGE} />
+                        <ClipboardList size={22} color={CYAN_INK} />
                     </div>
 
-                    <h3 style={{ fontSize: 18, fontWeight: 700, color: EARTH_DK, marginBottom: 8, lineHeight: 1.2 }}>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: NAVY, marginBottom: 8, lineHeight: 1.2 }}>
                         Test de Edad Celular
                     </h3>
 
                     <span style={{
                         display: 'inline-block',
-                        background: 'rgba(124,154,126,0.12)',
+                        background: CYAN_TINT,
                         borderRadius: 12, padding: '4px 12px',
-                        fontSize: 12, color: SAGE, marginBottom: 10
+                        fontSize: 12, color: CYAN_INK, marginBottom: 10
                     }}>
                         34 indicadores · 4 minutos
                     </span>
@@ -108,22 +111,22 @@ const TestsSelectorPage: React.FC = () => {
                 >
                     <div style={{
                         width: 48, height: 48, borderRadius: '50%',
-                        background: 'rgba(124,154,126,0.15)',
+                        background: CYAN_TINT,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         marginBottom: 14
                     }}>
-                        <Camera size={22} color={SAGE} />
+                        <Camera size={22} color={CYAN_INK} />
                     </div>
 
-                    <h3 style={{ fontSize: 18, fontWeight: 700, color: EARTH_DK, marginBottom: 8, lineHeight: 1.2 }}>
+                    <h3 style={{ fontSize: 18, fontWeight: 700, color: NAVY, marginBottom: 8, lineHeight: 1.2 }}>
                         Análisis Visual de Vitalidad
                     </h3>
 
                     <span style={{
                         display: 'inline-block',
-                        background: 'rgba(124,154,126,0.12)',
+                        background: CYAN_TINT,
                         borderRadius: 12, padding: '4px 12px',
-                        fontSize: 12, color: SAGE, marginBottom: 10
+                        fontSize: 12, color: CYAN_INK, marginBottom: 10
                     }}>
                         IA · Análisis instantáneo
                     </span>
@@ -139,7 +142,7 @@ const TestsSelectorPage: React.FC = () => {
                 </p>
 
                 {/* Footer */}
-                <p style={{ fontSize: 10, letterSpacing: 2, color: EARTH_DK, opacity: 0.4, textTransform: 'uppercase', textAlign: 'center' }}>
+                <p style={{ fontSize: 10, letterSpacing: 2, color: NAVY, opacity: 0.4, textTransform: 'uppercase', textAlign: 'center' }}>
                     Creado por Vytalix.io
                 </p>
             </div>
