@@ -6,6 +6,10 @@ const ENCRYPTION_SEED = import.meta.env.VITE_ENCRYPTION_SEED as string | undefin
 
 /** Patterns that indicate a placeholder or weak seed — checked case-insensitively as substrings */
 const WEAK_SEED_PATTERNS = [
+    // Semilla por defecto del workflow de CI: es pública, está en el repositorio.
+    // La guarda de build (scripts/check-release-config.mjs) la rechaza antes de
+    // compilar; esta entrada cubre un bundle construido fuera de ese flujo.
+    'not-for-production',
     'changeme',
     'secret',
     'password',

@@ -33,11 +33,20 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+      # La semilla de CI se genera al vuelo y muere con el runner. Antes había un
+      # literal por defecto en este archivo: al estar publicado, cualquier build
+      # que lo heredara cifraba el PHI con una clave conocida. Un valor aleatorio
+      # y efímero valida igual de bien y no puede filtrarse a producción.
+      - name: Semilla de cifrado efímera para el build de CI
+        run: echo "CI_EPHEMERAL_SEED=$(openssl rand -base64 48 | tr -d '\n')" >> "$GITHUB_ENV"
+
       - name: Production build
         run: npm run build
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://placeholder.onrender.com' }}
-          VITE_ENCRYPTION_SEED: ${{ secrets.VITE_ENCRYPTION_SEED || 'ci-build-seed-not-for-production' }}
+          # El dominio del backend debe estar permitido por el connect-src de
+          # public/_headers; check-release-config.mjs lo verifica antes de compilar.
+          VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://doctor-antivejez-web.onrender.com' }}
+          VITE_ENCRYPTION_SEED: ${{ secrets.VITE_ENCRYPTION_SEED || env.CI_EPHEMERAL_SEED }}
 
       - name: Guarda de secretos en el bundle
         run: node scripts/check-secrets.mjs

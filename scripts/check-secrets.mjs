@@ -36,6 +36,16 @@ const FORBIDDEN = [
     { name: 'Token de GitHub', re: /\bgh[pousr]_[A-Za-z0-9]{20,}/ },
     { name: 'Clave privada PEM', re: /-----BEGIN [A-Z ]*PRIVATE KEY-----/ },
     { name: 'service_role de Supabase', re: /"role"\s*:\s*"service_role"/ },
+    // La semilla de cifrado se inlinea en el bundle por construcción (ADR-001):
+    // lo que no puede ocurrir es que la inlineada sea una semilla PÚBLICA, que
+    // equivaldría a no cifrar nada. Última red tras la guarda de build.
+    // Nota: se busca el valor COMPLETO de la semilla de CI, no fragmentos como
+    // "not-for-production", porque esos fragmentos viven legítimamente en el
+    // bundle como parte de la lista de patrones débiles de cryptoService.
+    {
+        name: 'Semilla de cifrado pública (valor por defecto de CI)',
+        re: /ci-build-seed-not-for-production/,
+    },
 ];
 
 const walk = (dir) =>

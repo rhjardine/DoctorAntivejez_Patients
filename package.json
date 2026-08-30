@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "check:release": "node scripts/check-release-config.mjs",
+    "prebuild": "node scripts/check-release-config.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
