@@ -46,7 +46,7 @@ describe('updateItemStatus — sin falsa confirmación', () => {
         expect(await marcar()).toBe('confirmed');
     });
 
-    it.each([400, 403, 404, 409, 500, 503])(
+    it.each([400, 401, 403, 404, 409, 500, 503])(
         'backend responde %i → NO es éxito',
         async (status) => {
             server.use(
@@ -60,19 +60,16 @@ describe('updateItemStatus — sin falsa confirmación', () => {
         },
     );
 
-    // 401 es un caso aparte, y conviene dejarlo escrito: el interceptor de
-    // apiClient lo captura para intentar refrescar el token y, al no haber
-    // refresh token, rechaza con un Error plano SIN `.status`. Por eso aquí
-    // llega como fallo de red y se reporta 'pending'. No es una falsa
-    // confirmación —que es lo que este sprint debe impedir— pero el mensaje al
-    // paciente habla de conexión cuando en realidad expiró la sesión.
-    // Corregirlo exigiría tocar apiClient, que es dominio protegido.
-    it('401 (sesión expirada) no confirma, aunque se reporte como pendiente', async () => {
+    // 401 llega aquí disfrazado: el interceptor de apiClient lo atiende para
+    // refrescar el token y, al no poder, limpia el almacenamiento y rechaza con
+    // un Error plano SIN `.status`. Se detecta por su efecto (ya no hay sesión).
+    it('401 (sesión expirada) no encola: reintentar sin sesión no arregla nada', async () => {
         server.use(
             http.patch('*/protocols/:id/status', () => new HttpResponse(null, { status: 401 })),
         );
 
-        expect(await marcar()).not.toBe('confirmed');
+        expect(await marcar()).toBe('failed');
+        expect(await offlineQueue.count()).toBe(0);
     });
 
     it('404 (el endpoint que hoy no existe) no encola ni confirma', async () => {

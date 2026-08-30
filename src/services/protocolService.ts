@@ -164,6 +164,22 @@ export const ProtocolService = {
         return 'failed';
       }
 
+      // Caso 401 (sesión expirada). El interceptor de apiClient lo atiende para
+      // refrescar el token y, si no puede, limpia el almacenamiento y redirige a
+      // /acceso, rechazando con un Error plano SIN `.status`. Sin esta guarda
+      // llegaría aquí disfrazado de fallo de red y se reportaría 'pending'.
+      //
+      // Se detecta por su efecto —ya no hay sesión— en lugar de inspeccionar el
+      // mensaje del error, que es frágil, y sin tocar apiClient (protegido).
+      // Encolar aquí sería además contraproducente: el almacenamiento ya está
+      // vacío, así que la entrada nacería sin paciente y nunca se reproduciría.
+      if (!sessionStorage.length && !localStorage.getItem('rejuvenate_session_v1')) {
+        logger.warn('[ProtocolService] Adherencia descartada: la sesión expiró', {
+          reason: 'ADHERENCE_SESSION_EXPIRED',
+        });
+        return 'failed';
+      }
+
       // Sin respuesta del servidor: falta de red. Encolar es legítimo, pero
       // sigue SIN ser una confirmación — se informa como 'pending'.
       const baseUrl = apiClient.defaults.baseURL || '';
