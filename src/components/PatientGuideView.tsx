@@ -2,10 +2,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PatientProtocol, TimeSlot, ProtocolCategory, COLORS } from '../types';
 import {
-  Sun,
-  Moon,
-  Sunset,
-  CheckCircle2,
   Pill,
   Activity,
   Zap,
@@ -17,10 +13,7 @@ import {
   Leaf,
   Droplet,
   Stethoscope,
-  ChevronRight,
   Check,
-  ClipboardList,
-  ChevronDown,
   FileSearch,
   MessageSquareQuote,
   AlertTriangle,
@@ -42,14 +35,11 @@ interface PatientGuideViewProps {
   items: PatientProtocol[];
   loading?: boolean;
   onInfoPress?: () => void;
-  onToggleItem: (id: string) => void;
   onRefresh?: () => void;
   /** Mensaje visible cuando una marca de adherencia no pudo registrarse. */
   syncError?: string | null;
   onDismissSyncError?: () => void;
 }
-
-type ViewMode = 'PLAN' | 'TRACK';
 
 const LAST_SEEN_KEY = 'rejuvenate_last_guide_seen';
 
@@ -96,19 +86,12 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
   items,
   loading,
   onInfoPress,
-  onToggleItem,
   onRefresh,
   syncError,
   onDismissSyncError,
 }) => {
   const { profileData } = useProfileStore();
-  const [viewMode, setViewMode] = useState<ViewMode>('PLAN');
   const [activeGroup, setActiveGroup] = useState<TherapyGroup>('ORAL');
-  const [activeTab, setActiveTab] = useState<TimeSlot>('MORNING');
-  const [expandedCategories, setExpandedCategories] = useState<
-    Record<string, boolean>
-  >({});
-  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNewGuideBanner, setShowNewGuideBanner] = useState(false);
 
@@ -207,24 +190,6 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     }
   };
 
-  const toggleCategory = (type: string) => {
-    setExpandedCategories((prev) => ({
-      ...prev,
-      [type]: !prev[type],
-    }));
-  };
-
-  const toggleNote = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newExpanded = new Set(expandedNotes);
-    if (newExpanded.has(id)) {
-      newExpanded.delete(id);
-    } else {
-      newExpanded.add(id);
-    }
-    setExpandedNotes(newExpanded);
-  };
-
   const getIconByType = (type: string) => {
     switch (type) {
       case 'REMOVAL_PHASE':
@@ -288,110 +253,6 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     </div>
   );
 
-  const renderItemCard = (item: PatientProtocol) => {
-    const isCompleted = item.status === 'completed';
-    const hasNotes = !!item.observations && item.observations.trim().length > 0;
-    const isNoteExpanded = expandedNotes.has(item.id);
-
-    return (
-      <motion.div
-        variants={itemVariants}
-        key={item.id}
-        className={`group relative flex flex-col bg-white rounded-[2rem] shadow-sm transition-all duration-300 border-2 overflow-hidden ${isCompleted
-            ? 'bg-emerald-50/30 border-emerald-100 opacity-80'
-            : 'border-white hover:border-sky-100 shadow-md shadow-slate-200/50'
-          }`}
-      >
-        {/* Tarjeta compacta, por indicación médica: dosis y horario en una sola
-            línea bajo el nombre. Cada dato solo ocupa espacio si el médico lo
-            indicó — antes la fila de dosis se dibujaba siempre y dejaba un hueco
-            vacío en los ítems sin posología. */}
-        <div
-          onClick={() => onToggleItem(item.id)}
-          className="flex items-center gap-4 px-4 py-3.5 cursor-pointer"
-        >
-          <div
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-inner shrink-0 ${isCompleted
-                ? 'bg-emerald-500 text-white rotate-[360deg]'
-                : 'bg-slate-50 border border-slate-200 text-transparent group-hover:border-primary'
-              }`}
-          >
-            <Check
-              size={20}
-              strokeWidth={4}
-              className={
-                isCompleted ? 'scale-100' : 'scale-0 transition-transform'
-              }
-            />
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <h3
-              className={`font-black text-[15px] leading-snug transition-all ${isCompleted ? 'text-slate-400 line-through' : 'text-[#293B64]'
-                }`}
-            >
-              {item.itemName}
-            </h3>
-
-            {(item.dose || item.schedule) && (
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
-                {item.dose && (
-                  <span
-                    className={`text-[11px] font-bold ${isCompleted ? 'text-slate-400' : 'text-[#107da8]'}`}
-                  >
-                    {item.dose}
-                  </span>
-                )}
-                {item.dose && item.schedule && (
-                  <span className="text-[11px] text-slate-300">·</span>
-                )}
-                {item.schedule && (
-                  <span className="flex items-center gap-1 text-[11px] font-medium italic text-slate-500">
-                    <Clock size={11} className="text-slate-300" />
-                    {item.schedule}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-
-          {hasNotes && (
-            <button
-              onClick={(e) => toggleNote(item.id, e)}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0 ${isNoteExpanded
-                  ? 'bg-primary text-white shadow-lg'
-                  : 'bg-slate-50 text-slate-300'
-                }`}
-            >
-              <ChevronDown
-                size={20}
-                className={`transition-transform duration-300 ${isNoteExpanded ? 'rotate-180' : ''}`}
-              />
-            </button>
-          )}
-        </div>
-
-        {/* Branded Collapsible Note Area */}
-        {hasNotes && isNoteExpanded && (
-          <div className="px-5 pb-5 animate-in slide-in-from-top-2 duration-300">
-            <div className="p-4 rounded-2xl border flex gap-3 shadow-inner bg-amber-50 border-amber-100">
-              <div className="shrink-0 text-amber-500">
-                <MessageSquareQuote size={18} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <span className="text-[9px] font-black uppercase tracking-widest block mb-1 text-amber-700">
-                  Observación del Médico
-                </span>
-                <p className="text-xs leading-relaxed font-bold italic text-amber-900 whitespace-pre-wrap break-words">
-                  {item.observations}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </motion.div>
-    );
-  };
 
   /**
    * Terapéutica: procedimientos de consulta.
@@ -449,89 +310,6 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     </div>
   );
 
-  const renderTrackMode = () => {
-    const filteredItems = groupItems.filter((item) => {
-      if (activeTab === 'ANYTIME') return true;
-      return item.timeSlot === activeTab || item.timeSlot === 'ANYTIME';
-    });
-
-    return (
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="flex flex-col flex-1 bg-[#F8FAFC]"
-      >
-        <div className="px-6 py-3 bg-white border-b border-slate-100 shadow-sm">
-          <div className="flex justify-between items-center mb-2.5">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-              Adherencia al Tratamiento
-            </span>
-            <span className="text-sm font-black text-primary">
-              {progressPercent}%
-            </span>
-          </div>
-          <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary transition-all duration-700 ease-out shadow-sm shadow-primary/30"
-              style={{ width: `${progressPercent}%` }}
-            ></div>
-          </div>
-        </div>
-
-        <div className="flex p-4 gap-3 bg-white">
-          {(['MORNING', 'AFTERNOON', 'EVENING'] as TimeSlot[]).map((slot) => {
-            const isActive = activeTab === slot;
-            let Icon = Sun;
-            if (slot === 'AFTERNOON') Icon = Sunset;
-            if (slot === 'EVENING') Icon = Moon;
-
-            return (
-              <button
-                key={slot}
-                onClick={() => setActiveTab(slot)}
-                className={`flex-1 flex flex-col items-center justify-center p-3.5 rounded-[1.5rem] transition-all border-2 ${isActive ? 'bg-primary border-primary text-white shadow-lg' : 'bg-slate-50 border-transparent text-slate-400'}`}
-              >
-                <Icon
-                  size={20}
-                  strokeWidth={isActive ? 3 : 2}
-                  className="mb-1"
-                />
-                <span
-                  className={`text-[10px] font-black uppercase tracking-tighter ${isActive ? 'text-white' : 'text-slate-500'}`}
-                >
-                  {getSlotLabel(slot)}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="flex-1 px-4 py-4 space-y-4 overflow-y-auto no-scrollbar pb-10">
-          {filteredItems.length === 0 ? (
-            <motion.div variants={itemVariants} className="flex flex-col items-center justify-center py-20 text-center opacity-30">
-              <ClipboardList size={54} className="mb-4 text-slate-300" />
-              <p className="text-sm font-black text-slate-400 uppercase tracking-widest">
-                Sin tareas en este bloque
-              </p>
-            </motion.div>
-          ) : (
-            filteredItems.map((item) => renderItemCard(item))
-          )}
-          {/* Rigor Clínico Persistent Access */}
-          <motion.div variants={itemVariants} className="pt-6 pb-24 text-center">
-            <button
-              onClick={onInfoPress}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/50 rounded-full border border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-primary hover:bg-white transition-all shadow-sm"
-            >
-              <Info size={14} />
-              Rigor Clínico y Biomarcadores
-            </button>
-          </motion.div>
-        </div>
-      </motion.div>
-    );
-  };
 
   const renderPlanMode = () => {
     return (
@@ -577,9 +355,13 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
           </div>
         </motion.div>
 
+        {/* Listado vertical continuo, por indicación médica: sin acordeones.
+            El paciente lee su tratamiento de arriba abajo sin tener que abrir
+            nada. La cabecera de categoría se conserva —ya no como control, sino
+            como rótulo— porque agrupa el protocolo tal y como lo prescribió el
+            médico y perder esa estructura sería perder información clínica. */}
         {sortedActiveCategoryTypes.map((catType) => {
           const categoryItems = activeCategories[catType];
-          const isExpanded = expandedCategories[catType] ?? true;
 
           return (
             <motion.div
@@ -587,24 +369,13 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
               key={catType}
               className="rounded-[1.5rem] overflow-hidden shadow-lg border border-slate-100"
             >
-              <button
-                onClick={() => toggleCategory(catType)}
-                className="w-full bg-[#293B64] text-white px-5 py-4 flex items-center justify-between transition-colors hover:bg-[#1A253C]"
-              >
-                <div className="flex items-center gap-3">
-                  {getIconByType(catType)}
-                  <h3 className="font-black text-[13px] uppercase tracking-widest text-left">
-                    {CATEGORY_LABELS[catType] || catType}
-                  </h3>
-                </div>
-                <ChevronDown
-                  size={20}
-                  className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
-                />
-              </button>
-              <div
-                className={`bg-white transition-all overflow-hidden ${isExpanded ? 'max-h-[3000px]' : 'max-h-0'}`}
-              >
+              <div className="w-full bg-[#293B64] text-white px-5 py-3 flex items-center gap-3">
+                {getIconByType(catType)}
+                <h3 className="font-black text-[13px] uppercase tracking-widest text-left">
+                  {CATEGORY_LABELS[catType] || catType}
+                </h3>
+              </div>
+              <div className="bg-white">
                 {/* Formato compacto, por indicación médica: nombre, dosis y
                     horario en una línea. Cada dato aparece solo si el médico lo
                     indicó, de modo que un ítem sin posología no deja un hueco. */}
@@ -761,33 +532,11 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
                   }`}
                 >
                   {THERAPY_GROUP_LABELS[group]}
-                  <span className="ml-1.5 opacity-60">{groupCounts[group]}</span>
                 </button>
               ))}
             </div>
           )}
 
-          {/* El conmutador Ver Guía / Registrar Avances solo aplica a Terapia
-              Oral: la Terapéutica es de solo lectura, no se registra nada. */}
-          {groupItems.length > 0 && !loading && activeGroup === 'ORAL' && (
-            <div className="bg-slate-50 p-1 rounded-2xl flex relative h-11 shadow-inner border border-slate-100 mt-2">
-              <div
-                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-xl shadow-md transition-all duration-300 border border-slate-100 ${viewMode === 'TRACK' ? 'left-[calc(50%+2px)]' : 'left-1'}`}
-              ></div>
-              <button
-                onClick={() => setViewMode('PLAN')}
-                className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[9.5px] font-black uppercase tracking-widest z-10 transition-colors ${viewMode === 'PLAN' ? 'text-primary' : 'text-slate-400'}`}
-              >
-                <FileSearch size={14} /> Ver Guía
-              </button>
-              <button
-                onClick={() => setViewMode('TRACK')}
-                className={`flex-1 flex items-center justify-center gap-2 rounded-xl text-[9.5px] font-black uppercase tracking-widest z-10 transition-colors ${viewMode === 'TRACK' ? 'text-primary' : 'text-slate-400'}`}
-              >
-                <CheckCircle2 size={14} /> Registrar Avances
-              </button>
-            </div>
-          )}
         </div>
 
         <div className="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
@@ -844,8 +593,6 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
             </div>
           ) : activeGroup === 'CLINICAL' ? (
             renderClinicalMode()
-          ) : viewMode === 'TRACK' ? (
-            renderTrackMode()
           ) : (
             renderPlanMode()
           )}

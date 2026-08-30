@@ -4,7 +4,25 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import * as Sentry from "@sentry/react";
 import { cryptoService, CryptoConfigError } from './services/cryptoService';
+import { validateStoredSession } from './services/sessionBootstrap';
 import { logger } from './utils/logger';
+
+/**
+ * Rutas que no exigen sesión. Si el guard de arranque descarta la sesión y el
+ * paciente estaba en una de ellas, se le deja donde estaba: el embudo público
+ * es navegable sin haber iniciado sesión.
+ */
+const RUTAS_PUBLICAS = new Set([
+  '/login',
+  '/acceso',
+  '/longevidad',
+  '/longevidad-tests',
+  '/test',
+  '/agebot',
+  '/resultado',
+  '/consulta',
+  '/medicos',
+]);
 
 // ✅ SECURITY: Sentry solo se inicializa si el DSN está configurado via env var
 if (import.meta.env.VITE_SENTRY_DSN) {
@@ -134,6 +152,22 @@ async function main() {
     // For other failures in DEV, continue boot.
     // The profile store will re-fetch fresh data from the network on next mount.
     logger.error('[Boot] Crypto init failed — profile will re-fetch from network', { error });
+  }
+
+  // 🔐 Guard de arranque en frío. Debe ir ANTES de montar React: el router
+  // decide qué pintar leyendo el estado persistido, y ese estado no es una
+  // credencial. Sin esta validación, una sesión huérfana en localStorage
+  // —que sobrevive a desinstalar y reinstalar la PWA— abría el Dashboard con
+  // datos clínicos sin pedir nada. Ver src/services/sessionBootstrap.ts.
+  const estadoSesion = await validateStoredSession();
+
+  if (estadoSesion === 'invalid') {
+    // El almacenamiento ya quedó limpio. Se reescribe la URL antes del primer
+    // render para que el paciente aterrice en el login en lugar de ver
+    // parpadear una ruta protegida y luego el redirect del guard.
+    if (!RUTAS_PUBLICAS.has(window.location.pathname)) {
+      window.history.replaceState(null, '', '/login');
+    }
   }
 
   const root = createRoot(container);
