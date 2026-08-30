@@ -36,6 +36,17 @@ import './index.css'; // Assuming styles are imported here or in App.tsx
 const container = document.getElementById('root');
 
 /**
+ * Tiempo mínimo que la pantalla de carga permanece a la vista.
+ *
+ * Con caché caliente el arranque termina en pocos cientos de milisegundos y la
+ * marca aparecía como un parpadeo. Tres segundos dan margen a que se lea el
+ * isotipo y a que la animación del propio splash (3,2 s) complete un ciclo.
+ */
+const MIN_SPLASH_MS = 3000;
+
+let splashDismissed = false;
+
+/**
  * Retira la pantalla de carga de index.html una vez que React ya pintó.
  * Se espera un frame para que el primer render exista antes de desvanecer:
  * sin esa espera se vería un parpadeo en blanco entre splash y app.
@@ -43,14 +54,24 @@ const container = document.getElementById('root');
  */
 const dismissSplash = () => {
   const splash = document.getElementById('da-splash');
-  if (!splash) return;
-  requestAnimationFrame(() => {
-    splash.classList.add('da-hide');
-    splash.addEventListener('transitionend', () => splash.remove(), { once: true });
-    // Red de seguridad: si la transición no dispara (pestaña en segundo plano,
-    // prefers-reduced-motion), retirarlo igualmente.
-    setTimeout(() => splash.remove(), 800);
-  });
+  if (!splash || splashDismissed) return;
+  splashDismissed = true;
+
+  // `performance.now()` cuenta desde el inicio de la navegación, que es cuando
+  // el paciente empezó a ver la pantalla. Medir desde ahí hace que el mínimo sea
+  // el percibido: si el arranque ya tardó más de MIN_SPLASH_MS no se añade
+  // ninguna espera, y nunca se suma retardo sobre una carga lenta.
+  const restante = Math.max(0, MIN_SPLASH_MS - performance.now());
+
+  window.setTimeout(() => {
+    requestAnimationFrame(() => {
+      splash.classList.add('da-hide');
+      splash.addEventListener('transitionend', () => splash.remove(), { once: true });
+      // Red de seguridad: si la transición no dispara (pestaña en segundo plano,
+      // prefers-reduced-motion), retirarlo igualmente.
+      setTimeout(() => splash.remove(), 800);
+    });
+  }, restante);
 };
 
 async function main() {
