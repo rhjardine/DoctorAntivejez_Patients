@@ -63,7 +63,7 @@ const MealNotesField: React.FC<Props> = ({ mealId, mealLabel }) => {
   const fieldId = `meal-notes-${mealId}`;
 
   return (
-    <div className="mt-3 bg-white rounded-[1.5rem] border border-slate-100 p-4 shadow-sm">
+    <div className="mt-2.5 bg-white rounded-[1.5rem] border border-slate-100 p-3.5 shadow-sm">
       <div className="flex items-center justify-between mb-2">
         <label
           htmlFor={fieldId}
@@ -86,9 +86,9 @@ const MealNotesField: React.FC<Props> = ({ mealId, mealLabel }) => {
         disabled={!isLoaded}
         maxLength={MAX_LENGTH}
         onChange={(e) => handleChange(e.target.value)}
-        rows={3}
+        rows={2}
         placeholder={`¿Cómo te sentó tu ${mealLabel.toLowerCase()}? Anota lo que quieras recordar.`}
-        className="w-full resize-none bg-[#f8fafc] border border-slate-100 rounded-2xl px-4 py-3 text-sm font-medium text-[#293b64] placeholder:text-slate-400 outline-none focus:border-[#23bcef] transition-colors disabled:opacity-50"
+        className="w-full resize-none bg-[#f8fafc] border border-slate-100 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-[#293b64] placeholder:text-slate-400 outline-none focus:border-[#23bcef] transition-colors disabled:opacity-50"
       />
 
       <p className="flex items-start gap-1.5 mt-2 text-[10px] font-medium leading-relaxed text-slate-400">

@@ -292,7 +292,7 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
       <div className="flex-1 overflow-y-auto no-scrollbar bg-[#F8FAFC]">
         {/* 1. SECCIÓN: PLAN DIARIO (CON TABS DE COMIDA) */}
         {activeSection === 'diario' && (
-          <div className="px-5 pt-5 pb-16 space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+          <div className="px-5 pt-5 pb-16 space-y-3 animate-in fade-in slide-in-from-bottom-5 duration-500">
             {/* ADR-007: no presentar una pauta orientativa como si fuera prescripción. */}
             {planEsGenerico && (
               <div
@@ -309,6 +309,9 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
             )}
 
             {/* Cuatro bloques plegables: Desayuno → Almuerzo → Cena → Merienda.
+                Cada cabecera es una fila con su propio fondo, de modo que las
+                cuatro comidas se leen como una lista vertical desde el primer
+                momento aunque solo una esté desplegada.
                 Los datos son los mismos de `planAlimentario`; solo cambia cómo
                 se presentan. */}
             {MEALS.map(({ id, label, icon: Icon }) => {
@@ -322,9 +325,13 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                     onClick={() => toggleMeal(id)}
                     aria-expanded={isOpen}
                     aria-controls={`meal-panel-${id}`}
-                    className="w-full flex items-center gap-3 py-1 text-left"
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-left rounded-2xl border transition-colors ${
+                      isOpen
+                        ? 'bg-white border-slate-100 shadow-sm'
+                        : 'bg-white/70 border-slate-100 active:bg-white'
+                    }`}
                   >
-                    <div className="w-9 h-9 rounded-2xl bg-[#23BCEF]/10 flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-xl bg-[#23BCEF]/10 flex items-center justify-center shrink-0">
                       <Icon size={16} className="text-[#107da8]" />
                     </div>
                     <h3
@@ -346,7 +353,7 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                   </button>
 
                   {isOpen && (
-                    <div id={`meal-panel-${id}`} className="mt-3">
+                    <div id={`meal-panel-${id}`} className="mt-2.5 pl-1">
                       {items.length > 0 ? (
                         <div className="space-y-2.5">
                           {items.map((item, idx) => (
