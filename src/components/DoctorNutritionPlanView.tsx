@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ChevronLeft,
+  ChevronDown,
   Coffee,
   Sun,
   Moon,
@@ -64,6 +65,16 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
   const [isLoadingPlan, setIsLoadingPlan] = useState(false);
   const [hasAttemptedPlanLoad, setHasAttemptedPlanLoad] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionTab>('diario');
+
+  // Por indicación médica, las cuatro comidas son bloques plegables. Se abre
+  // Desayuno para que la pantalla nunca aparezca «vacía» y se vea de entrada
+  // qué contiene un bloque; el resto se despliega al tocarlo.
+  const [openMeals, setOpenMeals] = useState<Record<string, boolean>>({
+    desayuno: true,
+  });
+
+  const toggleMeal = (id: MealId) =>
+    setOpenMeals((prev) => ({ ...prev, [id]: !prev[id] }));
 
   useEffect(() => {
     if (
@@ -297,13 +308,22 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
               </div>
             )}
 
-            {/* Scroll vertical continuo: desayuno → almuerzo → cena → merienda */}
+            {/* Cuatro bloques plegables: Desayuno → Almuerzo → Cena → Merienda.
+                Los datos son los mismos de `planAlimentario`; solo cambia cómo
+                se presentan. */}
             {MEALS.map(({ id, label, icon: Icon }) => {
               const { items, isPrescribed } = planAlimentario[id];
+              const isOpen = openMeals[id] ?? false;
 
               return (
                 <section key={id} aria-labelledby={`meal-${id}`}>
-                  <div className="flex items-center gap-3 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => toggleMeal(id)}
+                    aria-expanded={isOpen}
+                    aria-controls={`meal-panel-${id}`}
+                    className="w-full flex items-center gap-3 py-1 text-left"
+                  >
                     <div className="w-9 h-9 rounded-2xl bg-[#23BCEF]/10 flex items-center justify-center shrink-0">
                       <Icon size={16} className="text-[#107da8]" />
                     </div>
@@ -318,32 +338,41 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                         Orientativo
                       </span>
                     )}
-                  </div>
+                    <ChevronDown
+                      size={18}
+                      aria-hidden="true"
+                      className={`ml-auto text-slate-400 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
 
-                  {items.length > 0 ? (
-                    <div className="space-y-2.5">
-                      {items.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="bg-white rounded-[1.25rem] px-4 py-3.5 shadow-sm border border-slate-100 flex items-center gap-3"
-                        >
-                          <CheckCircle2
-                            size={16}
-                            className="text-[#23BCEF] shrink-0"
-                          />
-                          <span className="text-sm font-bold text-[#293b64] leading-snug">
-                            {item}
-                          </span>
+                  {isOpen && (
+                    <div id={`meal-panel-${id}`} className="mt-3">
+                      {items.length > 0 ? (
+                        <div className="space-y-2.5">
+                          {items.map((item, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-white rounded-[1.25rem] px-4 py-3.5 shadow-sm border border-slate-100 flex items-center gap-3"
+                            >
+                              <CheckCircle2
+                                size={16}
+                                className="text-[#23BCEF] shrink-0"
+                              />
+                              <span className="text-sm font-bold text-[#293b64] leading-snug">
+                                {item}
+                              </span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-xs font-medium text-slate-400 italic px-1">
-                      Sin indicaciones para esta comida.
-                    </p>
-                  )}
+                      ) : (
+                        <p className="text-xs font-medium text-slate-400 italic px-1">
+                          Sin indicaciones para esta comida.
+                        </p>
+                      )}
 
-                  <MealNotesField mealId={id} mealLabel={label} />
+                      <MealNotesField mealId={id} mealLabel={label} />
+                    </div>
+                  )}
                 </section>
               );
             })}

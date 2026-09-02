@@ -175,6 +175,14 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     return (Object.keys(activeCategories) as ProtocolCategory[]).sort();
   }, [activeCategories]);
 
+  /** Terapia Oral en una sola lista, manteniendo juntos los ítems de una misma
+   *  categoría. Es un aplanado del mismo agrupamiento: no filtra ni reordena
+   *  dentro de cada categoría, así que no puede perderse ningún ítem. */
+  const orderedOralItems = useMemo(
+    () => sortedActiveCategoryTypes.flatMap((catType) => activeCategories[catType]),
+    [sortedActiveCategoryTypes, activeCategories],
+  );
+
   const completedCount = groupItems.filter(
     (i) => i.status === 'completed',
   ).length;
@@ -271,41 +279,58 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
         </p>
       </div>
 
-      {groupItems.map((item) => (
-        <div
-          key={item.id}
-          className="bg-white rounded-[1.25rem] px-4 py-4 shadow-sm border border-slate-100"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <h4 className="text-sm font-black text-[#293b64] leading-snug">
-              {item.itemName}
-            </h4>
-            <span className="text-[9px] font-bold uppercase tracking-wider text-[#107da8] bg-[#23bcef]/10 px-2 py-1 rounded-lg whitespace-nowrap shrink-0">
-              {CATEGORY_LABELS[item.category] || item.category}
-            </span>
+      {/* Jerarquía invertida, por indicación médica: la categoría clínica manda
+          como encabezado y los procedimientos cuelgan de ella, en lugar de ir
+          como etiqueta secundaria dentro de cada tarjeta. Sigue siendo solo
+          lectura: no hay casilla ni registro de adherencia. */}
+      {sortedActiveCategoryTypes.map((catType) => (
+        <section key={catType} aria-labelledby={`terapeutica-${catType}`} className="pt-1">
+          <div className="flex items-center gap-2.5 px-1 mb-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[#293B64] text-white flex items-center justify-center shrink-0">
+              {getIconByType(catType)}
+            </div>
+            <h3
+              id={`terapeutica-${catType}`}
+              className="text-[13px] font-black uppercase tracking-widest text-[#293b64]"
+            >
+              {CATEGORY_LABELS[catType] || catType}
+            </h3>
           </div>
 
-          {(item.dose || item.schedule) && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
-              {item.dose && (
-                <span className="text-xs font-bold text-slate-500">
-                  Dosis: {item.dose}
-                </span>
-              )}
-              {item.schedule && (
-                <span className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
-                  <Clock size={12} /> {item.schedule}
-                </span>
-              )}
-            </div>
-          )}
+          <div className="space-y-2.5">
+            {activeCategories[catType].map((item) => (
+              <div
+                key={item.id}
+                className="bg-white rounded-[1.25rem] px-4 py-4 shadow-sm border border-slate-100"
+              >
+                <h4 className="text-sm font-black text-[#293b64] leading-snug">
+                  {item.itemName}
+                </h4>
 
-          {item.observations && (
-            <p className="mt-2.5 text-[11px] font-medium italic leading-relaxed text-slate-500 bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
-              {item.observations}
-            </p>
-          )}
-        </div>
+                {(item.dose || item.schedule) && (
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                    {item.dose && (
+                      <span className="text-xs font-bold text-slate-500">
+                        Dosis: {item.dose}
+                      </span>
+                    )}
+                    {item.schedule && (
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                        <Clock size={12} /> {item.schedule}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {item.observations && (
+                  <p className="mt-2.5 text-[11px] font-medium italic leading-relaxed text-slate-500 bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
+                    {item.observations}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
       ))}
     </div>
   );
@@ -319,123 +344,126 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
         animate="show"
         className="flex-1 bg-[#F8FAFC] px-4 py-3 space-y-4 overflow-y-auto no-scrollbar pb-32"
       >
-        {/* HERO SECTION: EDAD BIOLÓGICA (Efecto Wow) */}
-        <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-[#293B64] to-slate-900 rounded-3xl p-6 text-white shadow-xl mb-4">
-          <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-            <HeartPulse className="w-32 h-32" />
+        {/* HERO: EDAD BIOLÓGICA. Compactado ~18 % por indicación médica para
+            ganar altura de lectura. Se reducen espaciados y escala tipográfica;
+            no cambia ningún dato ni cálculo. */}
+        <motion.div variants={itemVariants} className="relative overflow-hidden bg-gradient-to-br from-[#293B64] to-slate-900 rounded-3xl p-5 text-white shadow-xl mb-4">
+          <div className="absolute top-0 right-0 p-3 opacity-10 pointer-events-none">
+            <HeartPulse className="w-24 h-24" />
           </div>
 
           <div className="relative z-10">
-            <h2 className="text-primary/90 text-sm font-bold uppercase tracking-wider mb-1">
+            <h2 className="text-primary/90 text-[13px] font-bold uppercase tracking-wider mb-0.5">
               Mi Perfil de Longevidad
             </h2>
-            <p className="text-slate-300 text-[11px] mb-6">Basado en tus últimos biomarcadores clínicos</p>
+            <p className="text-slate-300 text-[10px] mb-5">Basado en tus últimos biomarcadores clínicos</p>
 
-            <div className="flex items-end gap-6">
+            <div className="flex items-end gap-5">
               <div>
-                <p className="text-slate-400 text-[10px] uppercase font-semibold mb-1 tracking-widest">Edad Celular</p>
+                <p className="text-slate-400 text-[10px] uppercase font-semibold mb-0.5 tracking-widest">Edad Celular</p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-5xl font-black text-white">{bioAge || '--'}</span>
-                  <span className="text-primary text-lg font-medium">años</span>
+                  <span className="text-4xl font-black text-white">{bioAge || '--'}</span>
+                  <span className="text-primary text-base font-medium">años</span>
                 </div>
               </div>
 
-              <div className="pb-1 border-l border-slate-700 pl-6">
-                <p className="text-slate-400 text-[10px] uppercase font-semibold mb-1 tracking-widest">Edad Cronológica</p>
-                <p className="text-xl font-medium text-slate-300">{chronoAge || '--'} años</p>
+              <div className="pb-0.5 border-l border-slate-700 pl-5">
+                <p className="text-slate-400 text-[10px] uppercase font-semibold mb-0.5 tracking-widest">Edad Cronológica</p>
+                <p className="text-lg font-medium text-slate-300">{chronoAge || '--'} años</p>
               </div>
             </div>
 
             {isYounger && (
-              <div className="mt-6 inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full text-xs font-black tracking-wide border border-primary/30 backdrop-blur-sm">
-                <Sparkles className="w-4 h-4" />
+              <div className="mt-5 inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full text-[11px] font-black tracking-wide border border-primary/30 backdrop-blur-sm">
+                <Sparkles className="w-3.5 h-3.5" />
                 ¡Felicidades! Tu edad celular es {chronoAge - bioAge} años menor.
               </div>
             )}
           </div>
         </motion.div>
 
-        {/* Listado vertical continuo, por indicación médica: sin acordeones.
-            El paciente lee su tratamiento de arriba abajo sin tener que abrir
-            nada. La cabecera de categoría se conserva —ya no como control, sino
-            como rótulo— porque agrupa el protocolo tal y como lo prescribió el
-            médico y perder esa estructura sería perder información clínica. */}
-        {sortedActiveCategoryTypes.map((catType) => {
-          const categoryItems = activeCategories[catType];
-
-          return (
-            <motion.div
-              variants={itemVariants}
-              key={catType}
-              className="rounded-[1.5rem] overflow-hidden shadow-lg border border-slate-100"
-            >
-              <div className="w-full bg-[#293B64] text-white px-5 py-3 flex items-center gap-3">
-                {getIconByType(catType)}
-                <h3 className="font-black text-[13px] uppercase tracking-widest text-left">
-                  {CATEGORY_LABELS[catType] || catType}
-                </h3>
-              </div>
-              <div className="bg-white">
-                {/* Formato compacto, por indicación médica: nombre, dosis y
-                    horario en una línea. Cada dato aparece solo si el médico lo
-                    indicó, de modo que un ítem sin posología no deja un hueco. */}
-                <div className="p-3 space-y-2">
-                  {categoryItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="px-4 py-3 rounded-[1.25rem] bg-slate-50/50 border border-slate-100"
-                    >
-                      <div className="flex justify-between items-start gap-3">
-                        <h4 className="font-black text-darkBlue text-[15px] leading-snug flex-1">
+        {/* Un único encabezado, por indicación médica: el paciente lee todos sus
+            nutracéuticos de corrido, sin la fragmentación en bloques por fase.
+            La fase de cada ítem no se pierde —se conserva como rótulo dentro de
+            la tarjeta— porque la prescribió el médico y ocultarla sería perder
+            información clínica (ADR-007). El orden es el de las categorías, de
+            modo que los ítems de una misma fase siguen apareciendo juntos. */}
+        {orderedOralItems.length > 0 && (
+          <motion.div
+            variants={itemVariants}
+            className="rounded-[1.5rem] overflow-hidden shadow-lg border border-slate-100"
+          >
+            <div className="w-full bg-[#293B64] text-white px-5 py-3 flex items-center gap-3">
+              <Pill size={14} />
+              <h3 className="font-black text-[13px] uppercase tracking-widest text-left">
+                Nutracéuticos
+              </h3>
+            </div>
+            <div className="bg-white">
+              {/* Formato compacto, por indicación médica: nombre, dosis y
+                  horario en una línea. Cada dato aparece solo si el médico lo
+                  indicó, de modo que un ítem sin posología no deja un hueco. */}
+              <div className="p-3 space-y-2">
+                {orderedOralItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="px-4 py-3 rounded-[1.25rem] bg-slate-50/50 border border-slate-100"
+                  >
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="flex-1 min-w-0">
+                        <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">
+                          {CATEGORY_LABELS[item.category] || item.category}
+                        </span>
+                        <h4 className="font-black text-darkBlue text-[15px] leading-snug">
                           {item.itemName}
                         </h4>
-                        <span className="text-[9px] font-black text-primary bg-white px-2.5 py-1 rounded-lg uppercase tracking-tighter border border-sky-100 shrink-0">
-                          {getSlotLabel(item.timeSlot)}
-                        </span>
                       </div>
-
-                      {(item.dose || item.schedule) && (
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
-                          {item.dose && (
-                            <span className="text-[11px] font-bold text-[#107da8]">
-                              {item.dose}
-                            </span>
-                          )}
-                          {item.dose && item.schedule && (
-                            <span className="text-[11px] text-slate-300">·</span>
-                          )}
-                          {item.schedule && (
-                            <span className="flex items-center gap-1 text-[11px] font-medium italic text-slate-500">
-                              <Clock size={11} className="text-slate-300" />
-                              {item.schedule}
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {item.observations && (
-                        <div className="mt-2.5 p-3 rounded-xl border flex gap-2.5 bg-amber-50 border-amber-100">
-                          <MessageSquareQuote
-                            size={16}
-                            className="text-amber-500 shrink-0"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <span className="text-[9px] font-black uppercase block mb-1 text-amber-700 tracking-widest">
-                              Observación del Médico
-                            </span>
-                            <p className="text-xs leading-relaxed font-bold italic text-amber-900 whitespace-pre-wrap break-words">
-                              {item.observations}
-                            </p>
-                          </div>
-                        </div>
-                      )}
+                      <span className="text-[9px] font-black text-primary bg-white px-2.5 py-1 rounded-lg uppercase tracking-tighter border border-sky-100 shrink-0">
+                        {getSlotLabel(item.timeSlot)}
+                      </span>
                     </div>
-                  ))}
-                </div>
+
+                    {(item.dose || item.schedule) && (
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+                        {item.dose && (
+                          <span className="text-[11px] font-bold text-[#107da8]">
+                            {item.dose}
+                          </span>
+                        )}
+                        {item.dose && item.schedule && (
+                          <span className="text-[11px] text-slate-300">·</span>
+                        )}
+                        {item.schedule && (
+                          <span className="flex items-center gap-1 text-[11px] font-medium italic text-slate-500">
+                            <Clock size={11} className="text-slate-300" />
+                            {item.schedule}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {item.observations && (
+                      <div className="mt-2.5 p-3 rounded-xl border flex gap-2.5 bg-amber-50 border-amber-100">
+                        <MessageSquareQuote
+                          size={16}
+                          className="text-amber-500 shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <span className="text-[9px] font-black uppercase block mb-1 text-amber-700 tracking-widest">
+                            Observación del Médico
+                          </span>
+                          <p className="text-xs leading-relaxed font-bold italic text-amber-900 whitespace-pre-wrap break-words">
+                            {item.observations}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            </motion.div>
-          );
-        })}
+            </div>
+          </motion.div>
+        )}
       </motion.div>
     );
   };
