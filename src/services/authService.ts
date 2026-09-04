@@ -173,6 +173,13 @@ export const authService = {
     clearPatientScopedStorage();
 
     useProfileStore.getState().clearProfileData();
+
+    // Estado en memoria de ProtocolService: caché de sesión, petición de perfil
+    // en vuelo y pausa tras un fallo. Sin esta llamada el siguiente paciente que
+    // entrara en el mismo dispositivo heredaba la pausa del anterior y se
+    // quedaba hasta 30 s sin sus datos, aunque el backend ya respondiera.
+    ProtocolService.clearCache();
+
     logger.audit('logout');
   },
 

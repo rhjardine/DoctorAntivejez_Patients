@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import { ProtocolService } from '../services/protocolService';
+import { authService } from '../services/authService';
 import { useProfileStore } from '../store/useProfileStore';
 
 /**
@@ -29,7 +30,7 @@ beforeAll(() => server.listen());
 afterEach(() => {
     server.resetHandlers();
     peticiones = 0;
-    ProtocolService.clearCache(); // reinicia también la pausa
+    authService.logout(); // reinicia el estado por el flujo real
     useProfileStore.setState({ profileData: null });
     vi.useRealTimers();
 });
@@ -86,13 +87,41 @@ describe('getMyProfile — no repetir contra un backend caído', () => {
         expect(perfil.firstName).toBe('Ana');
     });
 
-    it('el logout limpia la pausa: no la hereda el siguiente paciente', async () => {
+    // El flujo real: `authService.logout()`, que es lo que ejecuta la app.
+    // Invocar aquí `ProtocolService.clearCache()` probaría la función, no el
+    // flujo — y esa era precisamente la trampa: clearCache no lo llamaba nadie
+    // en producción, así que la pausa sobrevivía al cierre de sesión.
+    it('el logout REAL limpia la pausa: no la hereda el siguiente paciente', async () => {
         await ProtocolService.getMyProfile();
         expect(peticiones).toBe(1);
 
-        ProtocolService.clearCache();
+        authService.logout();
         await ProtocolService.getMyProfile();
 
         expect(peticiones).toBe(2);
+    });
+
+    // Regresión completa del escenario que motivó el bloqueo:
+    // A falla → pausa activa → logout real → entra B con el backend ya sano →
+    // B debe recibir SU perfil de inmediato, sin esperar los 30 s.
+    it('A falla, cierra sesión y B entra: B obtiene su perfil de inmediato', async () => {
+        await ProtocolService.getMyProfile(); // A: 500, pausa armada
+        expect(peticiones).toBe(1);
+
+        authService.logout();
+
+        server.use(
+            http.get('*/mobile-profile-v1', () => {
+                peticiones++;
+                return HttpResponse.json({ id: 'p2', firstName: 'Beto', chronologicalAge: 60 });
+            }),
+        );
+
+        const perfilDeB = await ProtocolService.getMyProfile();
+
+        expect(peticiones).toBe(2);
+        expect(perfilDeB).not.toBeNull();
+        expect(perfilDeB.firstName).toBe('Beto');
+        expect(perfilDeB.id).toBe('p2');
     });
 });
