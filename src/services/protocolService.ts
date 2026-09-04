@@ -49,6 +49,26 @@ const clearSessionCache = (): void => {
  */
 export type AdherenceResult = 'confirmed' | 'pending' | 'failed';
 
+// ─── Control de peticiones del perfil ────────────────────────────────────────
+
+/** Petición de perfil en curso, para que varias pantallas compartan una sola. */
+let inFlightProfile: Promise<any> | null = null;
+
+/** Instante hasta el que no se vuelve a pedir el perfil tras un fallo. */
+let profileCooldownUntil = 0;
+
+/** Pausa tras un fallo. Corta la tormenta sin dejar la app clavada: el paciente
+ *  recupera sus datos en la siguiente navegación pasado este tiempo, y el botón
+ *  de recargar de la cabecera sigue funcionando en cualquier momento. */
+const PROFILE_COOLDOWN_MS = 30_000;
+
+/** Reinicia el control de peticiones. Se llama en logout: la pausa de un
+ *  paciente no debe heredarla el siguiente que entre en el mismo dispositivo. */
+const resetProfileFetchState = (): void => {
+  inFlightProfile = null;
+  profileCooldownUntil = 0;
+};
+
 // ─── ProtocolService ─────────────────────────────────────────────────────────
 
 export const ProtocolService = {
@@ -71,7 +91,9 @@ export const ProtocolService = {
 
       return getFromSession<PatientProtocol[]>(PROTOCOL_CACHE_KEY) ?? [];
     } catch (error) {
-      console.error('[ProtocolService] Error fetching protocol:', error);
+      logger.warn('[ProtocolService] Protocolo no disponible; se usa el caché de sesión', {
+        reason: 'PROTOCOL_FETCH_FAILED',
+      });
 
       // ✅ Fallback a caché de sesión (NO localStorage)
       const cached = getFromSession<PatientProtocol[]>(PROTOCOL_CACHE_KEY);
@@ -96,7 +118,9 @@ export const ProtocolService = {
 
       return getFromSession<NutrigenomicPlan>(NUTRITION_CACHE_KEY);
     } catch (error) {
-      console.error('[ProtocolService] Error fetching nutrition plan:', error);
+      logger.warn('[ProtocolService] Plan nutricional no disponible; se usa el caché de sesión', {
+        reason: 'NUTRITION_FETCH_FAILED',
+      });
       return getFromSession<NutrigenomicPlan>(NUTRITION_CACHE_KEY);
     }
   },
@@ -211,26 +235,57 @@ export const ProtocolService = {
    * Ahora: '/mobile-profile-v1' (pasa por interceptor, agrega Bearer token automáticamente)
    */
   getMyProfile: async (): Promise<any> => {
-    try {
-      // Check if profile store has fresh data — avoid redundant API call
-      const { profileData, isCacheValid } = useProfileStore.getState();
-      if (profileData && isCacheValid()) {
-        return profileData;
-      }
-      const response = await apiClient.get('/mobile-profile-v1');
-      const profile = response.data;
-      return {
-        ...profile,
-        alimentacion: normalizeAlimentacion(profile),
-      };
-    } catch (error) {
-      console.error('[ProtocolService] Error fetching profile:', error);
+    // Check if profile store has fresh data — avoid redundant API call
+    const { profileData, isCacheValid } = useProfileStore.getState();
+    if (profileData && isCacheValid()) {
+      return profileData;
+    }
+
+    // Una sola petición en vuelo. Varias pantallas piden el perfil a la vez
+    // —HomePage lo pide y además llama a fetchActiveProtocol, que lo vuelve a
+    // pedir—, y sin esto cada montaje disparaba peticiones duplicadas
+    // simultáneas contra el mismo endpoint.
+    if (inFlightProfile) return inFlightProfile;
+
+    // Tras un fallo, no volver a preguntar durante un rato. Sin esta pausa, con
+    // el backend caído cada navegación entre la Guía y Alimentación lanzaba otra
+    // petición: el paciente no gana nada y el servidor recibe una tormenta justo
+    // cuando peor está.
+    if (Date.now() < profileCooldownUntil) {
       return null;
     }
+
+    inFlightProfile = (async () => {
+      try {
+        const response = await apiClient.get('/mobile-profile-v1');
+        const profile = response.data;
+        return {
+          ...profile,
+          alimentacion: normalizeAlimentacion(profile),
+        };
+      } catch (error) {
+        profileCooldownUntil = Date.now() + PROFILE_COOLDOWN_MS;
+        // Log compacto y sin PHI: apiClient ya registra el código y la ruta, así
+        // que aquí basta con dejar constancia de que se entra en pausa.
+        logger.warn('[ProtocolService] No se pudo obtener el perfil', {
+          reason: 'PROFILE_FETCH_FAILED',
+          status: (error as any)?.status,
+          cooldownMs: PROFILE_COOLDOWN_MS,
+        });
+        return null;
+      } finally {
+        inFlightProfile = null;
+      }
+    })();
+
+    return inFlightProfile;
   },
 
   /**
    * Limpia el caché de sesión (llamar en logout).
    */
-  clearCache: clearSessionCache,
+  clearCache: () => {
+    clearSessionCache();
+    resetProfileFetchState();
+  },
 };
