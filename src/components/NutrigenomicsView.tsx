@@ -272,8 +272,11 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
         </div>
       </div>
 
-      {/* TABS ELEGANTES */}
-      <div className="flex px-4 gap-2 overflow-x-auto no-scrollbar py-4 bg-white border-b border-slate-100 shadow-sm sticky top-0 z-20">
+      {/* Selector de comida en vertical, por indicación médica: las cuatro
+          opciones se leen de arriba abajo, sin desplazamiento lateral. Solo
+          cambia la disposición — el estado, el filtrado y el contenido que se
+          muestra son exactamente los mismos. */}
+      <div className="flex flex-col px-4 gap-1.5 py-3 bg-white border-b border-slate-100 shadow-sm">
         {(['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'] as MealType[]).map((tab) => {
           const isActive = activeTab === tab;
           const Icon = tab === 'BREAKFAST' ? Coffee : tab === 'LUNCH' ? Sun : tab === 'DINNER' ? Moon : Leaf;
@@ -283,12 +286,13 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-[10px] font-black transition-all border-2 shrink-0 ${isActive
-                ? 'bg-[#107da8] border-[#107da8] text-white shadow-lg shadow-[#107da8]/20 scale-105'
+              aria-pressed={isActive}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl text-[10px] font-black transition-all border-2 text-left ${isActive
+                ? 'bg-[#107da8] border-[#107da8] text-white shadow-lg shadow-[#107da8]/20'
                 : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'
                 }`}
             >
-              <Icon size={16} />
+              <Icon size={16} className="shrink-0" />
               {label.toUpperCase()}
             </button>
           );
