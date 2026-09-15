@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle, BrainCircuit, ChevronLeft } from 'lucide-react';
 import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
-import apiClient from '../../services/apiClient';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 import { usePublicFunnelStore } from '../../store/usePublicFunnelStore';
 
@@ -15,25 +14,49 @@ interface FacialResult {
     analysisPoints: number;
 }
 
-// TODO: conectar endpoint /api/vision-v1 cuando esté disponible en el backend
+/**
+ * Estimación de edad aparente a partir de una foto.
+ *
+ * Llama a `/api/vision/analyze-age`, que es el endpoint de reconocimiento facial
+ * (AWS Rekognition `DetectFaces` → `AgeRange`). Antes se llamaba a `/vision-v1`,
+ * que es el escáner de ALIMENTOS: su prompt solo contempla comida e ignora
+ * `analysisType`, de modo que a un rostro respondía `{"error":"No food detected"}`
+ * con HTTP 200 y la pantalla nunca recibía una edad.
+ *
+ * Se usa `fetch` y no `apiClient` a propósito. Es un endpoint público que no
+ * necesita token, y el interceptor de apiClient, ante un 401, limpia el
+ * almacenamiento y redirige a /acceso: un tropiezo en el embudo público no debe
+ * poder cerrarle la sesión a un paciente que sí la tiene abierta.
+ */
 async function analyzeFacialAge(imageBase64: string): Promise<FacialResult> {
     try {
-        // FIX 1: AbortController para prevenir el Loop Infinito si Render está dormido
+        // AbortController para no quedar colgados si Render está dormido.
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos máximo
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-        // apiClient resuelve la URL según el entorno. Antes se llamaba a
-        // '/api-render/api/vision-v1', que es SOLO el proxy del servidor de
-        // desarrollo: en producción esa ruta no existe.
-        const response = await apiClient.post(
-            '/vision-v1',
-            { imageBase64, analysisType: 'AGE_FACIAL' },
-            { signal: controller.signal },
-        );
+        const base = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+        const response = await fetch(`${base}/api/vision/analyze-age`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: imageBase64 }),
+            signal: controller.signal,
+        });
 
         clearTimeout(timeoutId);
 
-        return response.data;
+        const data = await response.json().catch(() => null);
+
+        // El backend responde 400/500 con `{ error }` cuando no detecta rostro o
+        // no puede estimar la edad. Es información útil para el paciente, no un
+        // fallo silencioso.
+        if (!response.ok || !data || typeof data.estimatedAge !== 'number') {
+            throw new Error(
+                (data && typeof data.error === 'string' && data.error) ||
+                'No se pudo estimar la edad a partir de esta foto.',
+            );
+        }
+
+        return data as FacialResult;
 
     } catch (error) {
         // In development only: use mock to allow testing without backend
@@ -47,8 +70,19 @@ async function analyzeFacialAge(imageBase64: string): Promise<FacialResult> {
             };
         }
 
-        // In production: surface the error honestly — do not fabricate results
+        // En producción se informa con honestidad: nunca se inventa un resultado.
+        // Si el backend explicó el motivo —no se detectó rostro, no se pudo
+        // estimar la edad—, ese mensaje le sirve al paciente para reintentar
+        // bien; el genérico solo se usa cuando no hubo respuesta (red, timeout).
+        const delServidor =
+            error instanceof Error &&
+            error.name !== 'AbortError' &&
+            !/Failed to fetch|NetworkError/i.test(error.message)
+                ? error.message
+                : null;
+
         throw new Error(
+            delServidor ||
             'El análisis no está disponible en este momento. ' +
             'Por favor intenta de nuevo en unos minutos.'
         );

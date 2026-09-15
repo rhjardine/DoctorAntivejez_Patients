@@ -77,7 +77,7 @@ const LandingPublicaPage: React.FC = () => {
                                     <LineChart className="w-7 h-7 text-[#107da8]" />
                                 </div>
                                 <div className="flex-1 text-left">
-                                    <h4 className="text-lg font-black text-[#293b64] leading-none mb-1">Cuestionario Clínico</h4>
+                                    <h4 className="text-lg font-black text-[#293b64] leading-none mb-1">Realizar el test preventivo gratuito</h4>
                                     <p className="text-xs font-medium text-slate-500">Test integral de hábitos y estilo de vida</p>
                                 </div>
                             </div>
@@ -94,7 +94,7 @@ const LandingPublicaPage: React.FC = () => {
                                     <BrainCircuit className="w-7 h-7 text-[#293b64]" />
                                 </div>
                                 <div className="flex-1 text-left">
-                                    <h4 className="text-lg font-black text-[#293b64] leading-none mb-1">Análisis Facial IA</h4>
+                                    <h4 className="text-lg font-black text-[#293b64] leading-none mb-1">Escanea tu rostro para obtener tu edad aparente</h4>
                                     <p className="text-xs font-medium text-slate-500">Evaluación fotográfica por inteligencia artificial</p>
                                 </div>
                             </div>
