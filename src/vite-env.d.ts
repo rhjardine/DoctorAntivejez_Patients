@@ -9,6 +9,10 @@ interface ImportMetaEnv {
   readonly VITE_FEATURE_VCOACH?: string;
   /** Kill switch de IA — "off" desactiva el FoodScanner. */
   readonly VITE_FEATURE_FOODSCANNER?: string;
+  /** "off" desactiva la estimación de edad aparente en el dispositivo. */
+  readonly VITE_FEATURE_FACIAL_LOCAL?: string;
+  /** "on" habilita la salida al endpoint remoto de visión. Apagada por defecto. */
+  readonly VITE_FEATURE_FACIAL_REMOTE?: string;
 }
 
 interface ImportMeta {
