@@ -55,6 +55,11 @@ export default defineConfig(() => {
           clientsClaim: true,
           importScripts: ['sw-messages.js'],
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,jpeg,jpg}'],
+          // El analizador facial y sus pesos se descargan solo cuando alguien
+          // abre /agebot. Sin esta exclusión el patrón de arriba los metería en
+          // el precache y todos los pacientes pagarían su peso al instalar la
+          // app, que es justo lo contrario de cargarlos bajo demanda.
+          globIgnores: ['**/vendor-faceapi-*.js', 'models/**'],
           runtimeCaching: [
             {
               urlPattern: ({ url }) =>
@@ -81,6 +86,10 @@ export default defineConfig(() => {
             'vendor-sentry': ['@sentry/react'],
             'vendor-fingerprint': ['@fingerprintjs/fingerprintjs'],
             'vendor-utils': ['axios', 'date-fns', 'zustand'],
+            // Nombre estable para poder excluirlo del precache. Solo lo
+            // referencia el import() dinámico de /agebot, así que sigue siendo
+            // un chunk diferido.
+            'vendor-faceapi': ['@vladmandic/face-api'],
           },
         },
       },

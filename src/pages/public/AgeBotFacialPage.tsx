@@ -3,37 +3,68 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Image as ImageIcon, ArrowRight, RefreshCw, Loader2, AlertTriangle, CheckCircle, BrainCircuit, ChevronLeft } from 'lucide-react';
 import WellnessDisclaimer from '../../components/public/WellnessDisclaimer';
-import apiClient from '../../services/apiClient';
 import { VITALITY_LABELS } from '../../utils/vitalityLabels';
 import { usePublicFunnelStore } from '../../store/usePublicFunnelStore';
+import { featureFlags } from '../../config/featureFlags';
+import { ErrorCargaModelo, estimarEdadLocal, prepararImagen } from '../../services/localFaceAgeService';
 
-type Phase = 'capture' | 'analyzing' | 'result' | 'error';
+/** `encuadre` no es un error: la foto llegó, faltó un rostro utilizable. */
+type Phase = 'capture' | 'analyzing' | 'result' | 'error' | 'encuadre';
 
 interface FacialResult {
     estimatedAge: number;
     confidence: number;
-    analysisPoints: number;
+    /**
+     * Ausente en la ruta local y en la remota real: solo el simulacro de
+     * desarrollo lo producía. Se muestra únicamente si existe, en vez de
+     * inventar una cifra para rellenar la tarjeta.
+     */
+    analysisPoints?: number;
 }
 
-// TODO: conectar endpoint /api/vision-v1 cuando esté disponible en el backend
+/**
+ * Estimación de edad aparente a partir de una foto.
+ *
+ * Llama a `/api/vision/analyze-age`, que es el endpoint de reconocimiento facial
+ * (AWS Rekognition `DetectFaces` → `AgeRange`). Antes se llamaba a `/vision-v1`,
+ * que es el escáner de ALIMENTOS: su prompt solo contempla comida e ignora
+ * `analysisType`, de modo que a un rostro respondía `{"error":"No food detected"}`
+ * con HTTP 200 y la pantalla nunca recibía una edad.
+ *
+ * Se usa `fetch` y no `apiClient` a propósito. Es un endpoint público que no
+ * necesita token, y el interceptor de apiClient, ante un 401, limpia el
+ * almacenamiento y redirige a /acceso: un tropiezo en el embudo público no debe
+ * poder cerrarle la sesión a un paciente que sí la tiene abierta.
+ */
 async function analyzeFacialAge(imageBase64: string): Promise<FacialResult> {
     try {
-        // FIX 1: AbortController para prevenir el Loop Infinito si Render está dormido
+        // AbortController para no quedar colgados si Render está dormido.
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos máximo
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-        // apiClient resuelve la URL según el entorno. Antes se llamaba a
-        // '/api-render/api/vision-v1', que es SOLO el proxy del servidor de
-        // desarrollo: en producción esa ruta no existe.
-        const response = await apiClient.post(
-            '/vision-v1',
-            { imageBase64, analysisType: 'AGE_FACIAL' },
-            { signal: controller.signal },
-        );
+        const base = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+        const response = await fetch(`${base}/api/vision/analyze-age`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: imageBase64 }),
+            signal: controller.signal,
+        });
 
         clearTimeout(timeoutId);
 
-        return response.data;
+        const data = await response.json().catch(() => null);
+
+        // El backend responde 400/500 con `{ error }` cuando no detecta rostro o
+        // no puede estimar la edad. Es información útil para el paciente, no un
+        // fallo silencioso.
+        if (!response.ok || !data || typeof data.estimatedAge !== 'number') {
+            throw new Error(
+                (data && typeof data.error === 'string' && data.error) ||
+                'No se pudo estimar la edad a partir de esta foto.',
+            );
+        }
+
+        return data as FacialResult;
 
     } catch (error) {
         // In development only: use mock to allow testing without backend
@@ -47,8 +78,19 @@ async function analyzeFacialAge(imageBase64: string): Promise<FacialResult> {
             };
         }
 
-        // In production: surface the error honestly — do not fabricate results
+        // En producción se informa con honestidad: nunca se inventa un resultado.
+        // Si el backend explicó el motivo —no se detectó rostro, no se pudo
+        // estimar la edad—, ese mensaje le sirve al paciente para reintentar
+        // bien; el genérico solo se usa cuando no hubo respuesta (red, timeout).
+        const delServidor =
+            error instanceof Error &&
+            error.name !== 'AbortError' &&
+            !/Failed to fetch|NetworkError/i.test(error.message)
+                ? error.message
+                : null;
+
         throw new Error(
+            delServidor ||
             'El análisis no está disponible en este momento. ' +
             'Por favor intenta de nuevo en unos minutos.'
         );
@@ -112,6 +154,7 @@ const AgeBotFacialPage: React.FC = () => {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [result, setResult] = useState<FacialResult | null>(null);
     const [errorMsg, setErrorMsg] = useState<string>('');
+    const [encuadreMsg, setEncuadreMsg] = useState<string>('');
     const [cameraError, setCameraError] = useState(false);
     const [isCameraLoading, setIsCameraLoading] = useState(false);
     const [cameraActive, setCameraActive] = useState(false);
@@ -268,14 +311,49 @@ const AgeBotFacialPage: React.FC = () => {
         setCapturedImage(base64);
         setPhase('analyzing');
         try {
-            const r = await analyzeFacialAge(base64);
-            setResult(r);
-            setPhase('result');
+            // Se reduce SIEMPRE antes de analizar, venga de la cámara o de la
+            // galería: una foto de 12 MP no mejora la estimación y sí puede
+            // agotar la memoria de un gama media.
+            const lienzo = await prepararImagen(base64);
+
+            if (featureFlags.facialLocalInference) {
+                const local = await estimarEdadLocal(lienzo);
+
+                if (local.estado === 'sin-rostro') {
+                    setEncuadreMsg('No se detectó ningún rostro. Acerca la cara, busca más luz y vuelve a intentarlo.');
+                    setPhase('encuadre');
+                    return;
+                }
+                if (local.estado === 'varios-rostros') {
+                    setEncuadreMsg(`Se detectaron ${local.total} rostros. La foto debe mostrar una sola persona.`);
+                    setPhase('encuadre');
+                    return;
+                }
+
+                setResult({ estimatedAge: local.estimatedAge, confidence: local.confidence });
+                setPhase('result');
+                return;
+            }
+
+            // Ruta remota: solo si alguien la encendió a propósito. Nunca se
+            // llega aquí por un fallo de la ruta local — enviar el rostro de un
+            // paciente a un tercero no es un plan B automático.
+            if (featureFlags.facialRemoteFallback) {
+                const r = await analyzeFacialAge(base64);
+                setResult(r);
+                setPhase('result');
+                return;
+            }
+
+            throw new Error('El análisis facial está desactivado en esta versión.');
+
         } catch (err) {
             setErrorMsg(
-                err instanceof Error
-                    ? err.message
-                    : 'No se pudo analizar la imagen. Intenta de nuevo.'
+                err instanceof ErrorCargaModelo
+                    ? 'No se pudo cargar el analizador en este dispositivo. Comprueba tu conexión e inténtalo de nuevo.'
+                    : err instanceof Error
+                        ? err.message
+                        : 'No se pudo analizar la imagen. Intenta de nuevo.'
             );
             setPhase('error');
         }
@@ -285,6 +363,7 @@ const AgeBotFacialPage: React.FC = () => {
         setCapturedImage(null);
         setResult(null);
         setErrorMsg('');
+        setEncuadreMsg('');
         setCameraError(false);
         setCameraActive(false);
         setCameraRequested(false);
@@ -568,11 +647,16 @@ const AgeBotFacialPage: React.FC = () => {
                                             {Math.round(result.confidence * 100)}%
                                         </p>
                                     </div>
-                                    <div className="w-px h-8 bg-slate-200" />
-                                    <div className="text-center">
-                                        <p className="text-[10px] uppercase font-black tracking-widest mb-1 text-slate-500">Marcadores</p>
-                                        <p className="text-base font-black text-[#293b64] tracking-tight">{result.analysisPoints}</p>
-                                    </div>
+                                    {/* La teja solo aparece si hay una cifra real detrás. */}
+                                    {typeof result.analysisPoints === 'number' && (
+                                        <>
+                                            <div className="w-px h-8 bg-slate-200" />
+                                            <div className="text-center">
+                                                <p className="text-[10px] uppercase font-black tracking-widest mb-1 text-slate-500">Marcadores</p>
+                                                <p className="text-base font-black text-[#293b64] tracking-tight">{result.analysisPoints}</p>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </motion.div>
 
@@ -595,6 +679,27 @@ const AgeBotFacialPage: React.FC = () => {
                                     <RefreshCw size={12} /> Analizar otra foto
                                 </button>
                             </motion.div>
+                        </motion.div>
+                    )}
+
+                    {/* ── ENCUADRE PHASE ──
+                        La foto llegó y el analizador funcionó; lo que falta es
+                        un rostro utilizable. Se separa del error porque la
+                        acción del paciente es distinta: repetir la foto. */}
+                    {phase === 'encuadre' && (
+                        <motion.div key="encuadre" data-testid="fase-encuadre" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                            className="flex-1 flex flex-col items-center justify-center px-8 text-center bg-[#f8fafc]">
+                            {capturedImage && (
+                                <img src={capturedImage} alt="Foto capturada"
+                                    className="w-36 h-36 object-cover rounded-[1.75rem] border-4 border-white shadow-xl shadow-slate-200 mb-6" />
+                            )}
+                            <AlertTriangle size={40} className="mb-4 text-amber-500" />
+                            <p className="text-xl font-black mb-2 text-[#293b64] uppercase">Repite la foto</p>
+                            <p className="text-sm mb-8 font-medium text-slate-500 leading-relaxed">{encuadreMsg}</p>
+                            <button onClick={reset}
+                                className="px-10 py-4 bg-[#293b64] text-white rounded-2xl font-black uppercase tracking-widest text-sm shadow-xl shadow-[#293b64]/20 active:scale-95 transition-all">
+                                Repetir foto
+                            </button>
                         </motion.div>
                     )}
 
