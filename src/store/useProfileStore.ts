@@ -26,7 +26,20 @@ interface ProfileState {
     setReady: (ready: boolean) => void;
 }
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+/**
+ * Cuánto tiempo se considera fresco el perfil ya descargado.
+ *
+ * Eran 5 minutos. Con el store bajo `persist`, esa ventana sobrevivía al cierre
+ * de la app: el médico actualizaba la guía, el paciente cerraba y reabría la
+ * PWA, y seguía viendo la versión anterior sin que se emitiera una sola
+ * petición. 60 s mantiene el propósito original —evitar que cada montaje de
+ * pantalla vuelva a pedir el perfil— sin que una actualización clínica se
+ * quede esperando minutos.
+ *
+ * La pausa de 30 s tras un fallo (protocolService) es independiente y sigue
+ * intacta: protege al backend cuando está caído, que es otro problema.
+ */
+const CACHE_DURATION = 60 * 1000; // 60 segundos
 
 let pendingWrites = 0;
 const memoryBuffer = new Map<string, string>();
