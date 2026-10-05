@@ -17,6 +17,10 @@ import PulsoMatinoCard from '../components/public/PulsoMatinoCard';
 import { BioStreakService } from '../services/BioStreakService';
 import BioAgeAlert from '../components/BioAgeAlert';
 import RemovalView from '../components/Therapies/RemovalView';
+import RestorationView from '../components/Therapies/RestorationView';
+import RevitalizationView from '../components/Therapies/RevitalizationView';
+import RegenerationView from '../components/Therapies/RegenerationView';
+import { FASES_4R } from '../config/therapies4R';
 import { Apple, Utensils, Coffee, Salad, Grape, Zap, Dumbbell, Trophy, Bike, Smile, Brain, Heart, Sparkles, Star, Sprout, Leaf, Home, CloudSun, Wind, Bed, Moon, Clock, Bell, Check, Dna } from 'lucide-react';
 
 const ICON_MAP: Record<string, any> = {
@@ -109,16 +113,16 @@ const HomePage: React.FC = () => {
                 <div className="flex justify-center gap-12 w-full px-4">
                     <div onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
-                            percentage={adherence}
+                            percentage={is5A ? adherence : 0}
                             label={is5A ? "Alimentación" : "Remoción"}
                             icon={is5A ? getIcon('NUTRITION') : <Trash2 size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={82}
                         />
                     </div>
-                    <div onClick={() => is5A ? navigate('/activity') : navigate('/restoration')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                    <div onClick={() => is5A ? navigate('/activity') : setActiveDetail('restoration')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
-                            percentage={adherence}
+                            percentage={is5A ? adherence : 0}
                             label={is5A ? "Actividad" : "Restauración"}
                             icon={is5A ? getIcon('ACTIVITY') : <RefreshCw size={18} />}
                             color={COLORS.PrimaryBlue}
@@ -143,18 +147,18 @@ const HomePage: React.FC = () => {
 
                 {/* Bottom Row: 3 Satellites (5A) or 2 Satellites (4R) */}
                 <div className={`flex justify-center w-full py-2 ${is5A ? 'gap-4' : 'gap-12'}`}>
-                    <div onClick={() => is5A ? navigate('/attitude') : null /* Regeneración */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                    <div onClick={() => is5A ? navigate('/attitude') : setActiveDetail('regeneration')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
-                            percentage={adherence}
+                            percentage={is5A ? adherence : 0}
                             label={is5A ? "Actitud" : "Regeneración"}
                             icon={is5A ? getIcon('ATTITUDE') : <Activity size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={is5A ? 78 : 82}
                         />
                     </div>
-                    <div onClick={() => is5A ? navigate('/environment') : null /* Revitalización */} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                    <div onClick={() => is5A ? navigate('/environment') : setActiveDetail('revitalization')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
                         <CircularProgress
-                            percentage={adherence}
+                            percentage={is5A ? adherence : 0}
                             label={is5A ? "Ambiente" : "Revitalización"}
                             icon={is5A ? getIcon('ENVIRONMENT') : <Flame size={18} />}
                             color={COLORS.PrimaryBlue}
@@ -258,19 +262,34 @@ const HomePage: React.FC = () => {
                             ) : (
                                 <div className="flex flex-col flex-1 px-4 pb-4">
                                     {/* =========================================================
-                                        SCOPING FASE 1: TERAPIAS 4R — BLOQUEADAS
+                                        TERAPIAS 4R
+                                        Cada círculo abre la fase que le corresponde. El contenido
+                                        de las cuatro vive en config/therapies4R.ts y procede de la
+                                        divulgación de la clínica: aquí no se redacta clínica.
                                         ========================================================= */}
-                                    <section className="mb-4 relative">
-                                        {/* Overlay de Bloqueo Fase 2 */}
-                                        <div className="absolute inset-0 z-20 bg-slate-50/60 backdrop-blur-[2px] flex items-center justify-center rounded-3xl border border-white/50">
-                                            <span className="bg-[#293b64] text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-xl flex items-center gap-2 transform -translate-y-4">
-                                                <span className="animate-pulse text-[#107da8]">✨</span> Pronto disponible
-                                            </span>
+                                    <div className="w-full bg-white rounded-[2rem] p-5 shadow-sm border border-gray-50 mb-2">
+                                        <span className="text-[9px] font-black text-[#23bcef] uppercase tracking-widest block mb-1.5">
+                                            Terapias Antivejez 4R
+                                        </span>
+                                        <p className="text-slate-600 text-[12px] font-medium leading-relaxed mb-4">
+                                            Cuatro fases en orden: primero se remueve, luego se revitaliza,
+                                            después se regenera y por último se restaura. Toca cada una para
+                                            ver en qué consiste.
+                                        </p>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {FASES_4R.map((f) => (
+                                                <span
+                                                    key={f.id}
+                                                    className="text-[9px] font-black uppercase tracking-widest text-[#293b64] bg-slate-50 border border-slate-100 rounded-lg px-2 py-1"
+                                                >
+                                                    {f.orden}. {f.nombre}
+                                                </span>
+                                            ))}
                                         </div>
-                                        {/* Contenido Oscurecido e Inactivo */}
-                                        <div className="opacity-30 pointer-events-none select-none transition-all duration-300">
-                                            {renderDashboardMatrix()}
-                                        </div>
+                                    </div>
+
+                                    <section className="mb-4">
+                                        {renderDashboardMatrix()}
                                     </section>
                                 </div>
                             )}
@@ -287,6 +306,9 @@ const HomePage: React.FC = () => {
                         className="flex flex-col w-full h-full"
                     >
                         {activeDetail === 'removal' && <RemovalView onBack={() => setActiveDetail(null)} />}
+                        {activeDetail === 'revitalization' && <RevitalizationView onBack={() => setActiveDetail(null)} />}
+                        {activeDetail === 'regeneration' && <RegenerationView onBack={() => setActiveDetail(null)} />}
+                        {activeDetail === 'restoration' && <RestorationView onBack={() => setActiveDetail(null)} />}
                     </motion.div>
                 )}
             </AnimatePresence>

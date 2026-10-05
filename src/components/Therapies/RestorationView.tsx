@@ -1,7 +1,19 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight, RefreshCw, Zap, ShieldCheck, Activity } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
+import { AVISO_4R, TERAPIAS_4R } from '../../config/therapies4R';
+import WellnessDisclaimer from '../public/WellnessDisclaimer';
+
+/** Las 5A, en el orden en que la clínica las publica, con su pantalla. */
+const CLAVES_5A: { nombre: string; ruta: string }[] = [
+    { nombre: 'Alimentación', ruta: '/nutrition' },
+    { nombre: 'Actividad física', ruta: '/activity' },
+    { nombre: 'Asueto y sueño reparador', ruta: '/rest' },
+    { nombre: 'Actitud mental y emocional', ruta: '/attitude' },
+    { nombre: 'Ambiente armónico', ruta: '/environment' },
+];
 
 interface TherapyItem {
     id: string;
@@ -45,7 +57,9 @@ const RESTORATION_THERAPIES: TherapyItem[] = [
 
 const RestorationView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     const { session } = useAuthStore();
+    const navigate = useNavigate();
     const firstName = session?.name?.split(' ')[0]?.toUpperCase() || 'PACIENTE';
+    const fase = TERAPIAS_4R.restoration;
 
     return (
         <div className="flex flex-col w-full pb-32 animate-in slide-in-from-right duration-500">
@@ -58,6 +72,7 @@ const RestorationView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={onBack}
+                                aria-label="Volver"
                                 className="bg-white/10 p-2 rounded-xl hover:bg-white/20 active:scale-95 transition-all"
                             >
                                 <ChevronRight size={20} className="rotate-180" />
@@ -65,21 +80,57 @@ const RestorationView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                             <div className="bg-white/20 p-2 rounded-xl">
                                 <RefreshCw size={18} className="text-emerald-100" />
                             </div>
-                            <span className="text-emerald-100 font-black uppercase tracking-widest text-[10px]">Fase 2: Restauración</span>
+                            <span className="text-emerald-100 font-black uppercase tracking-widest text-[10px]">Fase 4: Restauración</span>
                         </div>
                     </div>
 
                     <h2 className="text-lg font-bold italic leading-relaxed opacity-90 mb-2">
-                        "{firstName}, reconstruyamos tu terreno biológico."
+                        "{firstName}, sostengamos en el tiempo lo que ya ganaste."
                     </h2>
                     <p className="text-xs font-medium text-emerald-100/80">
-                        La integridad intestinal es la base de la absorción de nutrientes y la inmunidad.
+                        {fase.descripcion}
                     </p>
                 </div>
             </div>
 
+            {/* Las 5A: el contenido propio de esta fase según la clínica.
+                Cada clave abre la pantalla que el paciente ya usa a diario. */}
+            <div className="mx-4 mt-5 bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100">
+                <span className="text-[9px] font-black uppercase tracking-widest block mb-1 text-emerald-600">
+                    Claves de la Longevidad 5A
+                </span>
+                <p className="text-slate-500 text-[11px] font-medium leading-relaxed mb-4">
+                    Se ajustan de manera personalizada. Toca cualquiera para ir a tu plan.
+                </p>
+                <ul className="flex flex-col gap-2">
+                    {CLAVES_5A.map((clave, i) => (
+                        <li key={clave.ruta}>
+                            <button
+                                onClick={() => navigate(clave.ruta)}
+                                className="w-full flex items-center gap-3 text-left bg-slate-50 hover:bg-emerald-50 border border-slate-100 rounded-2xl px-3 py-2.5 transition-colors active:scale-[0.99]"
+                            >
+                                <span className="w-7 h-7 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-[11px] font-black shrink-0">
+                                    {i + 1}
+                                </span>
+                                <span className="flex-1 text-[#293b64] text-sm font-bold leading-snug">
+                                    {clave.nombre}
+                                </span>
+                                <ChevronRight size={16} className="text-slate-300 shrink-0" />
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            {/* Soporte clínico de la fase */}
+            <div className="px-4 mt-6 mb-1">
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                    Soporte clínico de la fase
+                </span>
+            </div>
+
             {/* Therapies List */}
-            <div className="flex flex-col gap-4 px-4 mt-6">
+            <div className="flex flex-col gap-4 px-4 mt-2">
                 {RESTORATION_THERAPIES.map((item, idx) => (
                     <motion.div
                         key={item.id}
@@ -118,6 +169,10 @@ const RestorationView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                         </div>
                     </motion.div>
                 ))}
+            </div>
+
+            <div className="mx-4 mt-4">
+                <WellnessDisclaimer text={AVISO_4R} />
             </div>
         </div>
     );
