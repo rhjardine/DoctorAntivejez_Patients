@@ -225,7 +225,13 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     }
   };
 
-  const getSlotLabel = (slot: TimeSlot) => {
+  /**
+   * Etiqueta de franja horaria. Devuelve `null` cuando el médico no fijó una:
+   * antes se rellenaba el hueco con «Cualquier momento», una frase que no
+   * aportaba nada y que el médico pidió retirar porque competía visualmente
+   * con la posología, que sí es información clínica.
+   */
+  const getSlotLabel = (slot: TimeSlot): string | null => {
     switch (slot) {
       case 'MORNING':
         return 'Mañana';
@@ -234,7 +240,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
       case 'EVENING':
         return 'Noche';
       default:
-        return 'Cualquier momento';
+        return null;
     }
   };
 
@@ -418,9 +424,11 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
                           {item.itemName}
                         </h4>
                       </div>
-                      <span className="text-[9px] font-black text-primary bg-white px-2.5 py-1 rounded-lg uppercase tracking-tighter border border-sky-100 shrink-0">
-                        {getSlotLabel(item.timeSlot)}
-                      </span>
+                      {getSlotLabel(item.timeSlot) && (
+                        <span className="text-[9px] font-black text-primary bg-white px-2.5 py-1 rounded-lg uppercase tracking-tighter border border-sky-100 shrink-0">
+                          {getSlotLabel(item.timeSlot)}
+                        </span>
+                      )}
                     </div>
 
                     {(item.dose || item.schedule) && (

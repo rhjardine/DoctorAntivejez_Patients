@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { PurgeProtocolModal, ChelationProtocolModal } from './RemovalModals';
+import { AVISO_4R } from '../../config/therapies4R';
+import WellnessDisclaimer from '../public/WellnessDisclaimer';
 
 // --- Types & Data ---
 
@@ -110,6 +112,7 @@ const RemovalView: React.FC<RemovalViewProps> = ({ onBack }) => {
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={onBack}
+                                aria-label="Volver"
                                 className="bg-white/10 p-1.5 rounded-lg text-white hover:bg-white/20 active:scale-95 transition-all outline-none"
                             >
                                 <ChevronRight size={16} className="rotate-180" />
@@ -210,6 +213,10 @@ const RemovalView: React.FC<RemovalViewProps> = ({ onBack }) => {
                         </div>
                     </motion.div>
                 ))}
+            </div>
+
+            <div className="mx-4 mt-4">
+                <WellnessDisclaimer text={AVISO_4R} />
             </div>
 
             {/* Modals */}
