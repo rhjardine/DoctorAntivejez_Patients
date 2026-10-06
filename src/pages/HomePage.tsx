@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trash2, RefreshCw, Activity, Flame, MessageCircle,
-    ClipboardCheck, ChevronRight, ClipboardList
+    ClipboardCheck, ChevronRight, ClipboardList, Info, X
 } from 'lucide-react';
 import { COLORS, MainTab } from '../types';
 import { useUIStore } from '../store/useUIStore';
@@ -20,7 +20,6 @@ import RemovalView from '../components/Therapies/RemovalView';
 import RestorationView from '../components/Therapies/RestorationView';
 import RevitalizationView from '../components/Therapies/RevitalizationView';
 import RegenerationView from '../components/Therapies/RegenerationView';
-import { FASES_4R } from '../config/therapies4R';
 import { Apple, Utensils, Coffee, Salad, Grape, Zap, Dumbbell, Trophy, Bike, Smile, Brain, Heart, Sparkles, Star, Sprout, Leaf, Home, CloudSun, Wind, Bed, Moon, Clock, Bell, Check, Dna } from 'lucide-react';
 
 const ICON_MAP: Record<string, any> = {
@@ -49,6 +48,30 @@ const HomePage: React.FC = () => {
 
     // View state for detail drill-down
     const [activeDetail, setActiveDetail] = useState<string | null>(null);
+
+    /**
+     * Aviso de la pestaña 4R. El médico pidió que fuera de los círculos no
+     * hubiera texto permanente: esto es una línea que el paciente cierra una
+     * vez y no vuelve a ver. Si el almacenamiento falla —modo privado, cuota—,
+     * se muestra: un aviso de más molesta menos que perder la referencia.
+     */
+    const CLAVE_AVISO_4R = 'da_4r_aviso_oculto';
+    const [mostrarAviso4R, setMostrarAviso4R] = useState(() => {
+        try {
+            return localStorage.getItem(CLAVE_AVISO_4R) !== '1';
+        } catch {
+            return true;
+        }
+    });
+
+    const ocultarAviso4R = () => {
+        setMostrarAviso4R(false);
+        try {
+            localStorage.setItem(CLAVE_AVISO_4R, '1');
+        } catch {
+            // Que no se recuerde la preferencia no justifica romper la pantalla.
+        }
+    };
 
     useEffect(() => {
         setActiveDetail(null);
@@ -115,6 +138,7 @@ const HomePage: React.FC = () => {
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Alimentación" : "Remoción"}
+                            centerText={is5A ? undefined : 'FASE 1'}
                             icon={is5A ? getIcon('NUTRITION') : <Trash2 size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={82}
@@ -124,6 +148,7 @@ const HomePage: React.FC = () => {
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Actividad" : "Restauración"}
+                            centerText={is5A ? undefined : 'FASE 4'}
                             icon={is5A ? getIcon('ACTIVITY') : <RefreshCw size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={82}
@@ -151,6 +176,7 @@ const HomePage: React.FC = () => {
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Actitud" : "Regeneración"}
+                            centerText={is5A ? undefined : 'FASE 3'}
                             icon={is5A ? getIcon('ATTITUDE') : <Activity size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={is5A ? 78 : 82}
@@ -160,6 +186,7 @@ const HomePage: React.FC = () => {
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Ambiente" : "Revitalización"}
+                            centerText={is5A ? undefined : 'FASE 2'}
                             icon={is5A ? getIcon('ENVIRONMENT') : <Flame size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={is5A ? 78 : 82}
@@ -263,30 +290,26 @@ const HomePage: React.FC = () => {
                                 <div className="flex flex-col flex-1 px-4 pb-4">
                                     {/* =========================================================
                                         TERAPIAS 4R
-                                        Cada círculo abre la fase que le corresponde. El contenido
-                                        de las cuatro vive en config/therapies4R.ts y procede de la
-                                        divulgación de la clínica: aquí no se redacta clínica.
+                                        Cada círculo abre su fase y lleva dentro el número que
+                                        ocupa en la secuencia. Fuera de los círculos solo queda
+                                        este aviso de una línea, y el paciente puede cerrarlo:
+                                        la explicación larga vive dentro de cada fase, no aquí.
                                         ========================================================= */}
-                                    <div className="w-full bg-white rounded-[2rem] p-5 shadow-sm border border-gray-50 mb-2">
-                                        <span className="text-[9px] font-black text-[#23bcef] uppercase tracking-widest block mb-1.5">
-                                            Terapias Antivejez 4R
-                                        </span>
-                                        <p className="text-slate-600 text-[12px] font-medium leading-relaxed mb-4">
-                                            Cuatro fases en orden: primero se remueve, luego se revitaliza,
-                                            después se regenera y por último se restaura. Toca cada una para
-                                            ver en qué consiste.
-                                        </p>
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {FASES_4R.map((f) => (
-                                                <span
-                                                    key={f.id}
-                                                    className="text-[9px] font-black uppercase tracking-widest text-[#293b64] bg-slate-50 border border-slate-100 rounded-lg px-2 py-1"
-                                                >
-                                                    {f.orden}. {f.nombre}
-                                                </span>
-                                            ))}
+                                    {mostrarAviso4R && (
+                                        <div className="flex items-center gap-2 bg-[#23bcef]/5 border border-[#23bcef]/15 rounded-2xl pl-3 pr-2 py-2 mb-2">
+                                            <Info size={13} className="text-[#107da8] shrink-0" />
+                                            <p className="flex-1 text-[#293b64]/70 text-[11px] font-medium leading-snug">
+                                                Cuatro fases en orden. Toca cada círculo para ver en qué consiste.
+                                            </p>
+                                            <button
+                                                onClick={ocultarAviso4R}
+                                                aria-label="Ocultar este aviso"
+                                                className="p-1.5 rounded-lg text-slate-400 hover:text-[#293b64] hover:bg-white active:scale-95 transition-all shrink-0"
+                                            >
+                                                <X size={14} />
+                                            </button>
                                         </div>
-                                    </div>
+                                    )}
 
                                     <section className="mb-4">
                                         {renderDashboardMatrix()}
