@@ -9,6 +9,14 @@ interface CircularProgressProps {
   fillColor?: string;
   size?: number;
   isCenter?: boolean;
+  /**
+   * Texto a mostrar dentro del círculo en lugar del porcentaje.
+   *
+   * Cuando se pasa, el círculo deja de ser un indicador de adherencia: el aro
+   * usa `color` y no el semáforo. Sin esto, un círculo puramente navegativo se
+   * pintaba de rojo por tener 0 %, como si algo fuera mal.
+   */
+  centerText?: string;
 }
 
 const CircularProgress: React.FC<CircularProgressProps> = ({
@@ -18,7 +26,8 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   color = COLORS.PrimaryBlue,
   fillColor,
   size = 100,
-  isCenter = false
+  isCenter = false,
+  centerText
 }) => {
   const [displayedPercentage, setDisplayedPercentage] = useState(0);
 
@@ -50,7 +59,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
     return '#4CAF50'; // Verde (AccentGreen)
   };
 
-  const progressColor = isCenter ? color : getStatusColor();
+  const progressColor = (isCenter || centerText) ? color : getStatusColor();
 
   // Determine icon/text color based on background
   const contentColor = (isCenter || fillColor === COLORS.DarkBlue || fillColor === COLORS.PrimaryBlue)
@@ -99,7 +108,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
               {icon}
             </div>
             <span className="text-[10px] font-bold leading-none" style={{ color: contentColor }}>
-              {percentage}%
+              {centerText ?? `${percentage}%`}
             </span>
           </div>
         </div>
