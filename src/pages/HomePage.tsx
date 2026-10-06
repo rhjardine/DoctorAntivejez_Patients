@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trash2, RefreshCw, Activity, Flame, MessageCircle,
-    ClipboardCheck, ChevronRight, ClipboardList, Info, X
+    ClipboardCheck, ChevronRight, ClipboardList
 } from 'lucide-react';
 import { COLORS, MainTab } from '../types';
 import { useUIStore } from '../store/useUIStore';
@@ -49,33 +49,19 @@ const HomePage: React.FC = () => {
     // View state for detail drill-down
     const [activeDetail, setActiveDetail] = useState<string | null>(null);
 
-    /**
-     * Aviso de la pestaña 4R. El médico pidió que fuera de los círculos no
-     * hubiera texto permanente: esto es una línea que el paciente cierra una
-     * vez y no vuelve a ver. Si el almacenamiento falla —modo privado, cuota—,
-     * se muestra: un aviso de más molesta menos que perder la referencia.
-     */
-    const CLAVE_AVISO_4R = 'da_4r_aviso_oculto';
-    const [mostrarAviso4R, setMostrarAviso4R] = useState(() => {
-        try {
-            return localStorage.getItem(CLAVE_AVISO_4R) !== '1';
-        } catch {
-            return true;
-        }
-    });
-
-    const ocultarAviso4R = () => {
-        setMostrarAviso4R(false);
-        try {
-            localStorage.setItem(CLAVE_AVISO_4R, '1');
-        } catch {
-            // Que no se recuerde la preferencia no justifica romper la pantalla.
-        }
-    };
-
     useEffect(() => {
         setActiveDetail(null);
     }, [currentMainTab]);
+
+    /**
+     * Las vistas de detalle se montan dentro del contenedor con scroll de
+     * MainLayout, que conserva la posición anterior: Regeneración y
+     * Revitalización aparecían empezadas por la mitad. Se vuelve arriba al
+     * abrir y al cerrar.
+     */
+    useEffect(() => {
+        document.getElementById('vytalix-main-container')?.scrollTo({ top: 0 });
+    }, [activeDetail]);
 
     useEffect(() => {
         if (isLoadingMetrics) return;
@@ -127,14 +113,41 @@ const HomePage: React.FC = () => {
         return <IconComponent size={20} />;
     };
 
+    /**
+     * Envoltorio de un círculo de la matriz.
+     *
+     * `inhabilitado` lo deja sin navegación y atenuado. No se oculta: el
+     * paciente debe seguir viendo el mapa completo de las 5A aunque el
+     * contenido de una clave esté en revisión.
+     */
+    const Satelite: React.FC<{
+        onClick?: () => void;
+        inhabilitado?: boolean;
+        children: React.ReactNode;
+    }> = ({ onClick, inhabilitado = false, children }) => (
+        <div
+            onClick={inhabilitado ? undefined : onClick}
+            aria-disabled={inhabilitado || undefined}
+            className={`flex justify-center ${inhabilitado
+                ? 'opacity-40 grayscale cursor-default select-none'
+                : 'cursor-pointer transition-transform active:scale-95'}`}
+        >
+            {children}
+        </div>
+    );
+
     const renderDashboardMatrix = () => {
         const is5A = currentMainTab === MainTab.KEYS_5A;
+        // Por indicación del médico, en Claves 5A solo Alimentación está
+        // disponible: el contenido de las otras cuatro va a cambiar y no debe
+        // consultarse mientras tanto.
+        const claveEnRevision = is5A;
 
         return (
             <div className="flex flex-col items-center justify-center w-full px-4 relative pb-2 min-h-[320px]">
                 {/* Top Row: 2 Satellites */}
                 <div className="flex justify-center gap-12 w-full px-4">
-                    <div onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                    <Satelite onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')}>
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Alimentación" : "Remoción"}
@@ -143,17 +156,17 @@ const HomePage: React.FC = () => {
                             color={COLORS.PrimaryBlue}
                             size={82}
                         />
-                    </div>
-                    <div onClick={() => is5A ? navigate('/activity') : setActiveDetail('restoration')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                    </Satelite>
+                    <Satelite onClick={() => setActiveDetail('restoration')} inhabilitado={claveEnRevision}>
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Actividad" : "Restauración"}
-                            centerText={is5A ? undefined : 'FASE 4'}
+                            centerText={is5A ? 'PRONTO' : 'FASE 4'}
                             icon={is5A ? getIcon('ACTIVITY') : <RefreshCw size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={82}
                         />
-                    </div>
+                    </Satelite>
                 </div>
 
                 {/* VCoach Center Nucleus */}
@@ -172,37 +185,38 @@ const HomePage: React.FC = () => {
 
                 {/* Bottom Row: 3 Satellites (5A) or 2 Satellites (4R) */}
                 <div className={`flex justify-center w-full py-2 ${is5A ? 'gap-4' : 'gap-12'}`}>
-                    <div onClick={() => is5A ? navigate('/attitude') : setActiveDetail('regeneration')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                    <Satelite onClick={() => setActiveDetail('regeneration')} inhabilitado={claveEnRevision}>
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Actitud" : "Regeneración"}
-                            centerText={is5A ? undefined : 'FASE 3'}
+                            centerText={is5A ? 'PRONTO' : 'FASE 3'}
                             icon={is5A ? getIcon('ATTITUDE') : <Activity size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={is5A ? 78 : 82}
                         />
-                    </div>
-                    <div onClick={() => is5A ? navigate('/environment') : setActiveDetail('revitalization')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                    </Satelite>
+                    <Satelite onClick={() => setActiveDetail('revitalization')} inhabilitado={claveEnRevision}>
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Ambiente" : "Revitalización"}
-                            centerText={is5A ? undefined : 'FASE 2'}
+                            centerText={is5A ? 'PRONTO' : 'FASE 2'}
                             icon={is5A ? getIcon('ENVIRONMENT') : <Flame size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={is5A ? 78 : 82}
                         />
-                    </div>
+                    </Satelite>
                     {/* The 5th Element: Asueto (Only in 5A) */}
                     {is5A && (
-                        <div onClick={() => navigate('/rest')} className="cursor-pointer flex justify-center transition-transform active:scale-95">
+                        <Satelite onClick={() => navigate('/rest')} inhabilitado={claveEnRevision}>
                             <CircularProgress
                                 percentage={0}
                                 label="Asueto"
+                                centerText="PRONTO"
                                 icon={getIcon('REST') || <Bed size={18} />}
                                 color={COLORS.PrimaryBlue}
                                 size={78}
                             />
-                        </div>
+                        </Satelite>
                     )}
                 </div>
             </div>
@@ -295,22 +309,6 @@ const HomePage: React.FC = () => {
                                         este aviso de una línea, y el paciente puede cerrarlo:
                                         la explicación larga vive dentro de cada fase, no aquí.
                                         ========================================================= */}
-                                    {mostrarAviso4R && (
-                                        <div className="flex items-center gap-2 bg-[#23bcef]/5 border border-[#23bcef]/15 rounded-2xl pl-3 pr-2 py-2 mb-2">
-                                            <Info size={13} className="text-[#107da8] shrink-0" />
-                                            <p className="flex-1 text-[#293b64]/70 text-[11px] font-medium leading-snug">
-                                                Cuatro fases en orden. Toca cada círculo para ver en qué consiste.
-                                            </p>
-                                            <button
-                                                onClick={ocultarAviso4R}
-                                                aria-label="Ocultar este aviso"
-                                                className="p-1.5 rounded-lg text-slate-400 hover:text-[#293b64] hover:bg-white active:scale-95 transition-all shrink-0"
-                                            >
-                                                <X size={14} />
-                                            </button>
-                                        </div>
-                                    )}
-
                                     <section className="mb-4">
                                         {renderDashboardMatrix()}
                                     </section>
