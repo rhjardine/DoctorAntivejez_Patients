@@ -62,9 +62,27 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   const progressColor = (isCenter || centerText) ? color : getStatusColor();
 
   // Determine icon/text color based on background
-  const contentColor = (isCenter || fillColor === COLORS.DarkBlue || fillColor === COLORS.PrimaryBlue)
+  const sobreFondoOscuro = isCenter || fillColor === COLORS.DarkBlue || fillColor === COLORS.PrimaryBlue;
+  const contentColor = sobreFondoOscuro ? COLORS.BrightWhite : progressColor;
+
+  /**
+   * El texto del centro va sobre un disco blanco, así que no puede usar los
+   * colores vivos del aro: el cian de marca mide 2.21:1 y el rojo del semáforo
+   * 3.68:1, por debajo del 4.5:1 que hace falta para leer sin esfuerzo.
+   *
+   * Cada color tiene aquí su equivalente en tinta: mismo significado, suficiente
+   * contraste. El aro y el icono conservan el color vivo — son formas, no
+   * palabras que haya que descifrar.
+   */
+  const TINTA: Record<string, string> = {
+    [COLORS.PrimaryBlue]: '#107DA8', // cian de marca  → 4.66:1
+    '#F44336': '#C62828',            // rojo semáforo   → 5.79:1
+    '#FFA726': '#B45309',            // ámbar semáforo  → 5.08:1
+    '#4CAF50': '#2E7D32',            // verde semáforo  → 5.13:1
+  };
+  const textColor = sobreFondoOscuro
     ? COLORS.BrightWhite
-    : progressColor;
+    : (TINTA[contentColor] ?? contentColor);
 
   return (
     <div className="flex flex-col items-center justify-center p-0.5">
@@ -107,7 +125,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
             <div style={{ color: contentColor }} className="mb-0.5">
               {icon}
             </div>
-            <span className="text-[10px] font-bold leading-none" style={{ color: contentColor }}>
+            <span className="text-[12px] font-bold leading-none" style={{ color: textColor }}>
               {centerText ?? `${percentage}%`}
             </span>
           </div>

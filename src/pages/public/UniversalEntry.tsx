@@ -74,7 +74,7 @@ const UniversalEntry: React.FC = () => {
         <div className='w-full max-w-sm flex flex-col gap-5'>
 
           {/* Etiqueta de selección */}
-          <p className='text-center text-[11px] font-bold uppercase tracking-[0.22em] mb-2 text-slate-600'>
+          <p className='text-center text-[13px] font-bold uppercase tracking-[0.22em] mb-2 text-slate-600'>
             SELECCIONA TU PERFIL DE ACCESO
           </p>
 
@@ -119,7 +119,7 @@ const UniversalEntry: React.FC = () => {
               <span className='block text-lg font-black leading-tight text-white'>
                 Mi Portal de Bienestar
               </span>
-              <span className='block text-[14px] font-semibold mt-1 leading-snug text-slate-300'>
+              <span className='block text-[14px] font-semibold mt-1 leading-snug text-slate-500'>
                 Accede a tus resultados, consultas y seguimiento personalizado.
               </span>
             </div>
@@ -132,13 +132,13 @@ const UniversalEntry: React.FC = () => {
         {/* ── Footer ── */}
         <div className='absolute bottom-6 flex flex-col items-center gap-1.5 text-center w-full z-10'>
           <p
-            className='text-[10px] font-bold uppercase tracking-widest'
+            className='text-[12px] font-bold uppercase tracking-widest'
             style={{ color: 'rgba(255, 255, 255, 0.65)' }}
           >
             DOCTOR ANTIVEJEZ © 2026
           </p>
           <p
-            className='text-[9px] font-bold uppercase tracking-widest'
+            className='text-[12px] font-bold uppercase tracking-widest'
             style={{ color: 'rgba(255, 255, 255, 0.48)' }}
           >
             VITALYX - INFRAESTRUCTURA CLINICA INTELIGENTE

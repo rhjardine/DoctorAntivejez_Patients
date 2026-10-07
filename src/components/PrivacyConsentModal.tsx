@@ -72,13 +72,13 @@ const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({ isOpen, onAcc
             <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-500">
               <CheckCircle size={16} />
             </div>
-            <span className="text-[10px] font-black text-darkBlue uppercase tracking-widest">Encriptación Militar</span>
+            <span className="text-[12px] font-black text-darkBlue uppercase tracking-widest">Encriptación Militar</span>
           </div>
           <div className="flex items-center gap-3 px-4">
             <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-500">
               <CheckCircle size={16} />
             </div>
-            <span className="text-[10px] font-black text-darkBlue uppercase tracking-widest">Cumplimiento Internacional</span>
+            <span className="text-[12px] font-black text-darkBlue uppercase tracking-widest">Cumplimiento Internacional</span>
           </div>
         </div>
 
@@ -97,7 +97,7 @@ const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({ isOpen, onAcc
           )}
         </button>
 
-        <p className="mt-6 text-[9px] font-black text-textLight uppercase tracking-widest">
+        <p className="mt-6 text-[12px] font-black text-textLight uppercase tracking-widest">
           Doctor Antivejez • Capa de Seguridad v2.0
         </p>
       </div>

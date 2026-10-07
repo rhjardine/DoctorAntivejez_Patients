@@ -90,7 +90,7 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
             <div className="max-w-[320px] mb-12">
                 {tipo === 'basica' ? (
                     <p className="text-[15px] leading-relaxed text-[#293b64]/60 font-medium">
-                        Tu solicitud para el <strong className="text-[#293b64]">Programa de Optimización</strong> ha sido procesada. Un especialista te contactará en <strong className="text-[#107da8] uppercase tracking-widest text-[11px]">menos de 24 horas</strong>.
+                        Tu solicitud para el <strong className="text-[#293b64]">Programa de Optimización</strong> ha sido procesada. Un especialista te contactará en <strong className="text-[#107da8] uppercase tracking-widest text-[13px]">menos de 24 horas</strong>.
                     </p>
                 ) : (
                     <p className="text-[15px] leading-relaxed text-[#293b64]/60 font-medium">
@@ -112,7 +112,7 @@ const ConfirmationScreen: React.FC<{ tipo: ConsultaType; name: string; navigate:
             </div>
 
             <div className="mt-auto pt-10">
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#293b64]/20">VYTALIX Longevity Suite</p>
+                <p className="text-[12px] font-black uppercase tracking-[0.4em] text-[#293b64]/20">VYTALIX Longevity Suite</p>
             </div>
         </motion.div>
     );
@@ -173,13 +173,13 @@ const StripePaymentSection: React.FC<StripePaymentSectionProps> = ({ onTokenRead
         <div className="pt-6 border-t border-[#293b64]/5 space-y-4">
             <div className="flex items-center gap-2 mb-2">
                 <Lock size={12} className="text-[#107da8]" />
-                <p className="text-[11px] font-black uppercase tracking-widest text-[#107da8]">
+                <p className="text-[13px] font-black uppercase tracking-widest text-[#107da8]">
                     Pasarela Segura PCI-DSS · Powered by Stripe
                 </p>
             </div>
 
             <div className="p-4 bg-[#23bcef]/5 rounded-2xl border border-[#23bcef]/10 mb-4">
-                <p className="text-[11px] font-medium leading-relaxed text-[#293b64]/70">
+                <p className="text-[13px] font-medium leading-relaxed text-[#293b64]/70">
                     El pago de <strong>USD 49</strong> se procesa directamente a través de Stripe.
                     Los datos de tu tarjeta <strong>nunca</strong> transitan ni se almacenan en nuestros servidores.
                 </p>
@@ -202,7 +202,7 @@ const StripePaymentSection: React.FC<StripePaymentSectionProps> = ({ onTokenRead
             {cardError && (
                 <div className="flex items-start gap-2 px-1">
                     <AlertCircle size={13} className="text-red-500 shrink-0 mt-0.5" />
-                    <p className="text-[11px] font-semibold text-red-500">{cardError}</p>
+                    <p className="text-[13px] font-semibold text-red-500">{cardError}</p>
                 </div>
             )}
 
@@ -366,7 +366,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                 {/* Header Section */}
                 <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10 text-center">
                     <div className="inline-block px-4 py-1.5 rounded-full bg-[#23bcef]/10 border border-[#23bcef]/20 mb-6">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#107da8]">
+                        <p className="text-[12px] font-black uppercase tracking-[0.2em] text-[#107da8]">
                             Protocolo de Longevidad
                         </p>
                     </div>
@@ -421,7 +421,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                     </div>
 
                     <div className="space-y-2 pt-2">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-[#293b64]/30 ml-1">Especialista Preferido</p>
+                        <p className="text-[12px] font-black uppercase tracking-widest text-[#293b64]/30 ml-1">Especialista Preferido</p>
                         {!showSelector && preselectedDoc ? (
                             <div className="flex items-center justify-between p-4 rounded-2xl bg-[#f8fafc]/50 border border-[#293b64]/5">
                                 <div className="flex items-center gap-3">
@@ -430,10 +430,10 @@ const ConsultaExploratoriaPage: React.FC = () => {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-[13px] font-black text-[#293b64] leading-none mb-1">{preselectedDoc.name}</span>
-                                        <span className="text-[10px] uppercase font-bold text-[#293b64]/40">{preselectedDoc.location}</span>
+                                        <span className="text-[12px] uppercase font-bold text-[#293b64]/40">{preselectedDoc.location}</span>
                                     </div>
                                 </div>
-                                <button type="button" onClick={() => setShowSelector(true)} className="text-[10px] font-black uppercase text-[#107da8] underline decoration-[#23bcef]/20 underline-offset-4">Cambiar</button>
+                                <button type="button" onClick={() => setShowSelector(true)} className="text-[12px] font-black uppercase text-[#107da8] underline decoration-[#23bcef]/20 underline-offset-4">Cambiar</button>
                             </div>
                         ) : (
                             <div className="relative">
@@ -475,7 +475,7 @@ const ConsultaExploratoriaPage: React.FC = () => {
                     {paymentError && submitState === 'error' && (
                         <div className="flex items-start gap-2 px-1">
                             <AlertCircle size={13} className="text-red-500 shrink-0 mt-0.5" />
-                            <p className="text-[11px] font-semibold text-red-500">{paymentError}</p>
+                            <p className="text-[13px] font-semibold text-red-500">{paymentError}</p>
                         </div>
                     )}
 
@@ -490,13 +490,13 @@ const ConsultaExploratoriaPage: React.FC = () => {
                             : tipo === 'profunda' ? 'Confirmar Evaluación (USD 49)' : 'Activar Mi Programa →'}
                     </button>
 
-                    <p className="text-center text-[10px] font-bold text-[#293b64]/30 uppercase tracking-widest mt-4">
+                    <p className="text-center text-[12px] font-bold text-[#293b64]/30 uppercase tracking-widest mt-4">
                         {tipo === 'profunda' ? 'Pago seguro procesado por Stripe · PCI-DSS compliant' : 'Cifrado de grado clínico SSL/AES-256'}
                     </p>
                 </motion.form>
 
                 <div className="text-center pb-8 flex flex-col items-center gap-6">
-                    <button onClick={() => navigate(-1)} className="text-[11px] font-black uppercase tracking-[0.2em] text-[#293b64]/40 hover:text-[#293b64] transition-colors">
+                    <button onClick={() => navigate(-1)} className="text-[13px] font-black uppercase tracking-[0.2em] text-[#293b64]/40 hover:text-[#293b64] transition-colors">
                         ← Ver mis resultados de vitalidad
                     </button>
 

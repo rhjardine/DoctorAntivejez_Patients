@@ -48,35 +48,35 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5 mb-1">
             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            <span className="text-[12px] font-black text-slate-500 uppercase tracking-widest">
               Estado Biofísico Actual
             </span>
           </div>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-[11px] font-bold text-darkBlue uppercase">Edad Bio:</span>
-            <span className="text-xl font-black text-primary leading-none">{biologicalAge}</span>
-            <span className="text-xs font-bold text-slate-400">/ {chronologicalAge} real</span>
+            <span className="text-[13px] font-bold text-darkBlue uppercase">Edad Bio:</span>
+            <span className="text-xl font-black text-brand-cyanInk leading-none">{biologicalAge}</span>
+            <span className="text-xs font-bold text-slate-500">/ {chronologicalAge} real</span>
           </div>
         </div>
 
         <div className="flex flex-col items-end">
           <div className="flex items-center gap-2 mb-1">
             {onInfoPress && (
-              <button
+              <button aria-label="Más información"
                 onClick={onInfoPress}
-                className="p-1.5 bg-slate-50 text-slate-300 rounded-lg hover:text-primary transition-colors"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-slate-50 text-slate-500 rounded-lg hover:text-primary transition-colors"
                 title="Información"
               >
                 <Info size={14} />
               </button>
             )}
             <div className="bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">
-              <span className="text-[9px] font-black text-emerald-600 uppercase">Score: {adherenceLabel(progressPercentage)}</span>
+              <span className="text-[12px] font-black text-emerald-700 uppercase">Score: {adherenceLabel(progressPercentage)}</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-tighter">
+          <div className="flex items-center gap-1 text-[12px] font-black uppercase tracking-tighter">
             {isOptimal ? (
-              <span className="text-emerald-500">+{yearsDifference} Años de Vitalidad</span>
+              <span className="text-emerald-700">+{yearsDifference} Años de Vitalidad</span>
             ) : (
               <span className="text-amber-500">{Math.abs(yearsDifference)} Años de Rezago</span>
             )}
@@ -93,7 +93,7 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
         </div>
 
         {/* Marcadores de Escala */}
-        <div className="absolute w-full flex justify-between text-[9px] text-slate-400 mt-2 font-black uppercase tracking-widest">
+        <div className="absolute w-full flex justify-between text-[12px] text-slate-500 mt-2 font-black uppercase tracking-widest">
           <span>7</span>
           <span className="absolute left-[33.33%] -translate-x-1/2">28</span>
           <span className="absolute left-[66.66%] -translate-x-1/2">70</span>
@@ -107,7 +107,7 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
             style={{ left: `${chronoPercentage}%`, transform: 'translateX(-50%)' }}
           >
             <div className="bg-slate-300 w-0.5 h-6 rounded-full opacity-60"></div>
-            <div className="bg-slate-100 text-slate-400 text-[7px] font-black px-1 py-0.5 rounded border border-slate-200 uppercase mt-0.5">
+            <div className="bg-slate-100 text-slate-600 text-[12px] font-black px-1 py-0.5 rounded border border-slate-200 mt-0.5">
               Ref ({chrono})
             </div>
           </div>
@@ -120,7 +120,7 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
             style={{ left: `${bioPercentage}%`, transform: 'translateX(-50%)' }}
           >
             <div className="bg-darkBlue w-[3px] h-6 rounded-full shadow-lg border border-white/40"></div>
-            <div className="bg-darkBlue text-white text-[8px] font-black px-1.5 py-0.5 rounded-md mt-0.5 shadow-md border border-white/10 uppercase">
+            <div className="bg-darkBlue text-white text-[12px] font-black px-1.5 py-0.5 rounded-md mt-0.5 shadow-md border border-white/10 uppercase">
               Tú ({bio})
             </div>
           </div>

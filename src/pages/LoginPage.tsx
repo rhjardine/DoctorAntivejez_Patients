@@ -87,7 +87,7 @@ const LoginPage: React.FC = () => {
                                 autoComplete="username"
                                 className="w-full bg-white rounded-lg p-3.5
                                          text-base font-medium text-slate-800
-                                         placeholder:text-slate-400
+                                         placeholder:text-slate-500
                                          focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all shadow-sm"
                                 required
                                 autoFocus
@@ -107,7 +107,7 @@ const LoginPage: React.FC = () => {
                                 autoComplete="current-password"
                                 className="w-full bg-white rounded-lg p-3.5
                                          text-base font-medium text-slate-800
-                                         placeholder:text-slate-400
+                                         placeholder:text-slate-500
                                          focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all shadow-sm"
                                 required
                             />
@@ -117,7 +117,7 @@ const LoginPage: React.FC = () => {
                         {error && (
                             <div className="flex items-center gap-2 mt-2 px-2 text-red-300 animate-in slide-in-from-top-2">
                                 <AlertCircle size={14} />
-                                <span className="text-[11px] font-bold uppercase">{error}</span>
+                                <span className="text-[13px] font-bold uppercase">{error}</span>
                             </div>
                         )}
                     </div>
@@ -170,10 +170,10 @@ const LoginPage: React.FC = () => {
 
                 {/* Footer */}
                 <div className="mt-12 mb-6 text-center z-10 opacity-70 flex flex-col items-center gap-4">
-                    <p className="text-[11px] font-medium text-cyan-200">
+                    <p className="text-[13px] font-medium text-cyan-200">
                         Protegido con cifrado AES-256 · Dr. Juan Carlos Méndez
                     </p>
-                    <p className="text-[9px] font-black text-cyan-400 uppercase tracking-[0.3em] opacity-50">
+                    <p className="text-[12px] font-black text-cyan-400 uppercase tracking-[0.3em] opacity-50">
                         Vytalix.io
                     </p>
                 </div>

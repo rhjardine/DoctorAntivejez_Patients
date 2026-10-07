@@ -58,7 +58,7 @@ const ActivityView: React.FC = () => {
       title: "Entrenamiento de Fuerza",
       desc: "Rutinas para preservar masa muscular y densidad ósea.",
       iconComponent: <Dumbbell size={20} />,
-      color: "bg-gray-200 text-darkBlue dark:bg-slate-700 dark:text-slate-300"
+      color: "bg-gray-200 text-darkBlue dark:bg-slate-700 dark:text-slate-500"
     },
     {
       id: "CARDIO_Z2",
@@ -79,7 +79,7 @@ const ActivityView: React.FC = () => {
       title: "Movilidad y Estabilidad",
       desc: "Ejercicios diarios para articulaciones y prevención de caídas.",
       iconComponent: <Move size={20} />,
-      color: "bg-[#23bcef]/15 text-[#107da8] dark:bg-[#23bcef]/20 dark:text-[#23bcef]"
+      color: "bg-[#23bcef]/15 text-[#107da8] dark:bg-[#23bcef]/20 dark:text-[#107da8]"
     }
   ];
 
@@ -104,10 +104,10 @@ const ActivityView: React.FC = () => {
                 {isDone ? <CheckCircle2 size={20} /> : tool.iconComponent}
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className={`text-sm font-semibold truncate ${isDone ? 'text-[#107da8] dark:text-[#23bcef]' : 'text-darkBlue dark:text-white'}`}>
+                <h4 className={`text-sm font-semibold truncate ${isDone ? 'text-[#107da8] dark:text-[#107da8]' : 'text-darkBlue dark:text-white'}`}>
                   {tool.title}
                 </h4>
-                <p className="text-[11px] text-textMedium dark:text-slate-400 mt-0.5 leading-snug line-clamp-2">
+                <p className="text-[13px] text-textMedium dark:text-slate-500 mt-0.5 leading-snug line-clamp-2">
                   {isDone ? '¡Completado hoy!' : tool.desc}
                 </p>
               </div>

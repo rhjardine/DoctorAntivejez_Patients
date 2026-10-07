@@ -37,7 +37,7 @@ const UserProfileGatewayPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-10 text-center"
         >
-          <p className="text-[11px] font-black uppercase tracking-[0.25em] mb-4 text-[#94A3B8]">
+          <p className="text-[13px] font-black uppercase tracking-[0.25em] mb-4 text-[#94A3B8]">
             Doctor Antivejez
           </p>
           <h1 className="text-[32px] font-black leading-[1.1] text-slate-900 tracking-tight">
@@ -101,7 +101,7 @@ const UserProfileGatewayPage: React.FC = () => {
               <h2 className="text-[17px] font-bold text-slate-800">Soy invitado</h2>
               <p className="text-[12px] text-slate-500 font-medium">Explora el test de longevidad gratuito.</p>
             </div>
-            <ArrowRight size={16} className="text-slate-300" />
+            <ArrowRight size={16} className="text-slate-500" />
           </motion.button>
 
           {/* TERTIARY: SOY PROFESIONAL */}
@@ -122,7 +122,7 @@ const UserProfileGatewayPage: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-center text-[10px] font-black uppercase tracking-[0.2em] mt-12 text-[#CBD5E1]"
+          className="text-center text-[12px] font-black uppercase tracking-[0.2em] mt-12 text-[#CBD5E1]"
         >
           Medicina de longevidad basada en evidencia
         </motion.p>

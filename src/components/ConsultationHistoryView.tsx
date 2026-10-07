@@ -42,7 +42,7 @@ const ConsultationHistoryView: React.FC<ConsultationHistoryViewProps> = ({ onBac
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 px-4 pt-12 pb-6 shadow-md z-10 sticky top-0 border-b border-gray-100">
          <div className="flex items-center gap-4">
-             <button 
+             <button aria-label="Volver" 
                 onClick={onBack}
                 className="w-12 h-12 flex items-center justify-center bg-gray-100 dark:bg-slate-800 rounded-full active:scale-90 transition-transform"
              >
@@ -65,7 +65,7 @@ const ConsultationHistoryView: React.FC<ConsultationHistoryViewProps> = ({ onBac
         ) : (
           history.sort((a,b) => b.date.localeCompare(a.date)).map((record) => (
             <div key={record.consultationId} className="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border-2 border-transparent hover:border-primary/20 transition-all group relative overflow-hidden">
-               <button 
+               <button aria-label="Más información" 
                  onClick={onInfoPress}
                  className="absolute top-6 right-16 text-slate-200 group-hover:text-primary transition-colors"
                >
@@ -96,7 +96,7 @@ const ConsultationHistoryView: React.FC<ConsultationHistoryViewProps> = ({ onBac
                <div className="bg-pearlyGray dark:bg-slate-700/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-600">
                   <div className="flex items-center gap-2 mb-2">
                      <FileText size={14} className="text-primary" />
-                     <span className="text-[10px] font-black text-textMedium uppercase tracking-widest">Notas del Doctor</span>
+                     <span className="text-[12px] font-black text-textMedium uppercase tracking-widest">Notas del Doctor</span>
                   </div>
                   <p className="text-sm text-darkBlue dark:text-slate-200 leading-relaxed font-medium italic">
                     "{record.doctorNotes}"
@@ -106,18 +106,18 @@ const ConsultationHistoryView: React.FC<ConsultationHistoryViewProps> = ({ onBac
                <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center">
                   <div className="flex items-center gap-4">
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-textLight uppercase">Edad Bio</span>
+                        <span className="text-[12px] font-bold text-textLight uppercase">Edad Bio</span>
                         <span className="font-black text-primary">{record.biologicalAgeAtTime} años</span>
                      </div>
                      <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-textLight uppercase">Mejoría</span>
+                        <span className="text-[12px] font-bold text-textLight uppercase">Mejoría</span>
                         <div className="flex items-center gap-1 text-accentGreen">
                            <TrendingDown size={14} />
                            <span className="font-black">-{record.chronologicalAgeAtTime - record.biologicalAgeAtTime} años</span>
                         </div>
                      </div>
                   </div>
-                  <button className="p-2 bg-gray-50 dark:bg-slate-700 rounded-xl text-gray-300 group-hover:text-primary transition-colors">
+                  <button aria-label="Siguiente" className="p-2 bg-gray-50 dark:bg-slate-700 rounded-xl text-gray-300 group-hover:text-primary transition-colors">
                      <ChevronRight size={24} />
                   </button>
                </div>

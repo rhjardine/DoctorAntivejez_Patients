@@ -120,7 +120,7 @@ const MedicalNetworkPage: React.FC = () => {
                                             {doc.name}
                                         </h3>
                                         {doc.isFounder && (
-                                            <span className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded" style={{ background: `${CYAN}25`, color: CYAN }}>
+                                            <span className="text-[12px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded" style={{ background: `${CYAN}25`, color: CYAN }}>
                                                 Fundador
                                             </span>
                                         )}
@@ -131,14 +131,14 @@ const MedicalNetworkPage: React.FC = () => {
 
                                     <div className="flex items-center gap-1.5 mt-2">
                                         <MapPin size={10} style={{ color: 'rgba(255,255,255,0.5)' }} />
-                                        <span className="text-[10px] uppercase font-semibold tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                                        <span className="text-[12px] uppercase font-semibold tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
                                             {doc.location.split(',')[0]}
                                         </span>
                                     </div>
 
                                     <div className="flex flex-wrap gap-1.5 mt-2">
                                         {doc.modality.map(m => (
-                                            <span key={m} className="px-1.5 py-0.5 rounded border text-[9px] uppercase tracking-wider font-bold"
+                                            <span key={m} className="px-1.5 py-0.5 rounded border text-[12px] uppercase tracking-wider font-bold"
                                                 style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.6)' }}>
                                                 {m}
                                             </span>

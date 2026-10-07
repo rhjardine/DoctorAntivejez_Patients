@@ -66,7 +66,7 @@ const NutritionView: React.FC = () => {
                         </div>
                         <div className="flex-1">
                             <h4 className="text-lg font-black text-darkBlue dark:text-white leading-tight">Mi Menú Visual</h4>
-                            <p className="text-sm text-textMedium dark:text-slate-400 font-medium leading-tight">Plan de comidas balanceado.</p>
+                            <p className="text-sm text-textMedium dark:text-slate-500 font-medium leading-tight">Plan de comidas balanceado.</p>
                         </div>
                         <ChevronRight size={24} className="text-gray-300 group-hover:text-accentGreen" />
                     </button>

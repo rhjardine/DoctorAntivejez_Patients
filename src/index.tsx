@@ -70,6 +70,9 @@ let splashDismissed = false;
  * sin esa espera se vería un parpadeo en blanco entre splash y app.
  * Idempotente — puede llamarse más de una vez sin efecto adicional.
  */
+/** Lo que tarda la marca del splash en desaparecer antes de levantar el fondo. */
+const SALIDA_MARCA_MS = 220;
+
 const dismissSplash = () => {
   const splash = document.getElementById('da-splash');
   if (!splash || splashDismissed) return;
@@ -83,11 +86,18 @@ const dismissSplash = () => {
 
   window.setTimeout(() => {
     requestAnimationFrame(() => {
-      splash.classList.add('da-hide');
-      splash.addEventListener('transitionend', () => splash.remove(), { once: true });
-      // Red de seguridad: si la transición no dispara (pestaña en segundo plano,
-      // prefers-reduced-motion), retirarlo igualmente.
-      setTimeout(() => splash.remove(), 800);
+      // Primero desaparece la marca del splash; solo cuando ya no está se
+      // levanta el fondo. Si ambas cosas ocurrieran a la vez, el isotipo del
+      // splash y el logotipo de la app se solaparían durante el fundido.
+      splash.classList.add('da-salir');
+
+      window.setTimeout(() => {
+        splash.classList.add('da-hide');
+        splash.addEventListener('transitionend', () => splash.remove(), { once: true });
+        // Red de seguridad: si la transición no dispara (pestaña en segundo
+        // plano, prefers-reduced-motion), retirarlo igualmente.
+        setTimeout(() => splash.remove(), 800);
+      }, SALIDA_MARCA_MS);
     });
   }, restante);
 };

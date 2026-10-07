@@ -19,7 +19,7 @@ const ClinicalInfoModal: React.FC<ClinicalInfoModalProps> = ({ isOpen, onClose }
       <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl relative animate-in zoom-in-95 duration-300 border border-white/20">
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 bg-gray-100 dark:bg-slate-700 rounded-full text-gray-400 hover:text-darkBlue transition-colors"
+          className="absolute top-6 right-6 p-2 bg-gray-100 dark:bg-slate-700 rounded-full text-slate-500 hover:text-darkBlue transition-colors"
         >
           <X size={20} />
         </button>
@@ -34,14 +34,14 @@ const ClinicalInfoModal: React.FC<ClinicalInfoModalProps> = ({ isOpen, onClose }
           </h3>
 
           <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border border-gray-100 dark:border-slate-700">
-            <p className="text-sm font-bold text-textMedium dark:text-slate-300 leading-relaxed italic">
+            <p className="text-sm font-bold text-textMedium dark:text-slate-500 leading-relaxed italic">
               "Tu Edad Biológica es calculada en base a biomarcadores de Biofísica y Bioquímica validados por Doctor Antivejez."
             </p>
           </div>
 
           <div className="mt-8 flex items-center gap-2 text-primary">
             <Zap size={16} fill="currentColor" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Doctor Antivejez</span>
+            <span className="text-[12px] font-black uppercase tracking-[0.2em]">Doctor Antivejez</span>
           </div>
         </div>
       </div>

@@ -222,7 +222,7 @@ const TestAntivejezPage: React.FC = () => {
                             const val = answers[q.id];
                             return (
                                 <div key={q.id} className="p-6 bg-white rounded-[1.5rem] border border-[#293b64]/5 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3 text-[#107da8]">
+                                    <p className="text-[12px] font-black uppercase tracking-[0.2em] mb-3 text-[#107da8]">
                                         ANÁLISIS VITAL {qNumber}
                                     </p>
                                     <p className="text-[17px] font-semibold mb-8 leading-tight text-[#293b64] tracking-tight">
@@ -276,7 +276,7 @@ const TestAntivejezPage: React.FC = () => {
                         <>Consultar Vitalidad <ChevronRight size={18} strokeWidth={3} /></>
                     )}
                 </button>
-                <p className="text-center text-[9px] mt-4 font-black uppercase tracking-[0.3em] text-[#293b64]/30">
+                <p className="text-center text-[12px] mt-4 font-black uppercase tracking-[0.3em] text-[#293b64]/30">
                     SISTEMA BIOMÉTRICO VYTALIX
                 </p>
             </div>

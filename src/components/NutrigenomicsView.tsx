@@ -149,7 +149,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
         <p className="text-sm font-medium text-slate-500 leading-relaxed italic mb-8 max-w-xs">
           Tu equipo médico está diseñando tu plan de alimentación basado en tu genética y metabolismo celular.
         </p>
-        <button onClick={onBack} className="bg-[#293B64] text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-900/20 active:scale-95 transition-all">
+        <button onClick={onBack} className="bg-[#293B64] text-white px-8 py-4 rounded-2xl font-black text-[12px] uppercase tracking-widest shadow-lg shadow-blue-900/20 active:scale-95 transition-all">
           Volver al Inicio
         </button>
       </motion.div>
@@ -183,11 +183,11 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="bg-[#23bcef]/10 text-[#107da8] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-[#23bcef]/20">
+                    <span className="bg-[#23bcef]/10 text-[#107da8] text-[12px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-[#23bcef]/20">
                       {selectedFood.category}
                     </span>
                     {selectedFood.isClinicalPriority && (
-                      <span className="bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-md shadow-primary/30">
+                      <span className="bg-primary text-white text-[12px] font-black px-3 py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-md shadow-primary/30">
                         <Zap size={10} fill="currentColor" /> Prioridad
                       </span>
                     )}
@@ -196,7 +196,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
                 </div>
                 <button
                   onClick={() => setSelectedFood(null)}
-                  className="p-2 bg-slate-50 text-slate-400 rounded-full hover:bg-slate-200 transition-colors"
+                  className="p-2 bg-slate-50 text-slate-500 rounded-full hover:bg-slate-200 transition-colors"
                 >
                   <X size={24} />
                 </button>
@@ -206,7 +206,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
                 <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100">
                   <div className="flex items-center gap-2 mb-2">
                     <Activity size={16} className="text-[#107da8]" />
-                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Impacto Metabólico Estimado</h4>
+                    <h4 className="text-[12px] font-black text-slate-500 uppercase tracking-widest">Impacto Metabólico Estimado</h4>
                   </div>
                   <div className="flex items-end gap-2">
                     <span className="text-2xl font-black text-[#293B64]">Alto</span>
@@ -221,7 +221,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
                   <div className="relative z-10 w-full">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold border border-amber-200">Dr</span>
-                      <h4 className="text-[10px] font-black text-amber-800/60 uppercase tracking-widest">Nota del Especialista</h4>
+                      <h4 className="text-[12px] font-black text-amber-800/60 uppercase tracking-widest">Nota del Especialista</h4>
                     </div>
                     <p className="text-sm font-medium text-amber-900 leading-relaxed italic">
                       "{selectedFood.notes || "Alimento seleccionado específicamente para tu genotipo debido a su capacidad para reducir la inflamación y mejorar la señalización celular."}"
@@ -242,32 +242,29 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
       </AnimatePresence>
 
       {/* HEADER PREMIUM (Hero Section con Gradiente) */}
-      <div className="relative bg-gradient-to-br from-[#293b64] to-[#0f1d38] px-4 pt-12 pb-6 shadow-xl z-20 overflow-hidden">
-        <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-          <Utensils className="w-48 h-48" />
+      <div className="relative bg-gradient-to-br from-[#293b64] to-[#0f1d38] px-3 py-3 shadow-lg z-20 overflow-hidden">
+        <div className="absolute top-0 right-0 opacity-10 pointer-events-none">
+          <Utensils className="w-28 h-28" />
         </div>
 
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-4">
-            <button onClick={onBack} className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-xl active:scale-90 transition-transform backdrop-blur-sm">
-              <ChevronLeft size={24} className="text-white" />
-            </button>
-            <div className="text-center">
-              <h2 className="text-lg font-black text-white leading-none tracking-tight uppercase">Nutrición Genómica</h2>
-              <span className="text-[10px] font-bold text-[#23bcef] uppercase tracking-[0.2em] mt-1 block">Tipo {plan.bloodType} • {plan.dietTypes.join(' + ')}</span>
-            </div>
-            <div className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-xl backdrop-blur-sm">
-              <Droplet size={20} className="text-[#23bcef]" fill="currentColor" />
-            </div>
+        <div className="relative z-10 flex items-center gap-2.5">
+          <button
+            onClick={onBack}
+            aria-label="Volver"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-white/10 rounded-xl active:scale-95 transition-transform backdrop-blur-sm shrink-0"
+          >
+            <ChevronLeft size={24} className="text-white" />
+          </button>
+
+          <div className="flex-1 min-w-0">
+            <h2 className="text-[17px] font-black text-white leading-tight tracking-tight truncate">Nutrición Genómica</h2>
+            <span className="text-[13px] font-bold text-cyan-200 leading-tight block truncate">
+              Tipo {plan.bloodType} · Enfoque {plan.dietTypes.join(' + ')}
+            </span>
           </div>
 
-          <div className="flex flex-wrap gap-2 justify-center">
-            {plan.dietTypes.map(type => (
-              <span key={type} className="bg-white/10 border border-white/20 text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest flex items-center gap-1.5 backdrop-blur-sm">
-                <Star size={10} className="text-accentYellow" fill="currentColor" />
-                Enfoque {type}
-              </span>
-            ))}
+          <div className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-xl backdrop-blur-sm shrink-0" aria-hidden="true">
+            <Droplet size={20} className="text-cyan-200" fill="currentColor" />
           </div>
         </div>
       </div>
@@ -276,7 +273,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
           opciones se leen de arriba abajo, sin desplazamiento lateral. Solo
           cambia la disposición — el estado, el filtrado y el contenido que se
           muestra son exactamente los mismos. */}
-      <div className="flex flex-col px-4 gap-1.5 py-3 bg-white border-b border-slate-100 shadow-sm">
+      <div className="grid grid-cols-2 px-3 gap-2 py-2.5 bg-white border-b border-slate-100 shadow-sm">
         {(['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'] as MealType[]).map((tab) => {
           const isActive = activeTab === tab;
           const Icon = tab === 'BREAKFAST' ? Coffee : tab === 'LUNCH' ? Sun : tab === 'DINNER' ? Moon : Leaf;
@@ -287,13 +284,13 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
               key={tab}
               onClick={() => setActiveTab(tab)}
               aria-pressed={isActive}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl text-[10px] font-black transition-all border-2 text-left ${isActive
+              className={`w-full min-h-[46px] flex items-center justify-center gap-2 px-2 rounded-2xl text-[13px] font-black transition-all border-2 ${isActive
                 ? 'bg-[#107da8] border-[#107da8] text-white shadow-lg shadow-[#107da8]/20'
-                : 'bg-slate-50 border-transparent text-slate-400 hover:bg-slate-100'
+                : 'bg-slate-50 border-transparent text-slate-500 hover:bg-slate-100'
                 }`}
             >
-              <Icon size={16} className="shrink-0" />
-              {label.toUpperCase()}
+              <Icon size={17} className="shrink-0" />
+              {label}
             </button>
           );
         })}
@@ -313,7 +310,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
                 <ShieldAlert size={24} />
               </div>
               <div className="flex-1">
-                <h4 className="text-[11px] font-black text-rose-700 uppercase tracking-[0.15em] mb-1">Evitar (Incompatibles)</h4>
+                <h4 className="text-[13px] font-black text-rose-700 uppercase tracking-[0.15em] mb-1">Evitar (Incompatibles)</h4>
                 <p className="text-xs text-rose-900 font-bold leading-relaxed">
                   {derivedForbidden.join(' • ')}
                 </p>
@@ -345,7 +342,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
                         }`}
                     >
                       {food.isClinicalPriority && (
-                        <div className="absolute -top-2 right-6 bg-[#23bcef] text-white text-[8px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-md shadow-[#23bcef]/30">
+                        <div className="absolute -top-2 right-6 bg-[#107DA8] text-white text-[12px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest flex items-center gap-1 shadow-md shadow-[#23bcef]/30">
                           <Zap size={10} fill="currentColor" />
                           Prioridad Clínica
                         </div>
@@ -359,7 +356,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
                       <div className="flex-1 min-w-0">
                         <h4 className="font-black text-[#293B64] text-base leading-tight truncate">{food.name}</h4>
                         {food.notes && (
-                          <p className="text-[11px] font-bold text-slate-400 mt-1 truncate italic">
+                          <p className="text-[13px] font-bold text-slate-500 mt-1 truncate italic">
                             {food.notes}
                           </p>
                         )}
@@ -367,7 +364,9 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
 
                       <button
                         onClick={(e) => toggleFavorite(food.id, e)}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isFav ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 'bg-slate-50 text-slate-300 hover:bg-slate-100'
+                        aria-label={isFav ? `Quitar ${food.name} de favoritos` : `Marcar ${food.name} como favorito`}
+                        aria-pressed={isFav}
+                        className={`min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-all ${isFav ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
                           }`}
                       >
                         <Heart size={18} fill={isFav ? "white" : "none"} strokeWidth={3} />
@@ -381,7 +380,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
         </div>
 
         <motion.div variants={itemVariants} className="pt-12 pb-24 text-center opacity-40">
-          <p className="text-[9px] font-black text-[#293B64] uppercase tracking-widest flex items-center justify-center gap-2">
+          <p className="text-[12px] font-black text-[#293B64] uppercase tracking-widest flex items-center justify-center gap-2">
             <Star size={10} /> Algoritmos Nutricionales Doctor Antivejez <Star size={10} />
           </p>
         </motion.div>
