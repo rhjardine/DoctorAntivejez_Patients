@@ -80,7 +80,7 @@ const RestorationView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                             <div className="bg-white/20 p-2 rounded-xl">
                                 <RefreshCw size={18} className="text-emerald-100" />
                             </div>
-                            <span className="text-emerald-100 font-black uppercase tracking-widest text-[10px]">Fase 4: Restauración</span>
+                            <span className="text-emerald-100 font-black uppercase tracking-widest text-[12px]">Fase 4: Restauración</span>
                         </div>
                     </div>
 
@@ -96,10 +96,10 @@ const RestorationView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             {/* Las 5A: el contenido propio de esta fase según la clínica.
                 Cada clave abre la pantalla que el paciente ya usa a diario. */}
             <div className="mx-4 mt-5 bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100">
-                <span className="text-[9px] font-black uppercase tracking-widest block mb-1 text-emerald-600">
+                <span className="text-[12px] font-black uppercase tracking-widest block mb-1 text-emerald-600">
                     Claves de la Longevidad 5A
                 </span>
-                <p className="text-slate-500 text-[11px] font-medium leading-relaxed mb-4">
+                <p className="text-slate-500 text-[13px] font-medium leading-relaxed mb-4">
                     Se ajustan de manera personalizada. Toca cualquiera para ir a tu plan.
                 </p>
                 <ul className="flex flex-col gap-2">
@@ -109,13 +109,13 @@ const RestorationView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                                 onClick={() => navigate(clave.ruta)}
                                 className="w-full flex items-center gap-3 text-left bg-slate-50 hover:bg-emerald-50 border border-slate-100 rounded-2xl px-3 py-2.5 transition-colors active:scale-[0.99]"
                             >
-                                <span className="w-7 h-7 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-[11px] font-black shrink-0">
+                                <span className="w-7 h-7 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-[13px] font-black shrink-0">
                                     {i + 1}
                                 </span>
                                 <span className="flex-1 text-[#293b64] text-sm font-bold leading-snug">
                                     {clave.nombre}
                                 </span>
-                                <ChevronRight size={16} className="text-slate-300 shrink-0" />
+                                <ChevronRight size={16} className="text-slate-500 shrink-0" />
                             </button>
                         </li>
                     ))}
@@ -124,7 +124,7 @@ const RestorationView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
             {/* Soporte clínico de la fase */}
             <div className="px-4 mt-6 mb-1">
-                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                <span className="text-[12px] font-black uppercase tracking-widest text-slate-500">
                     Soporte clínico de la fase
                 </span>
             </div>
@@ -145,7 +145,7 @@ const RestorationView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                             </div>
                             <div className="flex-1">
                                 <h3 className="text-slate-800 font-black text-lg leading-tight mb-1">{item.title}</h3>
-                                <p className="text-emerald-500 text-[10px] font-black uppercase tracking-widest">{item.subtitle}</p>
+                                <p className="text-emerald-500 text-[12px] font-black uppercase tracking-widest">{item.subtitle}</p>
                             </div>
                         </div>
 
@@ -155,7 +155,7 @@ const RestorationView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
                         <div className="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100/50">
                             <div className="flex justify-between items-end mb-2">
-                                <span className="text-emerald-800/60 text-[9px] font-black uppercase tracking-widest">Potencia Regenerativa</span>
+                                <span className="text-emerald-800/60 text-[12px] font-black uppercase tracking-widest">Potencia Regenerativa</span>
                                 <span className="text-emerald-600 text-xs font-black">{item.power}%</span>
                             </div>
                             <div className="h-1.5 w-full bg-emerald-100 rounded-full overflow-hidden">

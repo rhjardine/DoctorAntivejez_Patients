@@ -20,8 +20,8 @@ const AchievementsView: React.FC<AchievementsViewProps> = ({ onClose, isPage = t
     { id: 1, title: "Primeros Pasos", desc: "Completa 5 días.", icon: <TrendingUp size={20} />, color: "bg-blue-100 text-blue-600", unlocked: true },
     { id: 2, title: "Sueño Profundo", desc: "7h+ por 3 noches.", icon: <Star size={20} />, color: "bg-purple-100 text-purple-600", unlocked: true },
     { id: 3, title: "Nutrición Consciente", desc: "Registro 1 semana.", icon: <Zap size={20} />, color: "bg-orange-100 text-orange-600", unlocked: true },
-    { id: 4, title: "Ayuno Maestro", desc: "10 ayunos intermitentes.", icon: <Shield size={20} />, color: "bg-gray-100 text-gray-400", unlocked: false },
-    { id: 5, title: "Racha Imparable", desc: "30 días continuos.", icon: <Crown size={20} />, color: "bg-gray-100 text-gray-400", unlocked: false },
+    { id: 4, title: "Ayuno Maestro", desc: "10 ayunos intermitentes.", icon: <Shield size={20} />, color: "bg-gray-100 text-slate-500", unlocked: false },
+    { id: 5, title: "Racha Imparable", desc: "30 días continuos.", icon: <Crown size={20} />, color: "bg-gray-100 text-slate-500", unlocked: false },
   ];
 
   const rewards = [
@@ -61,13 +61,13 @@ const AchievementsView: React.FC<AchievementsViewProps> = ({ onClose, isPage = t
           <div className="flex bg-gray-200/50 dark:bg-slate-800 p-1.5 rounded-[1.5rem] mb-6">
               <button 
                 onClick={() => setActiveTab('BADGES')}
-                className={`flex-1 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${activeTab === 'BADGES' ? 'bg-white dark:bg-slate-700 text-primary shadow-md' : 'text-gray-400 dark:text-slate-500'}`}
+                className={`flex-1 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${activeTab === 'BADGES' ? 'bg-white dark:bg-slate-700 text-primary shadow-md' : 'text-slate-500 dark:text-slate-500'}`}
               >
                  Insignias
               </button>
               <button 
                 onClick={() => setActiveTab('REWARDS')}
-                className={`flex-1 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${activeTab === 'REWARDS' ? 'bg-white dark:bg-slate-700 text-primary shadow-md' : 'text-gray-400 dark:text-slate-500'}`}
+                className={`flex-1 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${activeTab === 'REWARDS' ? 'bg-white dark:bg-slate-700 text-primary shadow-md' : 'text-slate-500 dark:text-slate-500'}`}
               >
                  Canjear
               </button>
@@ -83,7 +83,7 @@ const AchievementsView: React.FC<AchievementsViewProps> = ({ onClose, isPage = t
                       </div>
                       <div className="flex justify-between items-start mb-4 relative z-10">
                           <div>
-                              <span className="text-[10px] font-black opacity-80 uppercase tracking-[0.2em]">Nivel Actual</span>
+                              <span className="text-[12px] font-black opacity-80 uppercase tracking-[0.2em]">Nivel Actual</span>
                               <h3 className="font-black text-2xl leading-tight tracking-tighter">{currentLevel}</h3>
                           </div>
                           <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
@@ -94,7 +94,7 @@ const AchievementsView: React.FC<AchievementsViewProps> = ({ onClose, isPage = t
                           <div className="bg-white h-full rounded-full transition-all duration-1000" style={{ width: `${levelProgress}%` }}></div>
                       </div>
                       <div className="text-right">
-                          <span className="text-[11px] font-black uppercase tracking-widest opacity-90">{levelProgress}% para subir de nivel</span>
+                          <span className="text-[13px] font-black uppercase tracking-widest opacity-90">{levelProgress}% para subir de nivel</span>
                       </div>
                   </div>
 
@@ -109,7 +109,7 @@ const AchievementsView: React.FC<AchievementsViewProps> = ({ onClose, isPage = t
                           </div>
                           <div>
                               <h4 className="font-black text-[13px] text-darkBlue dark:text-white leading-tight uppercase tracking-tight">{item.title}</h4>
-                              <p className="text-[10px] font-bold text-gray-400 mt-1 line-clamp-2">{item.desc}</p>
+                              <p className="text-[12px] font-bold text-slate-500 mt-1 line-clamp-2">{item.desc}</p>
                           </div>
                       </div>
                   ))}
@@ -132,7 +132,7 @@ const AchievementsView: React.FC<AchievementsViewProps> = ({ onClose, isPage = t
                                    {reward.icon}
                                </div>
                                <div className="bg-yellow-50 dark:bg-yellow-900/20 px-2.5 py-1 rounded-lg border border-yellow-100">
-                                   <span className="text-[11px] font-black text-yellow-700 dark:text-yellow-400 flex items-center gap-1">
+                                   <span className="text-[13px] font-black text-yellow-700 dark:text-yellow-400 flex items-center gap-1">
                                        <Coins size={10} /> {reward.cost}
                                    </span>
                                </div>
@@ -140,7 +140,7 @@ const AchievementsView: React.FC<AchievementsViewProps> = ({ onClose, isPage = t
                            <h4 className="font-black text-sm text-darkBlue dark:text-white mb-2 group-hover:text-primary transition-colors leading-tight">
                                {reward.title}
                            </h4>
-                           <div className="w-full py-2.5 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-400 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest text-center group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                           <div className="w-full py-2.5 rounded-xl bg-gray-100 dark:bg-slate-700 text-slate-500 dark:text-slate-500 text-[12px] font-black uppercase tracking-widest text-center group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
                                Canjear
                            </div>
                       </div>

@@ -38,14 +38,14 @@ export const PrivacySettings = () => {
     return (
         <div className="p-6 bg-white dark:bg-slate-800 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700/50 transition-all">
             <div className="flex items-center gap-3 mb-4">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${consent ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'}`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${consent ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500'}`}>
                     {consent ? <ShieldCheck size={20} /> : <Shield size={20} />}
                 </div>
                 <h3 className="text-sm font-black text-darkBlue dark:text-white uppercase tracking-tighter">Privacidad Médica</h3>
             </div>
 
             <div className="flex items-center justify-between gap-4">
-                <p className="text-[11px] font-bold text-textMedium dark:text-slate-400 leading-relaxed">
+                <p className="text-[13px] font-bold text-textMedium dark:text-slate-500 leading-relaxed">
                     Al activar esta opción, permites que el Dr. Juan Carlos Méndez visualice tu adherencia diaria y puntos Omics para un mejor seguimiento clínico.
                 </p>
                 <button
@@ -59,7 +59,7 @@ export const PrivacySettings = () => {
             </div>
 
             {!consent && (
-                <div className="mt-4 flex items-center gap-2 text-[10px] text-amber-600 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-100 dark:border-amber-900/20 font-bold">
+                <div className="mt-4 flex items-center gap-2 text-[12px] text-amber-600 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-100 dark:border-amber-900/20 font-bold">
                     <ShieldAlert size={14} />
                     <span>Tus datos de adherencia son actualmente privados.</span>
                 </div>

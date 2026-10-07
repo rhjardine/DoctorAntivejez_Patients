@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Info, LogOut, User, AlertCircle, Activity, Bell, Zap, FileClock, QrCode, Settings, MessageSquare } from 'lucide-react';
+import { X, LogOut, User, AlertCircle, Bell, Zap, MessageSquare, BookOpen } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useUIStore } from '../store/useUIStore';
 import { useLocale } from '../hooks/useLocale';
@@ -47,6 +47,11 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
       />
 
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú principal"
+        aria-hidden={!isOpen}
+        inert={!isOpen}
         className={`fixed top-0 left-0 h-full w-[300px] flex flex-col bg-white z-50 shadow-2xl transform transition-transform duration-500 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
@@ -55,7 +60,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
           <div className="absolute -top-6 -right-6 w-28 h-28 rounded-full bg-primary/10 pointer-events-none" />
           <div className="absolute top-10 -right-2 w-14 h-14 rounded-full bg-primary/15 pointer-events-none" />
 
-          <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white z-10"><X size={28} /></button>
+          <button onClick={onClose} aria-label="Cerrar menú" className="absolute top-4 right-4 p-2.5 text-white/60 hover:text-white z-10"><X size={26} /></button>
 
           {/* Welcome card */}
           <div className="flex items-center gap-4">
@@ -63,20 +68,20 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
               <User size={32} />
             </div>
             <div className="flex flex-col gap-0.5 min-w-0">
-              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary/80">Bienvenido</span>
+              <span className="text-[12px] font-black uppercase tracking-[0.2em] text-primary/80">Bienvenido</span>
               <h2 className="font-black text-lg leading-tight tracking-tight truncate max-w-[185px] text-white">
                 {session?.name || 'Paciente'}
               </h2>
               <div className="flex items-center gap-1.5 mt-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[9px] font-bold text-white/50 uppercase tracking-widest">Sesión activa</span>
+                <span className="text-[12px] font-bold text-white/50 uppercase tracking-widest">Sesión activa</span>
               </div>
             </div>
           </div>
 
           {/* Decorative motivational strip */}
           <div className="mt-4 bg-white/5 rounded-xl px-3 py-2 border border-white/10">
-            <p className="text-[10px] font-bold text-white/60 italic leading-snug">
+            <p className="text-[12px] font-bold text-white/60 italic leading-snug">
               "Cada día es una oportunidad para rejuvenecer a nivel celular."
             </p>
           </div>
@@ -84,34 +89,16 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
 
         <div className="py-6 flex flex-col flex-1 overflow-y-auto no-scrollbar">
 
-          {/* ── FASE 2: INHABILITADAS ── */}
-
-          {/* Mis Biométricos — Pronto */}
-          <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
-            <Activity size={22} className="text-textMedium shrink-0" />
-            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Mis Biométricos</span>
-            <span className="ml-auto text-[9px] font-bold bg-[#23bcef]/10 text-[#107da8] px-2 py-1 rounded-md uppercase tracking-wider border border-[#23bcef]/20 whitespace-nowrap">
-              Pronto
-            </span>
-          </div>
-
-          {/* Historial Médico — Pronto */}
-          <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
-            <FileClock size={22} className="text-textMedium shrink-0" />
-            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Historial Médico</span>
-            <span className="ml-auto text-[9px] font-bold bg-[#23bcef]/10 text-[#107da8] px-2 py-1 rounded-md uppercase tracking-wider border border-[#23bcef]/20 whitespace-nowrap">
-              Pronto
-            </span>
-          </div>
-
-          {/* Bio-Pase — Pronto */}
-          <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
-            <QrCode size={22} className="text-textMedium shrink-0" />
-            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Bio-Pase (Check-in)</span>
-            <span className="ml-auto text-[9px] font-bold bg-[#23bcef]/10 text-[#107da8] px-2 py-1 rounded-md uppercase tracking-wider border border-[#23bcef]/20 whitespace-nowrap">
-              Pronto
-            </span>
-          </div>
+          {/* Guía de uso — pantalla ya escrita que hasta ahora no tenía entrada.
+              Para un paciente mayor que abre la app por primera vez, es lo
+              primero que debería poder consultar. */}
+          <button
+            onClick={() => handleNavigation('/usage-guide')}
+            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-all text-left"
+          >
+            <BookOpen size={22} className="text-primary shrink-0" />
+            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Guía de uso</span>
+          </button>
 
           {/* ── Notificaciones (Toggle activo) ── */}
           <div className="px-6 py-5">
@@ -129,25 +116,9 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
             </div>
           </div>
 
-          {/* Configuración — Pronto */}
-          <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
-            <Settings size={22} className="text-textMedium shrink-0" />
-            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Configuración</span>
-            <span className="ml-auto text-[9px] font-bold bg-[#23bcef]/10 text-[#107da8] px-2 py-1 rounded-md uppercase tracking-wider border border-[#23bcef]/20 whitespace-nowrap">
-              Pronto
-            </span>
-          </div>
 
           <div className="h-px bg-gray-100 mx-6 my-3"></div>
 
-          {/* Sobre la App — Pronto */}
-          <div className="flex items-center gap-4 px-6 py-4 opacity-40 grayscale cursor-not-allowed select-none">
-            <Info size={22} className="text-textMedium shrink-0" />
-            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Sobre la App</span>
-            <span className="ml-auto text-[9px] font-bold bg-[#23bcef]/10 text-[#107da8] px-2 py-1 rounded-md uppercase tracking-wider border border-[#23bcef]/20 whitespace-nowrap">
-              Pronto
-            </span>
-          </div>
 
           {/* Reportar Problema (activo — canal de soporte) */}
           <a
@@ -161,7 +132,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
           </a>
 
           <div className="mt-auto mb-4 px-8 text-center">
-            <p className="text-[10px] font-black text-gray-300 tracking-[0.3em] uppercase">Rejuvenate v2.0</p>
+            <p className="text-[12px] font-black text-gray-300 tracking-[0.3em] uppercase">Rejuvenate v2.0</p>
           </div>
 
           {/* Botón de Logout con Confirmación Estilizada */}

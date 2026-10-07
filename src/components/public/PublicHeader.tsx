@@ -79,8 +79,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             {progressLabel && progress !== undefined && (
                 <div className="absolute top-[64px] left-0 right-0 flex justify-center pointer-events-none">
                     <span
-                        className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md shadow-sm border ${isWellness
-                            ? 'text-[#23bcef] bg-[#f8fafc]/10 border-[#23bcef]/20'
+                        className={`text-[12px] font-black uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md shadow-sm border ${isWellness
+                            ? 'text-[#107da8] bg-[#f8fafc]/10 border-[#23bcef]/20'
                             : 'text-clinical-cyan bg-clinical-navy/80 border-clinical-cyan/20'
                             }`}
                     >

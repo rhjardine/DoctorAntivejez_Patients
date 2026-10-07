@@ -20,7 +20,7 @@ const FeatureGateView: React.FC<FeatureGateViewProps> = ({
                     p-8 text-center animate-in fade-in duration-500
                     bg-[var(--background)]">
       <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center
-                      justify-center text-slate-300 mb-6 shadow-inner">
+                      justify-center text-slate-500 mb-6 shadow-inner">
         <Clock size={32} />
       </div>
 
@@ -40,7 +40,7 @@ const FeatureGateView: React.FC<FeatureGateViewProps> = ({
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 px-6 py-3 bg-white
                    rounded-2xl border border-slate-100 shadow-sm
-                   text-[11px] font-black text-darkBlue uppercase
+                   text-[13px] font-black text-darkBlue uppercase
                    tracking-widest hover:border-primary/20
                    active:scale-95 transition-all"
       >

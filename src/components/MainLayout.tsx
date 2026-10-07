@@ -3,13 +3,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Shield, Trophy, RefreshCw, Menu, ChevronLeft, LayoutDashboard,
-    Store, LogOut, Dna, WifiOff, AlertTriangle, ShieldCheck
+    LogOut, WifiOff, AlertTriangle, ShieldCheck, ClipboardList, Apple, MessageCircle
 } from 'lucide-react';
 import { useSessionTimeout } from '../hooks/useSessionTimeout';
 import { MainTab } from '../types';
 import { useAuthStore } from '../store/useAuthStore';
 import { useUIStore } from '../store/useUIStore';
 import { useProfileStore } from '../store/useProfileStore';
+import { featureFlags } from '../config/featureFlags';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { useSyncQueue } from '../hooks/useSyncQueue';
 import { offlineQueue } from '../services/offlineQueue';
@@ -57,12 +58,6 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     // Accesos de la barra inferior que no entran en la Beta. Antes eran <div>
     // con un tooltip en :hover, que en un móvil no existe: el paciente tocaba y
     // no pasaba nada. Ahora responden con un aviso explícito.
-    const [avisoConstruccion, setAvisoConstruccion] = useState<string | null>(null);
-
-    const avisarEnConstruccion = (seccion: string) => {
-        setAvisoConstruccion(seccion);
-        setTimeout(() => setAvisoConstruccion(null), 2600);
-    };
 
     const { resetTimer } = useSessionTimeout({
         timeoutMs: 30 * 60 * 1000,
@@ -134,6 +129,43 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const isDetailView = !isHome && !['/chat', '/achievements', '/store'].includes(location.pathname);
 
     const handleLogout = async () => { await logout(); navigate('/acceso'); };
+
+    /** Destinos de la barra inferior. Todos existen y todos llevan a contenido. */
+    const DESTINOS_PRINCIPALES = [
+        {
+            id: 'inicio',
+            etiqueta: 'Inicio',
+            Icono: LayoutDashboard,
+            visible: true,
+            activo: isHome,
+            alPulsar: () => { navigate('/'); setMainTab(MainTab.KEYS_5A); toggleDrawer(false); },
+        },
+        {
+            id: 'guia',
+            etiqueta: 'Mi Guía',
+            Icono: ClipboardList,
+            visible: true,
+            activo: location.pathname === '/guide',
+            alPulsar: () => { navigate('/guide'); toggleDrawer(false); },
+        },
+        {
+            id: 'alimentacion',
+            etiqueta: 'Alimentación',
+            Icono: Apple,
+            visible: true,
+            activo: location.pathname.startsWith('/nutrition') || location.pathname.startsWith('/mi-guia'),
+            alPulsar: () => { navigate('/nutrition'); toggleDrawer(false); },
+        },
+        {
+            id: 'asistente',
+            etiqueta: 'Asistente',
+            Icono: MessageCircle,
+            // Si el kill switch de IA generativa está apagado, este destino no existe.
+            visible: featureFlags.vcoach,
+            activo: location.pathname === '/chat',
+            alPulsar: () => { navigate('/chat'); toggleDrawer(false); },
+        },
+    ];
     const handleRefresh = async () => {
         setIsRefreshing(true);
         forceRefresh();
@@ -159,9 +191,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     
                     <div className="relative flex items-center justify-between px-6 h-20 z-10">
                         {isDetailView ? (
-                            <button onClick={() => navigate(-1)} className="p-1 hover:text-primary transition-colors"><ChevronLeft size={28} /></button>
+                            <button onClick={() => navigate(-1)} aria-label="Volver" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:text-primary hover:bg-white/10 active:scale-95 transition-all"><ChevronLeft size={28} /></button>
                         ) : (
-                            <button onClick={() => toggleDrawer(true)} className="p-1 hover:text-primary transition-colors"><Menu size={28} /></button>
+                            <button onClick={() => toggleDrawer(true)} aria-label="Abrir menú" className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:text-primary hover:bg-white/10 active:scale-95 transition-all"><Menu size={28} /></button>
                         )}
                         
                         {/* Perfect centering with absolute positioning and enlarged logo */}
@@ -173,23 +205,35 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             />
                         </div>
                         
-                        <div className="flex items-center gap-2">
-                            <button onClick={handleRefresh} className={`p-1 text-white/70 hover:text-white transition-all ${isRefreshing ? 'animate-spin' : ''}`} disabled={isRefreshing}>
-                                <RefreshCw size={18} />
+                        <div className="flex items-center">
+                            <button
+                                onClick={handleRefresh}
+                                aria-label="Actualizar mis datos"
+                                disabled={isRefreshing}
+                                className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-white/80 hover:text-white hover:bg-white/10 active:scale-95 transition-all ${isRefreshing ? 'animate-spin' : ''}`}
+                            >
+                                <RefreshCw size={20} />
                             </button>
-                            <button onClick={handleLogout} className="p-1 text-white/20 hover:text-white transition-colors"><LogOut size={20} /></button>
+                            <span aria-hidden="true" className="w-px h-6 bg-white/15 mx-1.5" />
+                            <button
+                                onClick={handleLogout}
+                                aria-label="Cerrar sesión"
+                                className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-white/55 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+                            >
+                                <LogOut size={20} />
+                            </button>
                         </div>
                     </div>
                     {isHome && (
                         <div className="flex bg-[var(--surface)] border-b border-[var(--border)] shadow-sm">
-                            <button onClick={() => setMainTab(MainTab.CHALLENGE)} className={`flex-1 py-3 px-2 text-[11px] uppercase tracking-wide flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.CHALLENGE ? 'font-black text-[#1a3a5c] border-[#1a3a5c] bg-blue-50/50' : 'font-semibold text-[#334155] border-transparent hover:text-[#1a3a5c] hover:bg-slate-50'}`}>
-                                <Trophy size={13} strokeWidth={currentMainTab === MainTab.CHALLENGE ? 3 : 2} /> Mi Guía
+                            <button onClick={() => setMainTab(MainTab.CHALLENGE)} className={`flex-1 py-3 px-2 text-[14px] tracking-tight flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.CHALLENGE ? 'font-black text-[#1a3a5c] border-[#1a3a5c] bg-blue-50/50' : 'font-semibold text-[#334155] border-transparent hover:text-[#1a3a5c] hover:bg-slate-50'}`}>
+                                <Trophy size={16} strokeWidth={currentMainTab === MainTab.CHALLENGE ? 3 : 2} /> Mi Guía
                             </button>
-                            <button onClick={() => setMainTab(MainTab.KEYS_5A)} className={`flex-1 py-3 px-2 text-[11px] uppercase tracking-wide flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.KEYS_5A ? 'font-black text-[#1a3a5c] border-[#1a3a5c] bg-blue-50/50' : 'font-semibold text-[#334155] border-transparent hover:text-[#1a3a5c] hover:bg-slate-50'}`}>
-                                <Shield size={13} strokeWidth={currentMainTab === MainTab.KEYS_5A ? 3 : 2} /> Claves 5A
+                            <button onClick={() => setMainTab(MainTab.KEYS_5A)} className={`flex-1 py-3 px-2 text-[14px] tracking-tight flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.KEYS_5A ? 'font-black text-[#1a3a5c] border-[#1a3a5c] bg-blue-50/50' : 'font-semibold text-[#334155] border-transparent hover:text-[#1a3a5c] hover:bg-slate-50'}`}>
+                                <Shield size={16} strokeWidth={currentMainTab === MainTab.KEYS_5A ? 3 : 2} /> Claves 5A
                             </button>
-                            <button onClick={() => setMainTab(MainTab.THERAPIES_4R)} className={`flex-1 py-3 px-2 text-[11px] uppercase tracking-wide flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.THERAPIES_4R ? 'font-black text-[#1a3a5c] border-[#1a3a5c] bg-blue-50/50' : 'font-semibold text-[#334155] border-transparent hover:text-[#1a3a5c] hover:bg-slate-50'}`}>
-                                <RefreshCw size={13} strokeWidth={currentMainTab === MainTab.THERAPIES_4R ? 3 : 2} /> Terapias 4R
+                            <button onClick={() => setMainTab(MainTab.THERAPIES_4R)} className={`flex-1 py-3 px-2 text-[14px] tracking-tight flex items-center justify-center gap-1.5 border-b-[3px] transition-all duration-200 ${currentMainTab === MainTab.THERAPIES_4R ? 'font-black text-[#1a3a5c] border-[#1a3a5c] bg-blue-50/50' : 'font-semibold text-[#334155] border-transparent hover:text-[#1a3a5c] hover:bg-slate-50'}`}>
+                                <RefreshCw size={16} strokeWidth={currentMainTab === MainTab.THERAPIES_4R ? 3 : 2} /> Terapias 4R
                             </button>
                         </div>
                     )}
@@ -204,7 +248,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
                     <div className="bg-amber-500/90 backdrop-blur-sm text-white px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg border border-amber-400/50 animate-in fade-in slide-in-from-bottom-4">
                         <WifiOff size={14} />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-center">
+                        <span className="text-[12px] font-black uppercase tracking-widest text-center">
                             {pendingCount > 0 ? `Modo Offline · ${pendingCount} registro(s) pendiente(s)` : `Modo Offline · Datos de ${profileData?.fetchedAt ? new Date(profileData.fetchedAt).toLocaleDateString() : 'hoy'}`}
                         </span>
                     </div>
@@ -214,14 +258,14 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             {showUpdateBanner && (
                 <div className="fixed bottom-32 left-1/2 -translate-x-1/2 z-[60]">
                     <div className="bg-darkBlue text-white px-4 py-2 rounded-full flex items-center gap-3 shadow-2xl border border-blue-500/30 animate-in fade-in slide-in-from-bottom-4">
-                        <span className="text-[10px] font-black uppercase tracking-widest">Nueva versión disponible</span>
+                        <span className="text-[12px] font-black uppercase tracking-widest">Nueva versión disponible</span>
                         <button
                             onClick={() => {
                                 navigator.serviceWorker.ready.then(reg => reg.waiting?.postMessage({ type: 'SKIP_WAITING' }));
                                 if ('caches' in window) caches.keys().then(keys => keys.forEach(k => { if (k.includes('manifest') || k.includes('workbox')) caches.delete(k); }));
                                 setTimeout(() => window.location.reload(), 300);
                             }}
-                            className="text-primary text-[10px] font-black uppercase underline hover:text-white transition-colors"
+                            className="text-primary text-[12px] font-black uppercase underline hover:text-white transition-colors"
                         >
                             Actualizar
                         </button>
@@ -235,72 +279,42 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         <div className="bg-white p-4 rounded-3xl shadow-2xl border-2 border-amber-100 flex items-center gap-4 max-w-sm w-full">
                             <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center shrink-0"><AlertTriangle className="text-amber-500" size={20} /></div>
                             <div className="flex-1">
-                                <p className="text-[11px] font-bold text-darkBlue leading-tight">Tu sesión expirará pronto por inactividad.</p>
-                                <button onClick={() => { resetTimer(); setShowTimeoutWarning(false); }} className="text-[10px] font-black uppercase text-primary mt-1 flex items-center gap-1"><ShieldCheck size={12} /> Mantener sesión activa</button>
+                                <p className="text-[13px] font-bold text-darkBlue leading-tight">Tu sesión expirará pronto por inactividad.</p>
+                                <button onClick={() => { resetTimer(); setShowTimeoutWarning(false); }} className="text-[12px] font-black uppercase text-primary mt-1 flex items-center gap-1"><ShieldCheck size={12} /> Mantener sesión activa</button>
                             </div>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* Aviso de sección no disponible en la Beta. */}
-            <AnimatePresence>
-                {avisoConstruccion && (
-                    <motion.div
-                        role="status"
-                        aria-live="polite"
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 16 }}
-                        className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-[#293b64] text-white shadow-xl max-w-[85vw]"
-                    >
-                        <p className="text-[11px] font-black uppercase tracking-widest text-center">
-                            {avisoConstruccion}
-                        </p>
-                        <p className="text-[11px] font-medium text-center text-white/80 mt-0.5">
-                            En construcción: Pronto estará disponible
-                        </p>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
             {showHeaderFooter && (
+                /* Barra inferior.
+                 *
+                 * Tenía cuatro destinos y tres no llevaban a ninguna parte: Logros,
+                 * Biomics y Tienda solo mostraban un aviso de «en construcción». Un
+                 * paciente que toca tres veces sin que pase nada no concluye que la
+                 * función falte, concluye que no sabe usar la app, y deja de explorar.
+                 *
+                 * Ahora los cuatro destinos existen y son los que el paciente usa a
+                 * diario. Las secciones pendientes volverán cuando tengan contenido. */
                 <footer className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 pb-safe-bottom shrink-0">
-                    <div className="flex justify-around items-center py-3.5 px-4">
-                        <button onClick={() => { navigate('/'); setMainTab(MainTab.KEYS_5A); toggleDrawer(false); }} className={`flex flex-col items-center gap-1 transition-all ${isHome ? 'text-[#293b64] scale-110' : 'text-slate-400'}`}>
-                            <LayoutDashboard size={24} strokeWidth={isHome ? 2.5 : 2} /><span className="text-[9px] font-black uppercase tracking-widest">Inicio</span>
-                        </button>
-                        
-                        <button
-                            type="button"
-                            onClick={() => avisarEnConstruccion('Logros')}
-                            aria-label="Logros — en construcción"
-                            className="flex flex-col items-center justify-center py-2 text-slate-300 select-none active:scale-95 transition-transform"
-                        >
-                            <Trophy size={24} strokeWidth={2} />
-                            <span className="text-[9px] font-black uppercase tracking-widest mt-1">Logros</span>
-                        </button>
-                        
-                        <button
-                            type="button"
-                            onClick={() => avisarEnConstruccion('Biomics')}
-                            aria-label="Biomics — en construcción"
-                            className="flex flex-col items-center justify-center py-2 text-slate-300 select-none active:scale-95 transition-transform"
-                        >
-                            <Dna size={24} strokeWidth={2} />
-                            <span className="text-[9px] font-black uppercase tracking-widest mt-1">Biomics</span>
-                        </button>
-                        
-                        <button
-                            type="button"
-                            onClick={() => avisarEnConstruccion('Tienda')}
-                            aria-label="Tienda — en construcción"
-                            className="flex flex-col items-center justify-center py-2 text-slate-300 select-none active:scale-95 transition-transform"
-                        >
-                            <Store size={24} strokeWidth={2} />
-                            <span className="text-[9px] font-black uppercase tracking-widest mt-1">Tienda</span>
-                        </button>
-                    </div>
+                    <nav aria-label="Navegación principal" className="flex justify-around items-center py-2 px-2">
+                        {DESTINOS_PRINCIPALES
+                            .filter(d => d.visible)
+                            .map(({ id, etiqueta, Icono, alPulsar, activo }) => (
+                                <button
+                                    key={id}
+                                    type="button"
+                                    onClick={alPulsar}
+                                    aria-current={activo ? 'page' : undefined}
+                                    className={`flex flex-col items-center justify-center gap-1 min-w-[64px] min-h-[52px] px-2 py-1.5 rounded-xl transition-all active:scale-95 ${activo ? 'text-[#293b64]' : 'text-slate-500'
+                                        }`}
+                                >
+                                    <Icono size={24} strokeWidth={activo ? 2.5 : 2} />
+                                    <span className="text-[12px] font-bold tracking-tight leading-none">{etiqueta}</span>
+                                </button>
+                            ))}
+                    </nav>
                 </footer>
             )}
         </div>

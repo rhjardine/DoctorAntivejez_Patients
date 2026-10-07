@@ -108,7 +108,7 @@ const VCoachChat: React.FC = () => {
     return (
       <div className="flex flex-col h-full bg-[#F8FAFC] items-center justify-center px-8 text-center">
         <div className="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center mb-4">
-          <ShieldAlert size={32} className="text-slate-400" />
+          <ShieldAlert size={32} className="text-slate-500" />
         </div>
         <h2 className="text-lg font-bold text-[#293B64] mb-2">VCoach no disponible</h2>
         <p className="text-sm text-slate-500 leading-relaxed">
@@ -126,7 +126,7 @@ const VCoachChat: React.FC = () => {
           puede escalar a su médico. No es descartable. */}
       <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 border-b border-amber-100">
         <ShieldAlert size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
-        <p className="text-[11px] font-medium leading-relaxed text-amber-900">
+        <p className="text-[13px] font-medium leading-relaxed text-amber-900">
           Estás conversando con un <strong>asistente de inteligencia artificial</strong> que
           puede cometer errores. No sustituye a tu médico ni emite diagnósticos ni
           prescripciones. Ante cualquier duda clínica, consulta a tu equipo médico.
@@ -153,7 +153,7 @@ const VCoachChat: React.FC = () => {
               )}
               <div className="flex flex-col">
                 <p className="text-sm font-medium leading-relaxed">{msg.text}</p>
-                <span className={`text-[9px] mt-1 font-bold uppercase tracking-widest ${msg.role === 'user' ? 'text-white/60' : 'text-gray-400'}`}>
+                <span className={`text-[12px] mt-1 font-bold uppercase tracking-widest ${msg.role === 'user' ? 'text-white/60' : 'text-slate-500'}`}>
                   {msg.role === 'model'
                     ? `Generado por IA · ${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                     : new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -194,13 +194,13 @@ const VCoachChat: React.FC = () => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder={cooldown ? 'Procesando bio-asistencia... por favor espere.' : 'Pregunta a tu VCoach...'}
-            className="flex-1 bg-transparent border-none focus:ring-0 outline-none text-sm font-medium text-textDark px-2 py-2"
+            className="flex-1 min-h-[44px] bg-transparent border-none focus:ring-0 outline-none text-[16px] font-medium text-textDark px-2 py-2"
             disabled={isLoading || cooldown}
           />
-          <button
+          <button aria-label="Enviar mensaje"
             onClick={handleSend}
             disabled={!input.trim() || isLoading || cooldown}
-            className={`p-3 rounded-full transition-all ${input.trim() && !isLoading && !cooldown ? 'bg-primary text-white shadow-lg scale-105' : 'bg-gray-200 text-gray-400'
+            className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full transition-all ${input.trim() && !isLoading && !cooldown ? 'bg-primary text-white shadow-lg' : 'bg-gray-200 text-slate-500'
               }`}
           >
             <Send size={18} strokeWidth={2.5} />

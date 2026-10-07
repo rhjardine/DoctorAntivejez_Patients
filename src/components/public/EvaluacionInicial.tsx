@@ -134,7 +134,7 @@ export const EvaluacionInicial: React.FC<EvaluacionInicialProps> = ({ branding }
                 transition={{ delay: 0.8, duration: 0.5 }}
                 className="mt-auto pt-12 pb-6 text-center"
             >
-                <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
                     Powered by VYTALIX
                 </p>
             </motion.div>

@@ -19,13 +19,13 @@ const EnvironmentView: React.FC = () => {
       title: "Detox Digital Consciente",
       desc: "Reduce el impacto negativo de las pantallas y notificaciones.",
       iconComponent: <EyeOff size={20} />,
-      color: "bg-gray-200 text-gray-600 dark:bg-slate-700 dark:text-slate-300"
+      color: "bg-gray-200 text-gray-600 dark:bg-slate-700 dark:text-slate-500"
     },
     {
       title: "\"Biophilia\" en Casa",
       desc: "Ideas para integrar elementos naturales en tu hogar.",
       iconComponent: <Leaf size={20} />,
-      color: "bg-[#23bcef]/15 text-[#107da8] dark:bg-[#23bcef]/20 dark:text-[#23bcef]"
+      color: "bg-[#23bcef]/15 text-[#107da8] dark:bg-[#23bcef]/20 dark:text-[#107da8]"
     },
     {
       title: "Evaluación de Tóxicos",
@@ -45,7 +45,7 @@ const EnvironmentView: React.FC = () => {
                  </div>
                  <div className="flex-1 min-w-0">
                      <h4 className="text-sm font-semibold text-darkBlue dark:text-white truncate">{tool.title}</h4>
-                     <p className="text-[11px] text-textMedium dark:text-slate-400 mt-0.5 leading-snug line-clamp-2">{tool.desc}</p>
+                     <p className="text-[13px] text-textMedium dark:text-slate-500 mt-0.5 leading-snug line-clamp-2">{tool.desc}</p>
                  </div>
              </div>
              <ChevronRight size={18} className="text-gray-300 dark:text-slate-600 flex-shrink-0 ml-2" />

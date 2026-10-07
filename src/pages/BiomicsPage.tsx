@@ -111,14 +111,14 @@ const BiomicsPage: React.FC = () => {
                         </div>
                         <div>
                             <h1 className="text-white font-black text-lg uppercase tracking-wide leading-none">Explorador Ómico</h1>
-                            <p className="text-[10px] text-sky-200 font-bold uppercase tracking-wider">Dataset: 24,500 puntos (WebGL)</p>
+                            <p className="text-[12px] text-sky-200 font-bold uppercase tracking-wider">Dataset: 24,500 puntos (WebGL)</p>
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <button className="p-2 bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors">
+                        <button aria-label="Filtrar" className="p-2 bg-white/10 rounded-lg text-white/70 hover:text-white transition-colors">
                             <Filter size={20} />
                         </button>
-                        <button className="p-2 bg-sky-500 rounded-lg text-white font-bold shadow-lg shadow-sky-500/30">
+                        <button aria-label="Ver actividad" className="p-2 bg-sky-500 rounded-lg text-white font-bold shadow-lg shadow-sky-500/30">
                             <Activity size={20} />
                         </button>
                     </div>
@@ -141,11 +141,11 @@ const BiomicsPage: React.FC = () => {
                     >
                         <div className="flex items-center gap-2 mb-2">
                             <Dna size={14} className="text-sky-400" />
-                            <span className="text-[10px] font-black text-white uppercase tracking-wider">Saturación Epigenética</span>
+                            <span className="text-[12px] font-black text-white uppercase tracking-wider">Saturación Epigenética</span>
                         </div>
                         <div className="flex items-end gap-2">
                             <span className="text-3xl font-black text-sky-400">0.742</span>
-                            <span className="text-[10px] font-bold text-emerald-400 mb-1.5 uppercase">Estable</span>
+                            <span className="text-[12px] font-bold text-emerald-400 mb-1.5 uppercase">Estable</span>
                         </div>
                     </motion.div>
 
@@ -157,11 +157,11 @@ const BiomicsPage: React.FC = () => {
                     >
                         <div className="flex items-center gap-2 mb-2">
                             <RefreshCw size={14} className="text-emerald-400" />
-                            <span className="text-[10px] font-black text-white uppercase tracking-wider">Tasa de Renovación</span>
+                            <span className="text-[12px] font-black text-white uppercase tracking-wider">Tasa de Renovación</span>
                         </div>
                         <div className="flex items-end gap-2">
                             <span className="text-3xl font-black text-emerald-400">12.4%</span>
-                            <span className="text-[10px] font-bold text-sky-400 mb-1.5 uppercase">Óptimo</span>
+                            <span className="text-[12px] font-bold text-sky-400 mb-1.5 uppercase">Óptimo</span>
                         </div>
                     </motion.div>
                 </div>
@@ -170,15 +170,15 @@ const BiomicsPage: React.FC = () => {
                 <div className="flex justify-center gap-6 py-2 bg-darkBlue/90 backdrop-blur-sm rounded-full border border-white/5 mx-4">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></div>
-                        <span className="text-[10px] font-bold text-white uppercase tracking-widest">Metilación</span>
+                        <span className="text-[12px] font-bold text-white uppercase tracking-widest">Metilación</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                        <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Expresión</span>
+                        <span className="text-[12px] font-bold text-white/60 uppercase tracking-widest">Expresión</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                        <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">Metabólico</span>
+                        <span className="text-[12px] font-bold text-white/60 uppercase tracking-widest">Metabólico</span>
                     </div>
                 </div>
             </div>
@@ -189,7 +189,7 @@ const BiomicsPage: React.FC = () => {
                 className="absolute right-4 bottom-44 z-20"
             >
                 <div className="bg-white/10 backdrop-blur-md border border-white/20 p-2 rounded-xl">
-                    <span className="text-[9px] font-black text-white uppercase flex items-center gap-2">
+                    <span className="text-[12px] font-black text-white uppercase flex items-center gap-2">
                         <Filter size={12} /> Filtros Ómicos
                     </span>
                 </div>

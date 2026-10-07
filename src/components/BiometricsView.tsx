@@ -13,7 +13,7 @@ interface BiometricsViewProps {
 }
 
 const SimpleLineChart: React.FC<{ data: number[]; color: string; height?: number }> = ({ data, color, height = 40 }) => {
-  if (data.length < 2) return <div style={{ height }} className="flex items-end justify-center text-[10px] text-gray-300 dark:text-slate-600 pb-1">Sin historial</div>;
+  if (data.length < 2) return <div style={{ height }} className="flex items-end justify-center text-[12px] text-gray-300 dark:text-slate-600 pb-1">Sin historial</div>;
 
   const max = Math.max(...data);
   const min = Math.min(...data);
@@ -106,7 +106,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
             </div>
             <div>
               <h3 className="text-sm font-semibold text-[#293b64] dark:text-white">{title}</h3>
-              <span className="text-[10px] text-textLight dark:text-slate-400">Último: {latest ? latest.timestamp.toLocaleDateString() : '--'}</span>
+              <span className="text-[12px] text-textLight dark:text-slate-500">Último: {latest ? latest.timestamp.toLocaleDateString() : '--'}</span>
             </div>
           </div>
 
@@ -126,7 +126,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
         <div className="z-10 mb-2">
           <div className="flex items-baseline gap-1">
             <span className="text-2xl font-bold text-[#293b64] dark:text-slate-200">{latest ? latest.value : '--'}</span>
-            <span className="text-xs text-textMedium dark:text-slate-400 font-medium">{unit}</span>
+            <span className="text-xs text-textMedium dark:text-slate-500 font-medium">{unit}</span>
           </div>
         </div>
 
@@ -266,7 +266,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
       {/* Header Summary */}
       <div className="bg-gradient-to-r from-blue-50 to-white dark:from-slate-800 dark:to-slate-900 p-4 rounded-xl border border-blue-100 dark:border-slate-700 mb-2 transition-colors duration-300">
         <h2 className="text-[#293b64] dark:text-white font-bold text-lg">Tu Salud en Cifras</h2>
-        <p className="text-xs text-textMedium dark:text-slate-400 leading-relaxed mt-1">
+        <p className="text-xs text-textMedium dark:text-slate-500 leading-relaxed mt-1">
           El monitoreo constante de biomarcadores es clave para detectar el envejecimiento acelerado.
         </p>
       </div>
@@ -335,14 +335,14 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-bold text-xl text-[#293b64] dark:text-white">Nuevo Registro</h3>
               <button onClick={() => !isSubmitting && setIsModalOpen(false)} className="p-1 bg-gray-100 dark:bg-slate-700 rounded-full hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
-                <X size={20} className="text-gray-500 dark:text-slate-400" />
+                <X size={20} className="text-gray-500 dark:text-slate-500" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Type Selector */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-textMedium dark:text-slate-400 uppercase tracking-wider">Tipo de Medición</label>
+                <label className="text-xs font-bold text-textMedium dark:text-slate-500 uppercase tracking-wider">Tipo de Medición</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { id: 'WEIGHT', label: 'Peso', icon: <Scale size={16} /> },
@@ -355,7 +355,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
                       onClick={() => !isSubmitting && handleTypeChange(opt.id as BiometricType)}
                       className={`p-3 rounded-xl border text-center text-sm font-medium cursor-pointer transition-all flex flex-col items-center justify-center gap-1 ${newType === opt.id
                         ? 'bg-blue-50 dark:bg-blue-900/30 border-primary text-primary shadow-sm'
-                        : 'border-gray-200 dark:border-slate-600 text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
+                        : 'border-gray-200 dark:border-slate-600 text-gray-500 dark:text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-700'
                         } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       {opt.icon}
@@ -367,7 +367,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
 
               {/* Value Input */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-textMedium dark:text-slate-400 uppercase tracking-wider">
+                <label className="text-xs font-bold text-textMedium dark:text-slate-500 uppercase tracking-wider">
                   Valor {newType === 'WEIGHT' && '(kg)'} {newType === 'GLUCOSE' && '(mg/dL)'} {newType === 'HEART_RATE' && '(bpm)'}
                 </label>
                 <input
@@ -386,18 +386,18 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
                   autoFocus
                 />
                 {validationError ? (
-                  <p className="text-[10px] text-red-500 font-semibold pl-1 animate-in fade-in slide-in-from-top-1">
+                  <p className="text-[12px] text-red-500 font-semibold pl-1 animate-in fade-in slide-in-from-top-1">
                     {validationError}
                   </p>
                 ) : (
-                  newType === 'BLOOD_PRESSURE' && <p className="text-[10px] text-gray-400 dark:text-slate-500 pl-1">Formato: Sistólica/Diastólica</p>
+                  newType === 'BLOOD_PRESSURE' && <p className="text-[12px] text-slate-500 dark:text-slate-500 pl-1">Formato: Sistólica/Diastólica</p>
                 )}
               </div>
 
               {/* Date & Time Inputs */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-textMedium dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                  <label className="text-[12px] font-bold text-textMedium dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
                     <Calendar size={12} /> Fecha
                   </label>
                   <input
@@ -409,7 +409,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-textMedium dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                  <label className="text-[12px] font-bold text-textMedium dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
                     <Clock size={12} /> Hora
                   </label>
                   <input
@@ -450,7 +450,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
                 <AlertCircle size={32} className="text-red-500" />
               </div>
               <h3 className="text-lg font-bold text-[#293b64] dark:text-white">¿Eliminar Registro?</h3>
-              <p className="text-sm text-textMedium dark:text-slate-400 mt-2 leading-relaxed">
+              <p className="text-sm text-textMedium dark:text-slate-500 mt-2 leading-relaxed">
                 Estás a punto de eliminar el último registro de <strong>{deleteConfirm.type}</strong>. Esta acción no se puede deshacer.
               </p>
             </div>
@@ -458,7 +458,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-slate-600 text-textMedium dark:text-slate-300 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-slate-700 active:scale-95 transition-all"
+                className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-slate-600 text-textMedium dark:text-slate-500 text-sm font-semibold hover:bg-gray-50 dark:hover:bg-slate-700 active:scale-95 transition-all"
               >
                 Cancelar
               </button>

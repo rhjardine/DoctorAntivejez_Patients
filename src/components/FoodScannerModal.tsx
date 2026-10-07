@@ -189,7 +189,7 @@ const FoodScannerModal: React.FC<FoodScannerModalProps> = ({ onClose }) => {
               </div>
             </div>
             <h3 className="text-xl font-bold mb-2">Analizando con IA...</h3>
-            <p className="text-gray-400 text-sm">Examinando ingredientes y densidad nutricional.</p>
+            <p className="text-slate-500 text-sm">Examinando ingredientes y densidad nutricional.</p>
           </div>
         )}
 
@@ -211,7 +211,7 @@ const FoodScannerModal: React.FC<FoodScannerModalProps> = ({ onClose }) => {
                    {/* Aviso de transparencia de IA — R-P0-4 / D-3(b) */}
                    <div className="mt-4 w-full flex items-start gap-2 p-3 rounded-2xl bg-amber-50 border border-amber-100 text-left">
                      <ShieldAlert size={14} className="text-amber-600 flex-shrink-0 mt-0.5" />
-                     <p className="text-[11px] font-medium leading-relaxed text-amber-900">
+                     <p className="text-[13px] font-medium leading-relaxed text-amber-900">
                        Clasificación generada por <strong>inteligencia artificial</strong>, que
                        puede equivocarse. No considera tus alergias ni tu plan médico
                        específico. Verifica con tu nutricionista antes de cambiar tu
@@ -274,7 +274,7 @@ const FoodScannerModal: React.FC<FoodScannerModalProps> = ({ onClose }) => {
            <div className="absolute inset-0 z-20 bg-black/90 flex flex-col items-center justify-center text-white p-6 text-center">
               <AlertTriangle size={48} className="text-red-500 mb-4" />
               <h3 className="text-xl font-bold mb-2">Algo salió mal</h3>
-              <p className="text-gray-400 mb-6">{error}</p>
+              <p className="text-slate-500 mb-6">{error}</p>
               <button 
                  onClick={resetScanner}
                  className="bg-white text-darkBlue px-6 py-3 rounded-full font-bold"

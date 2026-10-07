@@ -34,7 +34,7 @@ const BiologicalAgeSlider: React.FC<BiologicalAgeSliderProps> = ({
     <div className="w-full px-4 py-4 bg-white border-b border-gray-100">
       <div className="flex justify-between items-end mb-2">
         <div className="flex flex-col">
-          <span className="text-[10px] font-bold text-textMedium uppercase">
+          <span className="text-[12px] font-bold text-textMedium uppercase">
             {completedItems}/{totalItems} Items | {progressPercentage}%
           </span>
         </div>
@@ -44,9 +44,9 @@ const BiologicalAgeSlider: React.FC<BiologicalAgeSliderProps> = ({
             <span className="text-textLight font-normal ml-1">/ {chronologicalAge}</span>
           </span>
           {onInfoPress && (
-            <button 
+            <button aria-label="Más información" 
               onClick={onInfoPress}
-              className="p-1 text-slate-300 hover:text-primary transition-colors"
+              className="p-1 text-slate-500 hover:text-primary transition-colors"
             >
               <Info size={14} />
             </button>
@@ -64,7 +64,7 @@ const BiologicalAgeSlider: React.FC<BiologicalAgeSliderProps> = ({
         </div>
 
         {/* Ticks */}
-        <div className="absolute w-full flex justify-between text-[10px] text-textLight mt-1 font-bold">
+        <div className="absolute w-full flex justify-between text-[12px] text-textLight mt-1 font-bold">
           <span>7</span>
           <span className="absolute left-[25%] -translate-x-1/2">28</span>
           <span className="absolute left-[50%] -translate-x-1/2">49</span>

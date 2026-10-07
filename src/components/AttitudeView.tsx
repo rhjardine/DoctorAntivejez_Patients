@@ -115,7 +115,7 @@ const AttitudeView: React.FC = () => {
       {/* Header Context */}
       <div className="bg-gradient-to-r from-pink-50 to-white dark:from-slate-800 dark:to-slate-900 p-4 rounded-xl border border-pink-100 dark:border-slate-700 mb-1 transition-colors duration-300">
         <h2 className="text-darkBlue dark:text-white font-bold text-lg">Mente y Actitud</h2>
-        <p className="text-xs text-textMedium dark:text-slate-400 leading-relaxed mt-1">
+        <p className="text-xs text-textMedium dark:text-slate-500 leading-relaxed mt-1">
           Una actitud positiva modula la expresión génica y reduce el cortisol celular.
         </p>
       </div>
@@ -133,7 +133,7 @@ const AttitudeView: React.FC = () => {
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-sm font-semibold text-darkBlue dark:text-white truncate">{tool.title}</h4>
-              <p className="text-[11px] text-textMedium dark:text-slate-400 mt-0.5 leading-snug line-clamp-2">{tool.desc}</p>
+              <p className="text-[13px] text-textMedium dark:text-slate-500 mt-0.5 leading-snug line-clamp-2">{tool.desc}</p>
             </div>
           </div>
           <ChevronRight size={18} className="text-gray-300 flex-shrink-0 ml-2" />
@@ -155,13 +155,13 @@ const AttitudeView: React.FC = () => {
                 onClick={() => !isSubmitting && setIsJournalModalOpen(false)}
                 className="p-1 bg-gray-100 dark:bg-slate-700 rounded-full hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
               >
-                <X size={20} className="text-gray-500 dark:text-slate-400" />
+                <X size={20} className="text-gray-500 dark:text-slate-500" />
               </button>
             </div>
 
             <form onSubmit={handleSaveJournal} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-textMedium dark:text-slate-400 uppercase tracking-wider">
+                <label className="text-xs font-bold text-textMedium dark:text-slate-500 uppercase tracking-wider">
                   ¿Por qué estás agradecido hoy?
                 </label>
                 <textarea
@@ -172,7 +172,7 @@ const AttitudeView: React.FC = () => {
                   className="w-full h-40 p-4 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-400/50 text-darkBlue dark:text-white text-sm resize-none transition-all"
                   autoFocus
                 />
-                <p className="text-[10px] text-textLight dark:text-slate-500 italic">
+                <p className="text-[12px] text-textLight dark:text-slate-500 italic">
                   Escribir 3 cosas positivas al día reprograma tu cerebro hacia la longevidad.
                 </p>
               </div>

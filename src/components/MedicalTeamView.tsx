@@ -73,11 +73,11 @@ const MedicalTeamView: React.FC = () => {
               <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-2">
                 <div className="bg-primary text-white py-1.5 px-4 rounded-xl flex items-center gap-2 shadow-lg backdrop-blur-md">
                   <Instagram size={14} />
-                  <span className="text-[10px] font-black tracking-wider uppercase">{doc.social.instagram}</span>
+                  <span className="text-[12px] font-black tracking-wider uppercase">{doc.social.instagram}</span>
                 </div>
                 <div className="bg-white/90 text-darkBlue py-1.5 px-4 rounded-xl flex items-center gap-2 shadow-lg backdrop-blur-md">
                   <Globe size={14} className="text-primary" />
-                  <span className="text-[10px] font-black tracking-wider uppercase">{doc.social.web}</span>
+                  <span className="text-[12px] font-black tracking-wider uppercase">{doc.social.web}</span>
                 </div>
               </div>
             )}
@@ -86,22 +86,22 @@ const MedicalTeamView: React.FC = () => {
           {/* Content Area */}
           <div className="flex-1 p-6">
             <h3 className="text-xl font-black text-darkBlue leading-tight mb-1">{doc.name}</h3>
-            <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-4">{doc.title}</p>
+            <p className="text-[12px] font-bold text-primary uppercase tracking-widest mb-4">{doc.title}</p>
 
             <ul className="space-y-3">
               {doc.bio.map((item, i) => (
                 <li key={i} className="flex gap-2 items-start">
                   <div className="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-primary/40"></div>
-                  <p className="text-[11px] text-textMedium leading-tight font-medium">{item}</p>
+                  <p className="text-[13px] text-textMedium leading-tight font-medium">{item}</p>
                 </li>
               ))}
             </ul>
 
             <div className="mt-6 pt-4 border-t border-gray-50 flex gap-3">
-              <button className="flex-1 bg-pearlyGray py-3 rounded-xl text-[10px] font-black uppercase text-darkBlue tracking-widest flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors">
+              <button className="flex-1 bg-pearlyGray py-3 rounded-xl text-[12px] font-black uppercase text-darkBlue tracking-widest flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors">
                 <Mail size={14} /> Contactar
               </button>
-              <button className="flex-1 bg-darkBlue py-3 rounded-xl text-[10px] font-black uppercase text-white tracking-widest flex items-center justify-center gap-2 hover:bg-primary transition-colors">
+              <button className="flex-1 bg-darkBlue py-3 rounded-xl text-[12px] font-black uppercase text-white tracking-widest flex items-center justify-center gap-2 hover:bg-primary transition-colors">
                 <Phone size={14} /> Reservar Cita
               </button>
             </div>

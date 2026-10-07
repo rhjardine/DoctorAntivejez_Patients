@@ -49,15 +49,15 @@ export default function OnboardingSlim({ onComplete }: Props) {
                             <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-white/10 -z-10" />
                             <div className="flex flex-col items-center gap-2">
                                 <div className="w-12 h-12 bg-[#293B64] rounded-full flex items-center justify-center text-white ring-4 ring-[#0f1d38] border border-[#23BCEF]/30"><Microscope size={20} /></div>
-                                <span className="text-[11px] font-semibold text-white/70">Evalúa</span>
+                                <span className="text-[13px] font-semibold text-white/70">Evalúa</span>
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <div className="w-12 h-12 bg-[#23BCEF] rounded-full flex items-center justify-center text-white ring-4 ring-[#0f1d38] shadow-lg shadow-[#23BCEF]/20"><ClipboardList size={20} /></div>
-                                <span className="text-[11px] font-semibold text-white/70">Protocolo</span>
+                                <span className="text-[13px] font-semibold text-white/70">Protocolo</span>
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white ring-4 ring-[#0f1d38] shadow-lg shadow-green-500/20"><TrendingUp size={20} /></div>
-                                <span className="text-[11px] font-semibold text-white/70">Mejora</span>
+                                <span className="text-[13px] font-semibold text-white/70">Mejora</span>
                             </div>
                         </div>
 

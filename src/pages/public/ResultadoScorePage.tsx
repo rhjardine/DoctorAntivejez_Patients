@@ -272,7 +272,7 @@ const ResultadoScorePage: React.FC = () => {
               >
                 {score}
               </motion.span>
-              <span className="text-[10px] uppercase font-black tracking-[0.3em] text-[#293b64]/30 mt-2">
+              <span className="text-[12px] uppercase font-black tracking-[0.3em] text-[#293b64]/30 mt-2">
                 SCORE VITAL
               </span>
             </div>
@@ -306,7 +306,7 @@ const ResultadoScorePage: React.FC = () => {
               </div>
               <button
                 onClick={() => navigate('/test')}
-                className="w-full py-3 bg-[#f8fafc] text-[#107da8] font-black text-[11px] uppercase tracking-widest rounded-xl border border-[#23bcef]/30"
+                className="w-full py-3 bg-[#f8fafc] text-[#107da8] font-black text-[13px] uppercase tracking-widest rounded-xl border border-[#23bcef]/30"
               >
                 Iniciar Test Completo →
               </button>
@@ -330,7 +330,7 @@ const ResultadoScorePage: React.FC = () => {
                 {hookConfig.title}
               </p>
               <span
-                className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-[#f8fafc] border border-[#293b64]/5"
+                className="text-[12px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-[#f8fafc] border border-[#293b64]/5"
                 style={{ color: hookConfig.color }}
               >
                 {hookConfig.rangeBadge}
@@ -357,7 +357,7 @@ const ResultadoScorePage: React.FC = () => {
           transition={{ delay: 0.6 }}
           className="bg-white rounded-[2rem] p-8 border border-[#293b64]/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)] mb-8"
         >
-          <p className="text-[11px] font-black uppercase tracking-[0.25em] text-[#107da8] mb-8">
+          <p className="text-[13px] font-black uppercase tracking-[0.25em] text-[#107da8] mb-8">
             Mapa de Biomarcadores
           </p>
           <div className="space-y-6">
@@ -371,7 +371,7 @@ const ResultadoScorePage: React.FC = () => {
                       {d.label}
                     </span>
                     <span
-                      className="text-[11px] font-black"
+                      className="text-[13px] font-black"
                       style={{ color: col }}
                     >
                       {val}%
@@ -481,7 +481,7 @@ const ResultadoScorePage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col gap-4 mb-12"
           >
-            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-[#293b64]/40 text-center mb-2">
+            <p className="text-[13px] font-black uppercase tracking-[0.3em] text-[#293b64]/40 text-center mb-2">
               SIGUIENTE PASO CLÍNICO
             </p>
 
@@ -494,7 +494,7 @@ const ResultadoScorePage: React.FC = () => {
               }`}
             >
               <div className="flex justify-between items-center mb-4">
-                <span className="text-[9px] font-black uppercase px-2 py-1 rounded bg-[#f8fafc] text-[#293b64]/40 tracking-widest">
+                <span className="text-[12px] font-black uppercase px-2 py-1 rounded bg-[#f8fafc] text-[#293b64]/40 tracking-widest">
                   Inversión: $0
                 </span>
                 {selectedTier === 'basica' && (
@@ -532,11 +532,11 @@ const ResultadoScorePage: React.FC = () => {
                   : 'border-[#293b64]/5 bg-white'
               }`}
             >
-              <div className="absolute top-0 right-0 py-1 px-4 bg-[#23bcef] text-white text-[8px] font-black uppercase tracking-[0.3em] rounded-bl-xl">
+              <div className="absolute top-0 right-0 py-1 px-4 bg-[#23bcef] text-white text-[12px] font-black uppercase tracking-[0.3em] rounded-bl-xl">
                 Protocolo Full
               </div>
               <div className="flex justify-between items-center mb-4">
-                <span className="text-[9px] font-black uppercase px-2 py-1 rounded bg-[#23bcef]/10 text-[#107da8] tracking-widest">
+                <span className="text-[12px] font-black uppercase px-2 py-1 rounded bg-[#23bcef]/10 text-[#107da8] tracking-widest">
                   Vytalix Premium
                 </span>
                 {selectedTier === 'profunda' && (
@@ -568,7 +568,7 @@ const ResultadoScorePage: React.FC = () => {
         )}
 
         <div className="text-center pb-12">
-          <p className="text-[10px] font-semibold text-[#293b64]/30 uppercase tracking-[0.4em] mb-4">
+          <p className="text-[12px] font-semibold text-[#293b64]/30 uppercase tracking-[0.4em] mb-4">
             VYTALIX Longevity Suite
           </p>
           <button

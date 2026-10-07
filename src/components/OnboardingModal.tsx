@@ -84,7 +84,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete }) => {
                         {step < slides.length - 1 && (
                             <button
                                 onClick={handleSkip}
-                                className="absolute top-4 right-4 text-slate-300 hover:text-slate-500 p-1 rounded-full transition-colors"
+                                className="absolute top-4 right-4 text-slate-500 hover:text-slate-500 p-1 rounded-full transition-colors"
                             >
                                 <X size={18} />
                             </button>
@@ -118,7 +118,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete }) => {
                                         <div className="w-5 h-5 rounded-full bg-[#23bcef]/10 flex items-center justify-center shrink-0">
                                             <Check size={12} className="text-[#107da8]" strokeWidth={2.5} />
                                         </div>
-                                        <span className="text-[11px] font-black text-[#0D2137] uppercase tracking-widest">
+                                        <span className="text-[13px] font-black text-[#0D2137] uppercase tracking-widest">
                                             {item}
                                         </span>
                                     </div>
@@ -127,7 +127,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete }) => {
                         )}
 
                         {/* Button */}
-                        <button
+                        <button aria-label="Siguiente"
                             onClick={handleNext}
                             className={`w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-[13px] uppercase tracking-[0.15em] transition-all active:scale-95 ${slide.buttonStyle === 'dark'
                                     ? 'bg-[#0D2137] text-white'
@@ -160,7 +160,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete }) => {
 
                         {/* Footer text (last slide only) */}
                         {step === slides.length - 1 && (
-                            <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] mt-3">
+                            <p className="text-[12px] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">
                                 Doctor Antivejez • Capa de Seguridad V2.0
                             </p>
                         )}

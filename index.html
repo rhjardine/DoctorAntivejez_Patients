@@ -57,10 +57,25 @@
       transition: opacity .45s ease;
     }
 
+    /* Salida en dos tiempos.
+       Antes el splash se desvanecía entero: durante esos 450 ms el isotipo del
+       splash y el logotipo de la página de acceso se veían superpuestos, uno
+       grande y centrado y otro pequeño arriba. Parecía que la marca se
+       renderizaba dos veces. Ahora primero se retira la marca del splash y solo
+       después el fondo, así que nunca hay dos logotipos en pantalla a la vez. */
+    #da-splash.da-salir .da-mark,
+    #da-splash.da-salir .da-wordmark,
+    #da-splash.da-salir .da-track {
+      opacity: 0;
+      transform: scale(.96);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
     #da-splash.da-hide { opacity: 0; pointer-events: none; }
 
     .da-mark {
       width: 96px;
+      transform-origin: center;
       height: auto;
       /* Halo cian tenue: separa el isotipo del fondo sin recuadro. */
       filter: drop-shadow(0 0 28px rgba(35, 188, 239, .28));
@@ -112,6 +127,9 @@
       .da-mark { animation: none; }
       .da-track::after { animation: none; width: 100%; opacity: .55; }
       #da-splash { transition: none; }
+      #da-splash.da-salir .da-mark,
+      #da-splash.da-salir .da-wordmark,
+      #da-splash.da-salir .da-track { transition: none; }
     }
   </style>
 </head>

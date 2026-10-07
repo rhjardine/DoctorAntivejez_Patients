@@ -46,7 +46,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ preferences, onUpdatePrefer
                   }`}
               >
                 <scheme.icon size={20} />
-                <span className="text-[10px] font-bold uppercase">{scheme.label}</span>
+                <span className="text-[12px] font-bold uppercase">{scheme.label}</span>
               </button>
             ))}
           </div>
@@ -88,13 +88,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({ preferences, onUpdatePrefer
       </div>
 
       <div className="mt-8 bg-primary/5 rounded-[2rem] p-6 border border-primary/10">
-        <p className="text-[10px] font-bold text-[var(--dark-navy)] dark:text-[var(--text-primary)] opacity-60 leading-relaxed italic text-center">
+        <p className="text-[12px] font-bold text-[var(--dark-navy)] dark:text-[var(--text-primary)] opacity-60 leading-relaxed italic text-center">
           "{t('settings.quote')}"
         </p>
       </div>
 
       <div className="mt-12 pb-8 text-center opacity-30">
-        <p className="text-[9px] font-black text-[var(--dark-navy)] dark:text-white uppercase tracking-[0.3em]">
+        <p className="text-[12px] font-black text-[var(--dark-navy)] dark:text-white uppercase tracking-[0.3em]">
           Vytalix.io
         </p>
       </div>
