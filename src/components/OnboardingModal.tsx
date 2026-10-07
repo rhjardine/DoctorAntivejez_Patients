@@ -99,13 +99,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete }) => {
                         </div>
 
                         {/* Title */}
-                        <h2 className="font-black text-[22px] text-[#0D2137] leading-tight tracking-tight mb-5 whitespace-pre-line">
+                        <h2 className="font-black text-[calc(22px*var(--escala-texto,1))] text-[#0D2137] leading-tight tracking-tight mb-5 whitespace-pre-line">
                             {slide.title}
                         </h2>
 
                         {/* Quote card */}
                         <div className="w-full bg-[#F7FBFF] rounded-2xl px-4 py-4 border border-slate-100 mb-5">
-                            <p className="text-[13px] text-[#0D2137] font-semibold italic leading-relaxed">
+                            <p className="text-[calc(13px*var(--escala-texto,1))] text-[#0D2137] font-semibold italic leading-relaxed">
                                 {slide.quote}
                             </p>
                         </div>
@@ -118,7 +118,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete }) => {
                                         <div className="w-5 h-5 rounded-full bg-[#23bcef]/10 flex items-center justify-center shrink-0">
                                             <Check size={12} className="text-[#107da8]" strokeWidth={2.5} />
                                         </div>
-                                        <span className="text-[13px] font-black text-[#0D2137] uppercase tracking-widest">
+                                        <span className="text-[calc(13px*var(--escala-texto,1))] font-black text-[#0D2137] uppercase tracking-widest">
                                             {item}
                                         </span>
                                     </div>
@@ -129,7 +129,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete }) => {
                         {/* Button */}
                         <button aria-label="Siguiente"
                             onClick={handleNext}
-                            className={`w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-[13px] uppercase tracking-[0.15em] transition-all active:scale-95 ${slide.buttonStyle === 'dark'
+                            className={`w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-black text-[calc(13px*var(--escala-texto,1))] uppercase tracking-[0.15em] transition-all active:scale-95 ${slide.buttonStyle === 'dark'
                                     ? 'bg-[#0D2137] text-white'
                                     : 'bg-[#23BCEF] text-white'
                                 }`}
@@ -160,7 +160,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ onComplete }) => {
 
                         {/* Footer text (last slide only) */}
                         {step === slides.length - 1 && (
-                            <p className="text-[12px] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">
+                            <p className="text-[calc(12px*var(--escala-texto,1))] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">
                                 Doctor Antivejez • Capa de Seguridad V2.0
                             </p>
                         )}

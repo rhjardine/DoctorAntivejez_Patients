@@ -125,7 +125,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
             <div style={{ color: contentColor }} className="mb-0.5">
               {icon}
             </div>
-            <span className="text-[12px] font-bold leading-none" style={{ color: textColor }}>
+            <span className="text-[calc(12px*var(--escala-texto,1))] font-bold leading-none" style={{ color: textColor }}>
               {centerText ?? `${percentage}%`}
             </span>
           </div>

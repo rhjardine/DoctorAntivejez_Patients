@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, LogOut, User, AlertCircle, Bell, Zap, MessageSquare, BookOpen } from 'lucide-react';
+import { X, LogOut, User, AlertCircle, Bell, Zap, MessageSquare, BookOpen, Settings } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useUIStore } from '../store/useUIStore';
 import { useLocale } from '../hooks/useLocale';
@@ -68,26 +68,37 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
               <User size={32} />
             </div>
             <div className="flex flex-col gap-0.5 min-w-0">
-              <span className="text-[12px] font-black uppercase tracking-[0.2em] text-primary/80">Bienvenido</span>
+              <span className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-[0.2em] text-primary/80">Bienvenido</span>
               <h2 className="font-black text-lg leading-tight tracking-tight truncate max-w-[185px] text-white">
                 {session?.name || 'Paciente'}
               </h2>
               <div className="flex items-center gap-1.5 mt-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[12px] font-bold text-white/50 uppercase tracking-widest">Sesión activa</span>
+                <span className="text-[calc(12px*var(--escala-texto,1))] font-bold text-white/50 uppercase tracking-widest">Sesión activa</span>
               </div>
             </div>
           </div>
 
           {/* Decorative motivational strip */}
           <div className="mt-4 bg-white/5 rounded-xl px-3 py-2 border border-white/10">
-            <p className="text-[12px] font-bold text-white/60 italic leading-snug">
+            <p className="text-[calc(12px*var(--escala-texto,1))] font-bold text-white/60 italic leading-snug">
               "Cada día es una oportunidad para rejuvenecer a nivel celular."
             </p>
           </div>
         </div>
 
         <div className="py-6 flex flex-col flex-1 overflow-y-auto no-scrollbar">
+
+          {/* Configuración. Vuelve al menú porque ahora contiene el ajuste de
+              tamaño de texto, que es justo lo que un paciente mayor necesita
+              poder cambiar por su cuenta. */}
+          <button
+            onClick={() => handleNavigation('/settings')}
+            className="w-full flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-all text-left"
+          >
+            <Settings size={22} className="text-primary shrink-0" />
+            <span className="font-black text-[calc(13px*var(--escala-texto,1))] uppercase tracking-widest text-darkBlue">Configuración</span>
+          </button>
 
           {/* Guía de uso — pantalla ya escrita que hasta ahora no tenía entrada.
               Para un paciente mayor que abre la app por primera vez, es lo
@@ -97,7 +108,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
             className="w-full flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-all text-left"
           >
             <BookOpen size={22} className="text-primary shrink-0" />
-            <span className="font-black text-[13px] uppercase tracking-widest text-darkBlue">Guía de uso</span>
+            <span className="font-black text-[calc(13px*var(--escala-texto,1))] uppercase tracking-widest text-darkBlue">Guía de uso</span>
           </button>
 
           {/* ── Notificaciones (Toggle activo) ── */}
@@ -105,7 +116,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Bell size={22} className={notificationsEnabled ? 'text-primary' : 'text-textMedium'} />
-                <span className="font-black text-[13px] text-darkBlue uppercase tracking-widest">Avisos</span>
+                <span className="font-black text-[calc(13px*var(--escala-texto,1))] text-darkBlue uppercase tracking-widest">Avisos</span>
               </div>
               <div
                 onClick={toggleNotifications}
@@ -126,13 +137,13 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, notificationControls }
             className="w-full flex items-center gap-4 px-6 py-4 hover:bg-amber-50 transition-all text-amber-600 group"
           >
             <MessageSquare size={22} className="text-amber-400 group-hover:text-amber-600" />
-            <span className="font-black text-[13px] uppercase tracking-widest">
+            <span className="font-black text-[calc(13px*var(--escala-texto,1))] uppercase tracking-widest">
               Reportar Problema
             </span>
           </a>
 
           <div className="mt-auto mb-4 px-8 text-center">
-            <p className="text-[12px] font-black text-gray-300 tracking-[0.3em] uppercase">Rejuvenate v2.0</p>
+            <p className="text-[calc(12px*var(--escala-texto,1))] font-black text-gray-300 tracking-[0.3em] uppercase">Rejuvenate v2.0</p>
           </div>
 
           {/* Botón de Logout con Confirmación Estilizada */}

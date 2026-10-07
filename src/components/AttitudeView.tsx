@@ -133,7 +133,7 @@ const AttitudeView: React.FC = () => {
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-sm font-semibold text-darkBlue dark:text-white truncate">{tool.title}</h4>
-              <p className="text-[13px] text-textMedium dark:text-slate-500 mt-0.5 leading-snug line-clamp-2">{tool.desc}</p>
+              <p className="text-[calc(13px*var(--escala-texto,1))] text-textMedium dark:text-slate-500 mt-0.5 leading-snug line-clamp-2">{tool.desc}</p>
             </div>
           </div>
           <ChevronRight size={18} className="text-gray-300 flex-shrink-0 ml-2" />
@@ -172,7 +172,7 @@ const AttitudeView: React.FC = () => {
                   className="w-full h-40 p-4 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-400/50 text-darkBlue dark:text-white text-sm resize-none transition-all"
                   autoFocus
                 />
-                <p className="text-[12px] text-textLight dark:text-slate-500 italic">
+                <p className="text-[calc(12px*var(--escala-texto,1))] text-textLight dark:text-slate-500 italic">
                   Escribir 3 cosas positivas al día reprograma tu cerebro hacia la longevidad.
                 </p>
               </div>

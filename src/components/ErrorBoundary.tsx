@@ -56,8 +56,8 @@ class ErrorBoundary extends Component<Props, State> {
                         </p>
 
                         <div className="bg-slate-50 rounded-2xl p-4 mb-8 text-left border border-slate-100 overflow-hidden">
-                            <p className="text-[12px] font-black uppercase tracking-widest text-slate-500 mb-2">Detalles Técnicos</p>
-                            <p className="text-[13px] font-mono text-amber-700 break-all leading-tight">
+                            <p className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest text-slate-500 mb-2">Detalles Técnicos</p>
+                            <p className="text-[calc(13px*var(--escala-texto,1))] font-mono text-amber-700 break-all leading-tight">
                                 {this.state.error?.message || 'Error desconocido'}
                             </p>
                         </div>
@@ -77,7 +77,7 @@ class ErrorBoundary extends Component<Props, State> {
                             </button>
                         </div>
 
-                        <p className="mt-8 text-[12px] text-slate-500 font-medium">
+                        <p className="mt-8 text-[calc(12px*var(--escala-texto,1))] text-slate-500 font-medium">
                             Si el problema persiste, por favor contacte a soporte médico.
                         </p>
                     </div>

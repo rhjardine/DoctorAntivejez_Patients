@@ -70,7 +70,7 @@ export default function PulsoMatinoCard({ onComplete }: Props) {
         >
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#23bcef]/10 blur-3xl rounded-full pointer-events-none" />
 
-            <h3 className="text-[14px] text-white/90 font-medium mb-4 text-center">Buenos días · ¿Cómo amaneciste hoy?</h3>
+            <h3 className="text-[calc(14px*var(--escala-texto,1))] text-white/90 font-medium mb-4 text-center">Buenos días · ¿Cómo amaneciste hoy?</h3>
             <div className="flex justify-center gap-2">
                 {[1, 2, 3, 4, 5].map((val) => {
                     const { emoji, bg } = getEmojiAndColor(val);

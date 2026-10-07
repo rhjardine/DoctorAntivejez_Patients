@@ -31,7 +31,7 @@ const BioAgeAlert: React.FC<BioAgeAlertProps> = ({ bioAge, chronoAge, onAction }
           </div>
 
           <div className="space-y-4">
-            <p className="text-[13px] font-bold text-darkBlue leading-relaxed">
+            <p className="text-[calc(13px*var(--escala-texto,1))] font-bold text-darkBlue leading-relaxed">
               Tu prueba biofísica indica que tu Edad Biológica <span className="text-amber-600">({bioAge})</span> es actualmente mayor que tu Edad Cronológica <span className="text-slate-500">({chronoAge})</span>. 
               <br /><br />
               Esta <span className="bg-amber-200 px-1.5 rounded-md">+ {gap} años</span> de brecha indica que tus células necesitan apoyo. La buena noticia: a través de tu Guía del Paciente y Plan Nutrigenómico, tienes las herramientas validadas para revertir este marcador. ¡Cada acción de hoy cuenta hacia tu rejuvenecimiento!
@@ -39,7 +39,7 @@ const BioAgeAlert: React.FC<BioAgeAlertProps> = ({ bioAge, chronoAge, onAction }
 
             <button 
               onClick={onAction}
-              className="w-full bg-darkBlue text-white py-4 rounded-2xl font-black text-[13px] uppercase tracking-[0.15em] shadow-lg shadow-darkBlue/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
+              className="w-full bg-darkBlue text-white py-4 rounded-2xl font-black text-[calc(13px*var(--escala-texto,1))] uppercase tracking-[0.15em] shadow-lg shadow-darkBlue/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
             >
               Ver Misión de Hoy
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -47,7 +47,7 @@ const BioAgeAlert: React.FC<BioAgeAlertProps> = ({ bioAge, chronoAge, onAction }
 
             <div className="flex items-center justify-center gap-2 pt-2 border-t border-amber-100/50">
                <ShieldCheck size={12} className="text-amber-400" />
-               <p className="text-[12px] font-black text-amber-500 uppercase tracking-widest">
+               <p className="text-[calc(12px*var(--escala-texto,1))] font-black text-amber-500 uppercase tracking-widest">
                  Basado en biomarcadores validados • Rigor Clínico
                </p>
             </div>

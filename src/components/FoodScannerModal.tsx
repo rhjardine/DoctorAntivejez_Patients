@@ -211,7 +211,7 @@ const FoodScannerModal: React.FC<FoodScannerModalProps> = ({ onClose }) => {
                    {/* Aviso de transparencia de IA — R-P0-4 / D-3(b) */}
                    <div className="mt-4 w-full flex items-start gap-2 p-3 rounded-2xl bg-amber-50 border border-amber-100 text-left">
                      <ShieldAlert size={14} className="text-amber-600 flex-shrink-0 mt-0.5" />
-                     <p className="text-[13px] font-medium leading-relaxed text-amber-900">
+                     <p className="text-[calc(13px*var(--escala-texto,1))] font-medium leading-relaxed text-amber-900">
                        Clasificación generada por <strong>inteligencia artificial</strong>, que
                        puede equivocarse. No considera tus alergias ni tu plan médico
                        específico. Verifica con tu nutricionista antes de cambiar tu

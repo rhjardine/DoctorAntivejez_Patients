@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Info, Zap } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 interface BiologicalAgeGaugeProps {
   biologicalAge: number | string;
@@ -13,8 +13,6 @@ interface BiologicalAgeGaugeProps {
 const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
   biologicalAge,
   chronologicalAge,
-  completedItems,
-  totalItems,
   onInfoPress
 }) => {
   // Lógica Revisada: 7-28 (Verde), 28-70 (Amarillo), 70-120 (Rojo)
@@ -34,107 +32,106 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
 
   const bioPercentage = calculatePosition(biologicalAge);
   const chronoPercentage = calculatePosition(chronologicalAge);
-  const progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   const bio = Number(biologicalAge);
   const chrono = Number(chronologicalAge);
   const yearsDifference = (!isNaN(chrono) && !isNaN(bio)) ? chrono - bio : 0;
   const isOptimal = yearsDifference > 0;
 
+  /**
+   * Las dos etiquetas van encima de la barra y los números de la escala debajo:
+   * antes compartían banda y «Tú (62)» tapaba el 70 de la escala.
+   *
+   * Si las dos edades caen cerca, las etiquetas se pisarían entre sí. Cuando
+   * eso ocurre, la de referencia sube una altura para que ambas se lean.
+   */
+  const etiquetasCerca =
+    !isNaN(bio) && !isNaN(chrono) && Math.abs(bioPercentage - chronoPercentage) < 20;
 
   return (
-    <div className="w-full px-6 py-2.5 bg-white border-b border-slate-100 shadow-sm animate-in fade-in slide-in-from-top duration-700">
-      <div className="flex justify-between items-end mb-2">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-1.5 mb-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
-            <span className="text-[12px] font-black text-slate-500 uppercase tracking-widest">
-              Estado Biofísico Actual
+    <div className="w-full px-5 py-2 bg-white border-b border-slate-100 shadow-sm animate-in fade-in slide-in-from-top duration-700">
+      <div className="flex justify-between items-start gap-3">
+        <div className="flex flex-col min-w-0">
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shrink-0"></div>
+            <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-slate-500 tracking-tight">
+              Estado Biofísico
             </span>
           </div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-[13px] font-bold text-darkBlue uppercase">Edad Bio:</span>
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-[calc(13px*var(--escala-texto,1))] font-bold text-darkBlue">Edad Bio:</span>
             <span className="text-xl font-black text-brand-cyanInk leading-none">{biologicalAge}</span>
             <span className="text-xs font-bold text-slate-500">/ {chronologicalAge} real</span>
           </div>
         </div>
 
-        <div className="flex flex-col items-end">
-          <div className="flex items-center gap-2 mb-1">
-            {onInfoPress && (
-              <button aria-label="Más información"
-                onClick={onInfoPress}
-                className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-slate-50 text-slate-500 rounded-lg hover:text-primary transition-colors"
-                title="Información"
-              >
-                <Info size={14} />
-              </button>
-            )}
-            <div className="bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">
-              <span className="text-[12px] font-black text-emerald-700 uppercase">Score: {adherenceLabel(progressPercentage)}</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-1 text-[12px] font-black uppercase tracking-tighter">
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[calc(12px*var(--escala-texto,1))] font-black tracking-tight text-right">
             {isOptimal ? (
-              <span className="text-emerald-700">+{yearsDifference} Años de Vitalidad</span>
+              <span className="text-emerald-700">+{yearsDifference} años de vitalidad</span>
             ) : (
-              <span className="text-amber-500">{Math.abs(yearsDifference)} Años de Rezago</span>
+              <span className="text-amber-700">{Math.abs(yearsDifference)} años de rezago</span>
             )}
-          </div>
+          </span>
+          {onInfoPress && (
+            <button
+              aria-label="Qué significa la edad biológica"
+              onClick={onInfoPress}
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center bg-slate-50 text-slate-500 rounded-lg hover:text-primary transition-colors shrink-0"
+            >
+              <Info size={16} />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Barra de Septenios Gradiente Segmentada (Verde, Amarillo, Rojo) */}
-      <div className="relative h-10 mt-1">
+      {/* Barra de septenios. Etiquetas arriba, escala abajo: así no se solapan. */}
+      <div className="relative mt-5 mb-1">
+        {/* Etiquetas de posición, ancladas por su base al borde superior de la barra */}
+        {!isNaN(chrono) && (
+          <div
+            className="absolute bottom-full flex flex-col items-center z-0 transition-all duration-1000"
+            style={{
+              left: `${chronoPercentage}%`,
+              transform: 'translateX(-50%)',
+              marginBottom: etiquetasCerca ? 18 : 2,
+            }}
+          >
+            <span className="bg-slate-100 text-slate-600 text-[calc(12px*var(--escala-texto,1))] font-bold px-1.5 py-0.5 rounded border border-slate-200 whitespace-nowrap">
+              Ref {chrono}
+            </span>
+            <span className="w-0.5 h-1.5 bg-slate-300 rounded-full" />
+          </div>
+        )}
+
+        {!isNaN(bio) && (
+          <div
+            className="absolute bottom-full flex flex-col items-center z-10 transition-all duration-1000"
+            style={{ left: `${bioPercentage}%`, transform: 'translateX(-50%)', marginBottom: 2 }}
+          >
+            <span className="bg-darkBlue text-white text-[calc(12px*var(--escala-texto,1))] font-black px-1.5 py-0.5 rounded-md shadow-sm whitespace-nowrap">
+              Tú {bio}
+            </span>
+            <span className="w-0.5 h-1.5 bg-darkBlue rounded-full" />
+          </div>
+        )}
+
         <div className="h-2.5 w-full flex rounded-full overflow-hidden shadow-inner bg-slate-100 border border-slate-200">
           <div className="h-full bg-emerald-500 border-r border-white/20" style={{ width: '33.33%' }}></div>
           <div className="h-full bg-yellow-400 border-r border-white/20" style={{ width: '33.33%' }}></div>
           <div className="h-full bg-rose-500" style={{ width: '33.34%' }}></div>
         </div>
 
-        {/* Marcadores de Escala */}
-        <div className="absolute w-full flex justify-between text-[12px] text-slate-500 mt-2 font-black uppercase tracking-widest">
-          <span>7</span>
+        {/* Escala, debajo de la barra y ya sin nada encima */}
+        <div className="relative w-full h-4 mt-1 text-[calc(12px*var(--escala-texto,1))] text-slate-500 font-bold">
+          <span className="absolute left-0">7</span>
           <span className="absolute left-[33.33%] -translate-x-1/2">28</span>
           <span className="absolute left-[66.66%] -translate-x-1/2">70</span>
-          <span>120</span>
+          <span className="absolute right-0">120</span>
         </div>
-
-        {/* Marcador Edad Cronológica (Referencia) */}
-        {!isNaN(chrono) && (
-          <div
-            className="absolute top-0 transition-all duration-1000 cubic-bezier(0.34, 1.56, 0.64, 1) z-0 flex flex-col items-center"
-            style={{ left: `${chronoPercentage}%`, transform: 'translateX(-50%)' }}
-          >
-            <div className="bg-slate-300 w-0.5 h-6 rounded-full opacity-60"></div>
-            <div className="bg-slate-100 text-slate-600 text-[12px] font-black px-1 py-0.5 rounded border border-slate-200 mt-0.5">
-              Ref ({chrono})
-            </div>
-          </div>
-        )}
-
-        {/* Indicador Biofísico (Tú) */}
-        {!isNaN(bio) && (
-          <div
-            className="absolute top-0 transition-all duration-1000 cubic-bezier(0.34, 1.56, 0.64, 1) z-10 flex flex-col items-center"
-            style={{ left: `${bioPercentage}%`, transform: 'translateX(-50%)' }}
-          >
-            <div className="bg-darkBlue w-[3px] h-6 rounded-full shadow-lg border border-white/40"></div>
-            <div className="bg-darkBlue text-white text-[12px] font-black px-1.5 py-0.5 rounded-md mt-0.5 shadow-md border border-white/10 uppercase">
-              Tú ({bio})
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 };
-
-function adherenceLabel(pct: number) {
-  if (pct >= 90) return 'Elite';
-  if (pct >= 70) return 'Óptimo';
-  if (pct >= 50) return 'En Proceso';
-  return 'Iniciando';
-}
 
 export default BiologicalAgeGauge;

@@ -17,7 +17,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigateToTeam, onNavigateToGui
           alt="Doctor Antivejez"
           className="w-48 h-auto object-contain drop-shadow-sm mb-3"
         />
-        <span className="mt-2 px-4 py-1 bg-slate-100 text-slate-500 text-[12px] font-black tracking-widest rounded-full uppercase">
+        <span className="mt-2 px-4 py-1 bg-slate-100 text-slate-500 text-[calc(12px*var(--escala-texto,1))] font-black tracking-widest rounded-full uppercase">
           v1.0.0 (BETA)
         </span>
       </div>
@@ -45,7 +45,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigateToTeam, onNavigateToGui
             </div>
             <div className="text-left">
               <h4 className="text-base font-black text-darkBlue uppercase tracking-tight">Equipo Médico</h4>
-              <p className="text-[12px] text-textMedium font-bold">Conoce a los especialistas</p>
+              <p className="text-[calc(12px*var(--escala-texto,1))] text-textMedium font-bold">Conoce a los especialistas</p>
             </div>
           </div>
           <ChevronRight size={20} className="text-slate-500" />
@@ -58,7 +58,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigateToTeam, onNavigateToGui
             </div>
             <div className="text-left">
               <h4 className="text-base font-black text-darkBlue uppercase tracking-tight">Certificaciones</h4>
-              <p className="text-[12px] text-textMedium font-bold">Estándares de calidad y privacidad</p>
+              <p className="text-[calc(12px*var(--escala-texto,1))] text-textMedium font-bold">Estándares de calidad y privacidad</p>
             </div>
           </div>
           <ChevronRight size={20} className="text-slate-500" />
@@ -74,7 +74,7 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigateToTeam, onNavigateToGui
             </div>
             <div className="text-left">
               <h4 className="text-base font-black text-darkBlue uppercase tracking-tight">Guía de Uso</h4>
-              <p className="text-[12px] text-textMedium font-bold">Cómo navegar tu salud celular</p>
+              <p className="text-[calc(12px*var(--escala-texto,1))] text-textMedium font-bold">Cómo navegar tu salud celular</p>
             </div>
           </div>
           <ChevronRight size={20} className="text-slate-500" />
@@ -83,15 +83,15 @@ const AboutView: React.FC<AboutViewProps> = ({ onNavigateToTeam, onNavigateToGui
 
       {/* Legal Footer */}
       <div className="text-center pt-8 pb-12 opacity-40 flex flex-col items-center gap-3">
-        <p className="text-[12px] font-black text-darkBlue uppercase tracking-[0.3em]">
+        <p className="text-[calc(12px*var(--escala-texto,1))] font-black text-darkBlue uppercase tracking-[0.3em]">
           DOCTOR ANTIVEJEZ © {new Date().getFullYear()}
         </p>
-        <p className="text-[12px] font-black tracking-[0.2em] text-primary/60">
+        <p className="text-[calc(12px*var(--escala-texto,1))] font-black tracking-[0.2em] text-primary/60">
           Vytalix.io
         </p>
         <div className="flex justify-center gap-8">
-          <span className="text-[12px] font-bold text-primary underline">Privacidad</span>
-          <span className="text-[12px] font-bold text-primary underline">Términos</span>
+          <span className="text-[calc(12px*var(--escala-texto,1))] font-bold text-primary underline">Privacidad</span>
+          <span className="text-[calc(12px*var(--escala-texto,1))] font-bold text-primary underline">Términos</span>
         </div>
       </div>
     </div>

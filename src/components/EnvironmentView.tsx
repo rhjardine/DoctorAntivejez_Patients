@@ -45,7 +45,7 @@ const EnvironmentView: React.FC = () => {
                  </div>
                  <div className="flex-1 min-w-0">
                      <h4 className="text-sm font-semibold text-darkBlue dark:text-white truncate">{tool.title}</h4>
-                     <p className="text-[13px] text-textMedium dark:text-slate-500 mt-0.5 leading-snug line-clamp-2">{tool.desc}</p>
+                     <p className="text-[calc(13px*var(--escala-texto,1))] text-textMedium dark:text-slate-500 mt-0.5 leading-snug line-clamp-2">{tool.desc}</p>
                  </div>
              </div>
              <ChevronRight size={18} className="text-gray-300 dark:text-slate-600 flex-shrink-0 ml-2" />

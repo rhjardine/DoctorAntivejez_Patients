@@ -43,7 +43,7 @@ const MetricsView: React.FC<MetricsViewProps> = ({ onInfoPress }) => {
     return (
       <div className="flex flex-col items-center justify-center h-full text-primary">
         <Loader2 size={48} className="animate-spin" />
-        <p className="mt-4 font-bold uppercase text-[12px] tracking-[0.2em]">Analizando Evolución...</p>
+        <p className="mt-4 font-bold uppercase text-[calc(12px*var(--escala-texto,1))] tracking-[0.2em]">Analizando Evolución...</p>
       </div>
     );
   }
@@ -52,7 +52,7 @@ const MetricsView: React.FC<MetricsViewProps> = ({ onInfoPress }) => {
     return (
       <div className="flex flex-col items-center justify-center h-full text-primary">
         <AlertCircle size={48} className="text-slate-500" />
-        <p className="mt-4 font-bold uppercase text-[12px] tracking-[0.2em] text-textMedium">No hay datos disponibles en este momento.</p>
+        <p className="mt-4 font-bold uppercase text-[calc(12px*var(--escala-texto,1))] tracking-[0.2em] text-textMedium">No hay datos disponibles en este momento.</p>
       </div>
     );
   }
@@ -79,14 +79,14 @@ const MetricsView: React.FC<MetricsViewProps> = ({ onInfoPress }) => {
             <Info size={14} />
           </button>
           <div className="flex justify-between items-start mb-2">
-            <span className="text-[12px] font-black text-textMedium uppercase">Cumplimiento</span>
+            <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-textMedium uppercase">Cumplimiento</span>
             <Activity size={18} className="text-primary" />
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-3xl font-black text-darkBlue">{latestAdherence}%</span>
           </div>
           {adherenceTrend !== null && (
-            <p className={`text-[12px] font-bold mt-1 ${
+            <p className={`text-[calc(12px*var(--escala-texto,1))] font-bold mt-1 ${
               adherenceTrend >= 0 ? 'text-accentGreen' : 'text-accentRed'
             }`}>
               {adherenceTrend >= 0 ? '+' : ''}{adherenceTrend}% vs período anterior
@@ -102,15 +102,15 @@ const MetricsView: React.FC<MetricsViewProps> = ({ onInfoPress }) => {
             <Info size={14} />
           </button>
           <div className="flex justify-between items-start mb-2">
-            <span className="text-[12px] font-black text-textMedium uppercase">Edad Bio</span>
+            <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-textMedium uppercase">Edad Bio</span>
             <TrendingDown size={18} className="text-accentGreen" />
           </div>
           <div className="flex items-baseline gap-1">
             <span className="text-3xl font-black text-darkBlue">{currentBioAge.toFixed(1)}</span>
-            <span className="text-[12px] font-bold text-textMedium">años</span>
+            <span className="text-[calc(12px*var(--escala-texto,1))] font-bold text-textMedium">años</span>
           </div>
           {currentBioAge > 0 && (
-            <p className="text-[12px] font-bold text-primary mt-1">Rejuvenecimiento activo</p>
+            <p className="text-[calc(12px*var(--escala-texto,1))] font-bold text-primary mt-1">Rejuvenecimiento activo</p>
           )}
         </div>
       </div>

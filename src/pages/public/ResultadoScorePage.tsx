@@ -272,7 +272,7 @@ const ResultadoScorePage: React.FC = () => {
               >
                 {score}
               </motion.span>
-              <span className="text-[12px] uppercase font-black tracking-[0.3em] text-[#293b64]/30 mt-2">
+              <span className="text-[calc(12px*var(--escala-texto,1))] uppercase font-black tracking-[0.3em] text-[#293b64]/30 mt-2">
                 SCORE VITAL
               </span>
             </div>
@@ -296,7 +296,7 @@ const ResultadoScorePage: React.FC = () => {
             <div className="mt-8 p-5 bg-white rounded-3xl border border-[#23bcef]/20 animate-pulse-subtle">
               <div className="flex items-start gap-4 mb-4">
                 <Info className="w-6 h-6 shrink-0 text-[#107da8]" />
-                <p className="text-[13px] font-medium leading-relaxed text-[#293b64]/70">
+                <p className="text-[calc(13px*var(--escala-texto,1))] font-medium leading-relaxed text-[#293b64]/70">
                   Este score es una{' '}
                   <strong className="text-[#107da8]">
                     estimación biométrica facial
@@ -306,7 +306,7 @@ const ResultadoScorePage: React.FC = () => {
               </div>
               <button
                 onClick={() => navigate('/test')}
-                className="w-full py-3 bg-[#f8fafc] text-[#107da8] font-black text-[13px] uppercase tracking-widest rounded-xl border border-[#23bcef]/30"
+                className="w-full py-3 bg-[#f8fafc] text-[#107da8] font-black text-[calc(13px*var(--escala-texto,1))] uppercase tracking-widest rounded-xl border border-[#23bcef]/30"
               >
                 Iniciar Test Completo →
               </button>
@@ -330,18 +330,18 @@ const ResultadoScorePage: React.FC = () => {
                 {hookConfig.title}
               </p>
               <span
-                className="text-[12px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-[#f8fafc] border border-[#293b64]/5"
+                className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-[#f8fafc] border border-[#293b64]/5"
                 style={{ color: hookConfig.color }}
               >
                 {hookConfig.rangeBadge}
               </span>
             </div>
           </div>
-          <p className="text-[14px] leading-relaxed text-[#293b64]/60 mb-6 font-medium">
+          <p className="text-[calc(14px*var(--escala-texto,1))] leading-relaxed text-[#293b64]/60 mb-6 font-medium">
             {hookConfig.context}
           </p>
           <div className="p-4 bg-[#f8fafc]/50 rounded-2xl border border-[#293b64]/5">
-            <p className="text-[13px] leading-relaxed text-[#293b64] font-semibold">
+            <p className="text-[calc(13px*var(--escala-texto,1))] leading-relaxed text-[#293b64] font-semibold">
               {hookConfig.opportunity}
             </p>
           </div>
@@ -357,7 +357,7 @@ const ResultadoScorePage: React.FC = () => {
           transition={{ delay: 0.6 }}
           className="bg-white rounded-[2rem] p-8 border border-[#293b64]/5 shadow-[0_4px_30px_rgba(0,0,0,0.03)] mb-8"
         >
-          <p className="text-[13px] font-black uppercase tracking-[0.25em] text-[#107da8] mb-8">
+          <p className="text-[calc(13px*var(--escala-texto,1))] font-black uppercase tracking-[0.25em] text-[#107da8] mb-8">
             Mapa de Biomarcadores
           </p>
           <div className="space-y-6">
@@ -367,11 +367,11 @@ const ResultadoScorePage: React.FC = () => {
               return (
                 <div key={d.key}>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-[13px] font-bold text-[#293b64] tracking-tight">
+                    <span className="text-[calc(13px*var(--escala-texto,1))] font-bold text-[#293b64] tracking-tight">
                       {d.label}
                     </span>
                     <span
-                      className="text-[13px] font-black"
+                      className="text-[calc(13px*var(--escala-texto,1))] font-black"
                       style={{ color: col }}
                     >
                       {val}%
@@ -443,7 +443,7 @@ const ResultadoScorePage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={leadStatus === 'sending'}
-                  className="w-full py-5 bg-[#23bcef] text-white font-black text-[13px] uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-[#23bcef]/20 transition-all active:scale-95 disabled:opacity-50"
+                  className="w-full py-5 bg-[#23bcef] text-white font-black text-[calc(13px*var(--escala-texto,1))] uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-[#23bcef]/20 transition-all active:scale-95 disabled:opacity-50"
                 >
                   {leadStatus === 'sending' ? (
                     <Loader2 className="animate-spin mx-auto" />
@@ -466,7 +466,7 @@ const ResultadoScorePage: React.FC = () => {
                 <p className="text-xl font-black mb-2 uppercase tracking-tighter">
                   Acceso Concedido
                 </p>
-                <p className="text-[13px] text-white/50 font-medium">
+                <p className="text-[calc(13px*var(--escala-texto,1))] text-white/50 font-medium">
                   Tu reporte clínico está en camino.
                 </p>
               </motion.div>
@@ -481,7 +481,7 @@ const ResultadoScorePage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col gap-4 mb-12"
           >
-            <p className="text-[13px] font-black uppercase tracking-[0.3em] text-[#293b64]/40 text-center mb-2">
+            <p className="text-[calc(13px*var(--escala-texto,1))] font-black uppercase tracking-[0.3em] text-[#293b64]/40 text-center mb-2">
               SIGUIENTE PASO CLÍNICO
             </p>
 
@@ -494,7 +494,7 @@ const ResultadoScorePage: React.FC = () => {
               }`}
             >
               <div className="flex justify-between items-center mb-4">
-                <span className="text-[12px] font-black uppercase px-2 py-1 rounded bg-[#f8fafc] text-[#293b64]/40 tracking-widest">
+                <span className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase px-2 py-1 rounded bg-[#f8fafc] text-[#293b64]/40 tracking-widest">
                   Inversión: $0
                 </span>
                 {selectedTier === 'basica' && (
@@ -532,11 +532,11 @@ const ResultadoScorePage: React.FC = () => {
                   : 'border-[#293b64]/5 bg-white'
               }`}
             >
-              <div className="absolute top-0 right-0 py-1 px-4 bg-[#23bcef] text-white text-[12px] font-black uppercase tracking-[0.3em] rounded-bl-xl">
+              <div className="absolute top-0 right-0 py-1 px-4 bg-[#23bcef] text-white text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-[0.3em] rounded-bl-xl">
                 Protocolo Full
               </div>
               <div className="flex justify-between items-center mb-4">
-                <span className="text-[12px] font-black uppercase px-2 py-1 rounded bg-[#23bcef]/10 text-[#107da8] tracking-widest">
+                <span className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase px-2 py-1 rounded bg-[#23bcef]/10 text-[#107da8] tracking-widest">
                   Vytalix Premium
                 </span>
                 {selectedTier === 'profunda' && (
@@ -568,7 +568,7 @@ const ResultadoScorePage: React.FC = () => {
         )}
 
         <div className="text-center pb-12">
-          <p className="text-[12px] font-semibold text-[#293b64]/30 uppercase tracking-[0.4em] mb-4">
+          <p className="text-[calc(12px*var(--escala-texto,1))] font-semibold text-[#293b64]/30 uppercase tracking-[0.4em] mb-4">
             VYTALIX Longevity Suite
           </p>
           <button

@@ -62,7 +62,7 @@ const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({ isOpen, onAcc
         </h3>
 
         <div className="bg-slate-50 p-6 rounded-[2rem] border border-gray-100 mb-8">
-          <p className="text-[13px] font-bold text-textMedium leading-relaxed text-center italic">
+          <p className="text-[calc(13px*var(--escala-texto,1))] font-bold text-textMedium leading-relaxed text-center italic">
             "Su información clínica y biomarcadores son tratados bajo los más estrictos estándares internacionales de seguridad (GDPR/HIPAA). Garantizamos la confidencialidad absoluta de sus datos sensibles encriptados de extremo a extremo."
           </p>
         </div>
@@ -72,13 +72,13 @@ const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({ isOpen, onAcc
             <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-500">
               <CheckCircle size={16} />
             </div>
-            <span className="text-[12px] font-black text-darkBlue uppercase tracking-widest">Encriptación Militar</span>
+            <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-darkBlue uppercase tracking-widest">Encriptación Militar</span>
           </div>
           <div className="flex items-center gap-3 px-4">
             <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-500">
               <CheckCircle size={16} />
             </div>
-            <span className="text-[12px] font-black text-darkBlue uppercase tracking-widest">Cumplimiento Internacional</span>
+            <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-darkBlue uppercase tracking-widest">Cumplimiento Internacional</span>
           </div>
         </div>
 
@@ -97,7 +97,7 @@ const PrivacyConsentModal: React.FC<PrivacyConsentModalProps> = ({ isOpen, onAcc
           )}
         </button>
 
-        <p className="mt-6 text-[12px] font-black text-textLight uppercase tracking-widest">
+        <p className="mt-6 text-[calc(12px*var(--escala-texto,1))] font-black text-textLight uppercase tracking-widest">
           Doctor Antivejez • Capa de Seguridad v2.0
         </p>
       </div>

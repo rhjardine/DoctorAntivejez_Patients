@@ -41,7 +41,7 @@ const ClinicalInfoModal: React.FC<ClinicalInfoModalProps> = ({ isOpen, onClose }
 
           <div className="mt-8 flex items-center gap-2 text-primary">
             <Zap size={16} fill="currentColor" />
-            <span className="text-[12px] font-black uppercase tracking-[0.2em]">Doctor Antivejez</span>
+            <span className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-[0.2em]">Doctor Antivejez</span>
           </div>
         </div>
       </div>

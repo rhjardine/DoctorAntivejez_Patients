@@ -47,7 +47,7 @@ const Phase4RView: React.FC<Phase4RViewProps> = ({ fase, acento, fondo, icono, o
                             {icono}
                         </div>
                         <span
-                            className="font-black uppercase tracking-widest text-[12px]"
+                            className="font-black uppercase tracking-widest text-[calc(12px*var(--escala-texto,1))]"
                             style={{ color: acento }}
                         >
                             Fase {fase.orden}: {fase.nombre}
@@ -59,7 +59,7 @@ const Phase4RView: React.FC<Phase4RViewProps> = ({ fase, acento, fondo, icono, o
                     </h2>
                     {/* El propósito va solo: anteponerle el nombre del paciente producía
                         frases que no cerraban («ANA, devolver al metabolismo…»). */}
-                    <p className="text-white/80 text-[12px] font-medium leading-relaxed max-w-[92%]">
+                    <p className="text-white/80 text-[calc(12px*var(--escala-texto,1))] font-medium leading-relaxed max-w-[92%]">
                         {fase.proposito}
                     </p>
                 </div>
@@ -72,7 +72,7 @@ const Phase4RView: React.FC<Phase4RViewProps> = ({ fase, acento, fondo, icono, o
                 transition={{ delay: 0.1 }}
                 className="mx-4 mt-5 bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100"
             >
-                <span className="text-[12px] font-black uppercase tracking-widest block mb-2" style={{ color: acento }}>
+                <span className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest block mb-2" style={{ color: acento }}>
                     En qué consiste
                 </span>
                 <p className="text-slate-600 text-sm font-medium leading-relaxed">
@@ -87,7 +87,7 @@ const Phase4RView: React.FC<Phase4RViewProps> = ({ fase, acento, fondo, icono, o
                 transition={{ delay: 0.2 }}
                 className="mx-4 mt-4 bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100"
             >
-                <span className="text-[12px] font-black uppercase tracking-widest block mb-4" style={{ color: acento }}>
+                <span className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest block mb-4" style={{ color: acento }}>
                     {fase.modalidades.length === 1 ? 'Modalidad' : 'Modalidades'}
                 </span>
                 <ul className="flex flex-col gap-3">
@@ -100,7 +100,7 @@ const Phase4RView: React.FC<Phase4RViewProps> = ({ fase, acento, fondo, icono, o
                             className="flex items-center gap-3"
                         >
                             <span
-                                className="w-7 h-7 rounded-xl flex items-center justify-center text-[13px] font-black text-white shrink-0"
+                                className="w-7 h-7 rounded-xl flex items-center justify-center text-[calc(13px*var(--escala-texto,1))] font-black text-white shrink-0"
                                 style={{ backgroundColor: acento }}
                             >
                                 {i + 1}
@@ -116,7 +116,7 @@ const Phase4RView: React.FC<Phase4RViewProps> = ({ fase, acento, fondo, icono, o
             {/* Qué sigue en la secuencia */}
             <div className="mx-4 mt-4 flex items-start gap-2.5 bg-slate-50 rounded-2xl p-4 border border-slate-100">
                 <Info size={14} className="text-slate-500 mt-0.5 shrink-0" />
-                <p className="text-slate-500 text-[13px] font-medium leading-relaxed">
+                <p className="text-slate-500 text-[calc(13px*var(--escala-texto,1))] font-medium leading-relaxed">
                     Las 4R son una secuencia: primero se remueve, luego se revitaliza, después
                     se regenera y por último se restaura. Esta es la fase {fase.orden} de 4.
                 </p>

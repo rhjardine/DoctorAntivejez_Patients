@@ -67,7 +67,7 @@ const LoginPage: React.FC = () => {
                     />
                 </div>
 
-                <h1 className="text-[22px] font-medium text-cyan-200 mb-10 z-10 text-center px-4">
+                <h1 className="text-[calc(22px*var(--escala-texto,1))] font-medium text-cyan-200 mb-10 z-10 text-center px-4">
                     Acceso Seguro para Pacientes
                 </h1>
 
@@ -117,7 +117,7 @@ const LoginPage: React.FC = () => {
                         {error && (
                             <div className="flex items-center gap-2 mt-2 px-2 text-red-300 animate-in slide-in-from-top-2">
                                 <AlertCircle size={14} />
-                                <span className="text-[13px] font-bold uppercase">{error}</span>
+                                <span className="text-[calc(13px*var(--escala-texto,1))] font-bold uppercase">{error}</span>
                             </div>
                         )}
                     </div>
@@ -127,7 +127,7 @@ const LoginPage: React.FC = () => {
                         type="submit"
                         disabled={!documentId || !password || isLoading}
                         className="w-full text-[#0f172a] py-3.5 rounded-lg
-                                 font-bold text-[17px] shadow-lg
+                                 font-bold text-[calc(17px*var(--escala-texto,1))] shadow-lg
                                  active:scale-95 transition-all
                                  flex items-center justify-center
                                  gap-2 disabled:opacity-50
@@ -159,7 +159,7 @@ const LoginPage: React.FC = () => {
                         type="button"
                         onClick={() => alert("Autenticación biométrica no configurada.")}
                         className="w-full bg-transparent border-[1.5px] border-cyan-400 text-cyan-400 
-                                 py-3.5 rounded-lg font-medium text-[17px]
+                                 py-3.5 rounded-lg font-medium text-[calc(17px*var(--escala-texto,1))]
                                  active:scale-95 transition-all
                                  flex items-center justify-center gap-3"
                     >
@@ -170,10 +170,10 @@ const LoginPage: React.FC = () => {
 
                 {/* Footer */}
                 <div className="mt-12 mb-6 text-center z-10 opacity-70 flex flex-col items-center gap-4">
-                    <p className="text-[13px] font-medium text-cyan-200">
+                    <p className="text-[calc(13px*var(--escala-texto,1))] font-medium text-cyan-200">
                         Protegido con cifrado AES-256 · Dr. Juan Carlos Méndez
                     </p>
-                    <p className="text-[12px] font-black text-cyan-400 uppercase tracking-[0.3em] opacity-50">
+                    <p className="text-[calc(12px*var(--escala-texto,1))] font-black text-cyan-400 uppercase tracking-[0.3em] opacity-50">
                         Vytalix.io
                     </p>
                 </div>

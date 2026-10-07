@@ -247,7 +247,7 @@ const HomePage: React.FC = () => {
                             {currentMainTab === MainTab.CHALLENGE ? (
                                 <div className="flex flex-col items-center w-full px-6 py-4">
                                     <div className="w-full bg-white/70 backdrop-blur-sm rounded-3xl p-4 mb-3 border border-white/50 text-center shadow-sm">
-                                        <p className="text-[13px] font-bold text-[#293b64] italic">"La consistencia es la clave de la regeneración celular."</p>
+                                        <p className="text-[calc(13px*var(--escala-texto,1))] font-bold text-[#293b64] italic">"La consistencia es la clave de la regeneración celular."</p>
                                     </div>
 
                                     {/* Componentes Anti-Churn */}
@@ -265,10 +265,10 @@ const HomePage: React.FC = () => {
                                             <div className="bg-sky-50 p-3.5 rounded-2xl text-[#107da8]"><ClipboardCheck size={28} /></div>
                                             <div>
                                                 <h3 className="font-black text-[#293b64] text-lg">Guía del Paciente</h3>
-                                                <p className="text-[12px] font-bold text-textMedium uppercase">Misión Diaria</p>
+                                                <p className="text-[calc(12px*var(--escala-texto,1))] font-bold text-textMedium uppercase">Misión Diaria</p>
                                             </div>
                                         </div>
-                                        <div className="bg-red-50 text-accentRed text-[12px] font-black px-3 py-2 rounded-xl uppercase tracking-tighter">
+                                        <div className="bg-red-50 text-accentRed text-[calc(12px*var(--escala-texto,1))] font-black px-3 py-2 rounded-xl uppercase tracking-tighter">
                                             {totalCount - completedCount} Pendientes
                                         </div>
                                     </div>
@@ -277,7 +277,7 @@ const HomePage: React.FC = () => {
                                             <div className="bg-sky-50 p-3.5 rounded-2xl text-[#107da8]"><Dna size={28} /></div>
                                             <div>
                                                 <h3 className="font-black text-[#293b64] text-lg leading-tight">Alimentación Sana</h3>
-                                                <p className="text-[12px] font-bold uppercase tracking-wider" style={{ color: '#23bcef' }}>Antienvejecimiento</p>
+                                                <p className="text-[calc(12px*var(--escala-texto,1))] font-bold uppercase tracking-wider" style={{ color: '#23bcef' }}>Antienvejecimiento</p>
                                             </div>
                                         </div>
                                         <div className="text-[#107da8] pr-2">

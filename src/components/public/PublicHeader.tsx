@@ -47,11 +47,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                 {/* Center Section */}
                 <div className="flex-1 flex justify-center text-center overflow-hidden">
                     {title ? (
-                        <span className={`text-[14px] font-black uppercase tracking-widest truncate px-4 ${textColor}`}>
+                        <span className={`text-[calc(14px*var(--escala-texto,1))] font-black uppercase tracking-widest truncate px-4 ${textColor}`}>
                             {title}
                         </span>
                     ) : isWellness ? (
-                        <span className={`text-[14px] font-black tracking-[0.4em] ${textColor}`}>
+                        <span className={`text-[calc(14px*var(--escala-texto,1))] font-black tracking-[0.4em] ${textColor}`}>
                             VYTALIX
                         </span>
                     ) : (
@@ -79,7 +79,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
             {progressLabel && progress !== undefined && (
                 <div className="absolute top-[64px] left-0 right-0 flex justify-center pointer-events-none">
                     <span
-                        className={`text-[12px] font-black uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md shadow-sm border ${isWellness
+                        className={`text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-wider px-3 py-1 rounded-full backdrop-blur-md shadow-sm border ${isWellness
                             ? 'text-[#107da8] bg-[#f8fafc]/10 border-[#23bcef]/20'
                             : 'text-clinical-cyan bg-clinical-navy/80 border-clinical-cyan/20'
                             }`}

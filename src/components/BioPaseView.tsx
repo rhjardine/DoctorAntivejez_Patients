@@ -88,7 +88,7 @@ const BioPaseView: React.FC<BioPaseViewProps> = ({ patientId, onRefresh, onBack 
           </div>
 
           <div className="mt-8 flex flex-col items-center">
-            <span className="text-[12px] font-black text-textLight uppercase tracking-[0.3em]">ID Paciente</span>
+            <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-textLight uppercase tracking-[0.3em]">ID Paciente</span>
             <span className="text-lg font-black text-darkBlue tracking-widest">{patientId}</span>
           </div>
         </div>
@@ -114,14 +114,14 @@ const BioPaseView: React.FC<BioPaseViewProps> = ({ patientId, onRefresh, onBack 
 
           <div className="bg-blue-50/50 p-4 rounded-2xl flex gap-3 border border-blue-100/50">
             <div className="mt-1"><Info size={20} className="text-primary flex-shrink-0" /></div>
-            <p className="text-[12px] text-textMedium font-bold leading-relaxed">
+            <p className="text-[calc(12px*var(--escala-texto,1))] text-textMedium font-bold leading-relaxed">
               Al finalizar tu consulta, presiona "Actualizar Plan" para recibir inmediatamente tus nuevas indicaciones médicas.
             </p>
           </div>
         </div>
 
         <div className="mt-auto py-6 opacity-30 text-center">
-          <p className="text-[12px] font-black text-darkBlue uppercase tracking-widest">Pase de acceso seguro v2.0</p>
+          <p className="text-[calc(12px*var(--escala-texto,1))] font-black text-darkBlue uppercase tracking-widest">Pase de acceso seguro v2.0</p>
         </div>
       </div>
     </div>

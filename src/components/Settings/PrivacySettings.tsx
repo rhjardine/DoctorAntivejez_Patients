@@ -45,7 +45,7 @@ export const PrivacySettings = () => {
             </div>
 
             <div className="flex items-center justify-between gap-4">
-                <p className="text-[13px] font-bold text-textMedium dark:text-slate-500 leading-relaxed">
+                <p className="text-[calc(13px*var(--escala-texto,1))] font-bold text-textMedium dark:text-slate-500 leading-relaxed">
                     Al activar esta opción, permites que el Dr. Juan Carlos Méndez visualice tu adherencia diaria y puntos Omics para un mejor seguimiento clínico.
                 </p>
                 <button
@@ -59,7 +59,7 @@ export const PrivacySettings = () => {
             </div>
 
             {!consent && (
-                <div className="mt-4 flex items-center gap-2 text-[12px] text-amber-600 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-100 dark:border-amber-900/20 font-bold">
+                <div className="mt-4 flex items-center gap-2 text-[calc(12px*var(--escala-texto,1))] text-amber-600 bg-amber-50 dark:bg-amber-900/10 p-3 rounded-xl border border-amber-100 dark:border-amber-900/20 font-bold">
                     <ShieldAlert size={14} />
                     <span>Tus datos de adherencia son actualmente privados.</span>
                 </div>

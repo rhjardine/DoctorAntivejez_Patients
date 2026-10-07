@@ -42,10 +42,10 @@ const MedicalNetworkPage: React.FC = () => {
 
             <div className="w-full max-w-md px-5 mt-8 flex-1 flex flex-col">
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
-                    <h1 className="text-[26px] font-black text-white mb-2 leading-tight" style={{ fontFamily: 'Poppins' }}>
+                    <h1 className="text-[calc(26px*var(--escala-texto,1))] font-black text-white mb-2 leading-tight" style={{ fontFamily: 'Poppins' }}>
                         Nuestra Red Médica
                     </h1>
-                    <p className="text-[13px] mx-auto leading-relaxed max-w-[300px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                    <p className="text-[calc(13px*var(--escala-texto,1))] mx-auto leading-relaxed max-w-[300px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
                         Especialistas certificados por la Academia ALMA en medicina antienvejecimiento y longevidad.
                     </p>
                 </motion.div>
@@ -116,11 +116,11 @@ const MedicalNetworkPage: React.FC = () => {
                                 {/* Right: Info */}
                                 <div className="flex-1 flex flex-col justify-center">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <h3 className="text-[15px] font-semibold text-white leading-tight">
+                                        <h3 className="text-[calc(15px*var(--escala-texto,1))] font-semibold text-white leading-tight">
                                             {doc.name}
                                         </h3>
                                         {doc.isFounder && (
-                                            <span className="text-[12px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded" style={{ background: `${CYAN}25`, color: CYAN }}>
+                                            <span className="text-[calc(12px*var(--escala-texto,1))] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded" style={{ background: `${CYAN}25`, color: CYAN }}>
                                                 Fundador
                                             </span>
                                         )}
@@ -131,14 +131,14 @@ const MedicalNetworkPage: React.FC = () => {
 
                                     <div className="flex items-center gap-1.5 mt-2">
                                         <MapPin size={10} style={{ color: 'rgba(255,255,255,0.5)' }} />
-                                        <span className="text-[12px] uppercase font-semibold tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                                        <span className="text-[calc(12px*var(--escala-texto,1))] uppercase font-semibold tracking-wider" style={{ color: 'rgba(255,255,255,0.5)' }}>
                                             {doc.location.split(',')[0]}
                                         </span>
                                     </div>
 
                                     <div className="flex flex-wrap gap-1.5 mt-2">
                                         {doc.modality.map(m => (
-                                            <span key={m} className="px-1.5 py-0.5 rounded border text-[12px] uppercase tracking-wider font-bold"
+                                            <span key={m} className="px-1.5 py-0.5 rounded border text-[calc(12px*var(--escala-texto,1))] uppercase tracking-wider font-bold"
                                                 style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.6)' }}>
                                                 {m}
                                             </span>

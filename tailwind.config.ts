@@ -49,6 +49,28 @@ export default {
                     slate: '#475569',
                 },
             },
+            /**
+             * Escala tipográfica gobernada por `--escala-texto`.
+             *
+             * El paciente la elige en Configuración: quien ve poco agranda la
+             * letra sin depender de nadie y quien ve bien la deja compacta. Con
+             * la variable en 1 —el valor por defecto— los tamaños son los
+             * mismos de siempre; las alturas de línea van sin unidad para que
+             * crezcan en la misma proporción y el texto no se solape.
+             */
+            fontSize: {
+                'xs':   ['calc(0.75rem*var(--escala-texto,1))',  { lineHeight: '1.333' }],
+                'sm':   ['calc(0.875rem*var(--escala-texto,1))', { lineHeight: '1.429' }],
+                'base': ['calc(1rem*var(--escala-texto,1))',     { lineHeight: '1.5' }],
+                'lg':   ['calc(1.125rem*var(--escala-texto,1))', { lineHeight: '1.556' }],
+                'xl':   ['calc(1.25rem*var(--escala-texto,1))',  { lineHeight: '1.4' }],
+                '2xl':  ['calc(1.5rem*var(--escala-texto,1))',   { lineHeight: '1.333' }],
+                '3xl':  ['calc(1.875rem*var(--escala-texto,1))', { lineHeight: '1.2' }],
+                '4xl':  ['calc(2.25rem*var(--escala-texto,1))',  { lineHeight: '1.111' }],
+                '5xl':  ['calc(3rem*var(--escala-texto,1))',     { lineHeight: '1' }],
+                '6xl':  ['calc(3.75rem*var(--escala-texto,1))',  { lineHeight: '1' }],
+                '7xl':  ['calc(4.5rem*var(--escala-texto,1))',   { lineHeight: '1' }],
+            },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],
             },

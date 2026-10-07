@@ -96,7 +96,7 @@ const ConsultationHistoryView: React.FC<ConsultationHistoryViewProps> = ({ onBac
                <div className="bg-pearlyGray dark:bg-slate-700/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-600">
                   <div className="flex items-center gap-2 mb-2">
                      <FileText size={14} className="text-primary" />
-                     <span className="text-[12px] font-black text-textMedium uppercase tracking-widest">Notas del Doctor</span>
+                     <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-textMedium uppercase tracking-widest">Notas del Doctor</span>
                   </div>
                   <p className="text-sm text-darkBlue dark:text-slate-200 leading-relaxed font-medium italic">
                     "{record.doctorNotes}"
@@ -106,11 +106,11 @@ const ConsultationHistoryView: React.FC<ConsultationHistoryViewProps> = ({ onBac
                <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center">
                   <div className="flex items-center gap-4">
                      <div className="flex flex-col">
-                        <span className="text-[12px] font-bold text-textLight uppercase">Edad Bio</span>
+                        <span className="text-[calc(12px*var(--escala-texto,1))] font-bold text-textLight uppercase">Edad Bio</span>
                         <span className="font-black text-primary">{record.biologicalAgeAtTime} años</span>
                      </div>
                      <div className="flex flex-col">
-                        <span className="text-[12px] font-bold text-textLight uppercase">Mejoría</span>
+                        <span className="text-[calc(12px*var(--escala-texto,1))] font-bold text-textLight uppercase">Mejoría</span>
                         <div className="flex items-center gap-1 text-accentGreen">
                            <TrendingDown size={14} />
                            <span className="font-black">-{record.chronologicalAgeAtTime - record.biologicalAgeAtTime} años</span>

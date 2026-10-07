@@ -59,7 +59,7 @@ export const PurgeProtocolModal: React.FC<ModalProps> = ({ isOpen, onClose }) =>
                         <div className="bg-[#23bcef] p-6 text-white flex justify-between items-center shrink-0">
                             <div>
                                 <h3 className="text-xl font-black uppercase tracking-tight">Purga Antivejez</h3>
-                                <p className="text-[12px] font-bold opacity-80 tracking-[0.2em] uppercase">Protocolo Intestinal</p>
+                                <p className="text-[calc(12px*var(--escala-texto,1))] font-bold opacity-80 tracking-[0.2em] uppercase">Protocolo Intestinal</p>
                             </div>
                             <button onClick={onClose} className="bg-white/20 p-2 rounded-full hover:bg-white/30 transition-colors">
                                 <X size={20} />
@@ -92,14 +92,14 @@ export const PurgeProtocolModal: React.FC<ModalProps> = ({ isOpen, onClose }) =>
                                     <AlertTriangle size={14} />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-amber-800 text-[12px] font-black uppercase tracking-widest">CENA RECOMENDADA</p>
+                                    <p className="text-amber-800 text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest">CENA RECOMENDADA</p>
                                     <p className="text-amber-700 text-xs font-bold leading-tight">Sopa de vegetales ligera o ayuno después de las 6:00 PM.</p>
                                 </div>
                             </div>
 
                             {/* Section 2: Substance Selection */}
                             <div className="space-y-3">
-                                <h4 className="text-slate-500 text-[12px] font-black uppercase tracking-[0.2em] px-1">Sustancia a Utilizar</h4>
+                                <h4 className="text-slate-500 text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-[0.2em] px-1">Sustancia a Utilizar</h4>
                                 <div className="grid gap-3">
                                     {substances.map((sub) => (
                                         <button
@@ -112,7 +112,7 @@ export const PurgeProtocolModal: React.FC<ModalProps> = ({ isOpen, onClose }) =>
                                         >
                                             <div>
                                                 <p className={`font-black text-sm ${selectedSubstance === sub.id ? 'text-[#107da8]' : 'text-[#293b64]'}`}>{sub.name}</p>
-                                                <p className="text-slate-500 text-[12px] font-semibold">{sub.desc}</p>
+                                                <p className="text-slate-500 text-[calc(12px*var(--escala-texto,1))] font-semibold">{sub.desc}</p>
                                             </div>
                                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedSubstance === sub.id ? 'bg-[#23bcef] border-[#23bcef]' : 'border-slate-200'
                                                 }`}>
@@ -140,13 +140,13 @@ export const PurgeProtocolModal: React.FC<ModalProps> = ({ isOpen, onClose }) =>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
                                     <Droplet className="text-[#107da8]" size={20} />
-                                    <h5 className="text-[#293b64] font-black text-[12px] uppercase">Agua Mineral</h5>
-                                    <p className="text-slate-500 text-[12px] font-bold">Reponer electrolitos.</p>
+                                    <h5 className="text-[#293b64] font-black text-[calc(12px*var(--escala-texto,1))] uppercase">Agua Mineral</h5>
+                                    <p className="text-slate-500 text-[calc(12px*var(--escala-texto,1))] font-bold">Reponer electrolitos.</p>
                                 </div>
                                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
                                     <Shield className="text-emerald-500" size={20} />
-                                    <h5 className="text-[#293b64] font-black text-[12px] uppercase">Dieta Detox</h5>
-                                    <p className="text-slate-500 text-[12px] font-bold">Reiniciar bioma.</p>
+                                    <h5 className="text-[#293b64] font-black text-[calc(12px*var(--escala-texto,1))] uppercase">Dieta Detox</h5>
+                                    <p className="text-slate-500 text-[calc(12px*var(--escala-texto,1))] font-bold">Reiniciar bioma.</p>
                                 </div>
                             </div>
                         </div>
@@ -195,7 +195,7 @@ export const ChelationProtocolModal: React.FC<ModalProps> = ({ isOpen, onClose }
                         <div className="bg-[#293b64] p-6 text-white flex justify-between items-center shrink-0 border-b-2 border-cyan-400">
                             <div>
                                 <h3 className="text-xl font-black uppercase tracking-tight">Quelación Endovenosa</h3>
-                                <p className="text-[12px] font-bold text-cyan-400 tracking-[0.2em] uppercase">Limpieza Vascular Profunda</p>
+                                <p className="text-[calc(12px*var(--escala-texto,1))] font-bold text-cyan-400 tracking-[0.2em] uppercase">Limpieza Vascular Profunda</p>
                             </div>
                             <button onClick={onClose} className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-colors">
                                 <X size={20} />
@@ -225,9 +225,9 @@ export const ChelationProtocolModal: React.FC<ModalProps> = ({ isOpen, onClose }
                             {/* Section 2: Active Ingredient (EDTA) */}
                             <div className="bg-[#1e2b4a] rounded-[2rem] p-6 border-2 border-cyan-500/30 shadow-[0_0_15px_rgba(35,188,239,0.3)] flex items-center justify-between group">
                                 <div className="space-y-1">
-                                    <p className="text-cyan-400 text-[12px] font-black uppercase tracking-widest">Ingrediente Activo</p>
+                                    <p className="text-cyan-400 text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest">Ingrediente Activo</p>
                                     <h4 className="text-5xl font-black text-white tracking-tighter">EDTA</h4>
-                                    <p className="text-slate-500 text-[12px] font-bold uppercase">Ácido Edético Magistral</p>
+                                    <p className="text-slate-500 text-[calc(12px*var(--escala-texto,1))] font-bold uppercase">Ácido Edético Magistral</p>
                                 </div>
                                 <div className="text-cyan-400/20 group-hover:text-cyan-400/40 transition-colors duration-500">
                                     <Dna size={80} />
@@ -236,7 +236,7 @@ export const ChelationProtocolModal: React.FC<ModalProps> = ({ isOpen, onClose }
 
                             {/* Section 3: Objectives */}
                             <div className="space-y-4">
-                                <h4 className="text-slate-500 text-[12px] font-black uppercase tracking-[0.2em] px-1">Objetivos de Remoción</h4>
+                                <h4 className="text-slate-500 text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-[0.2em] px-1">Objetivos de Remoción</h4>
                                 <div className="space-y-3">
                                     {[
                                         { title: 'Calcificaciones', desc: 'Descalcificación de arterias coronarias y renales.', icon: <Droplet className="text-blue-400" size={18} /> },
@@ -247,7 +247,7 @@ export const ChelationProtocolModal: React.FC<ModalProps> = ({ isOpen, onClose }
                                             <div className="shrink-0 pt-1">{obj.icon}</div>
                                             <div className="space-y-1">
                                                 <h5 className="text-[#293b64] font-black text-xs uppercase">{obj.title}</h5>
-                                                <p className="text-slate-500 text-[13px] font-semibold leading-snug">{obj.desc}</p>
+                                                <p className="text-slate-500 text-[calc(13px*var(--escala-texto,1))] font-semibold leading-snug">{obj.desc}</p>
                                             </div>
                                         </div>
                                     ))}

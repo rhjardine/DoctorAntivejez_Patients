@@ -31,7 +31,7 @@ export const ExitConfirmModal: React.FC<ExitConfirmModalProps> = ({
                             </div>
 
                             <h3 className="text-white text-lg font-bold">¿Salir del test?</h3>
-                            <p className="text-white/70 text-[13px] leading-relaxed mt-2 px-1">
+                            <p className="text-white/70 text-[calc(13px*var(--escala-texto,1))] leading-relaxed mt-2 px-1">
                                 {message || "Perderás las respuestas que has registrado hasta ahora."}
                             </p>
                         </div>

@@ -37,13 +37,13 @@ const UserProfileGatewayPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-10 text-center"
         >
-          <p className="text-[13px] font-black uppercase tracking-[0.25em] mb-4 text-[#94A3B8]">
+          <p className="text-[calc(13px*var(--escala-texto,1))] font-black uppercase tracking-[0.25em] mb-4 text-[#94A3B8]">
             Doctor Antivejez
           </p>
-          <h1 className="text-[32px] font-black leading-[1.1] text-slate-900 tracking-tight">
+          <h1 className="text-[calc(32px*var(--escala-texto,1))] font-black leading-[1.1] text-slate-900 tracking-tight">
             ¿Cómo deseas ingresar?
           </h1>
-          <p className="text-[15px] mt-4 text-slate-500 font-medium">
+          <p className="text-[calc(15px*var(--escala-texto,1))] mt-4 text-slate-500 font-medium">
             Selecciona tu perfil para una atención personalizada.
           </p>
         </motion.div>
@@ -77,8 +77,8 @@ const UserProfileGatewayPage: React.FC = () => {
               </div>
             </div>
 
-            <h2 className="text-[22px] font-black text-white leading-tight mb-2">Soy paciente</h2>
-            <p className="text-[14px] text-white/70 leading-relaxed font-medium">
+            <h2 className="text-[calc(22px*var(--escala-texto,1))] font-black text-white leading-tight mb-2">Soy paciente</h2>
+            <p className="text-[calc(14px*var(--escala-texto,1))] text-white/70 leading-relaxed font-medium">
               Accede a tu guía médica personalizada y seguimiento de vitalidad.
             </p>
           </motion.button>
@@ -98,8 +98,8 @@ const UserProfileGatewayPage: React.FC = () => {
               <UserRound size={20} />
             </div>
             <div className="flex-1">
-              <h2 className="text-[17px] font-bold text-slate-800">Soy invitado</h2>
-              <p className="text-[12px] text-slate-500 font-medium">Explora el test de longevidad gratuito.</p>
+              <h2 className="text-[calc(17px*var(--escala-texto,1))] font-bold text-slate-800">Soy invitado</h2>
+              <p className="text-[calc(12px*var(--escala-texto,1))] text-slate-500 font-medium">Explora el test de longevidad gratuito.</p>
             </div>
             <ArrowRight size={16} className="text-slate-500" />
           </motion.button>
@@ -110,7 +110,7 @@ const UserProfileGatewayPage: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
             onClick={() => navigate('/medicos')}
-            className="mt-6 py-4 px-6 text-[13px] font-bold uppercase tracking-widest text-[#94A3B8] hover:text-slate-600 transition-colors text-center"
+            className="mt-6 py-4 px-6 text-[calc(13px*var(--escala-texto,1))] font-bold uppercase tracking-widest text-[#94A3B8] hover:text-slate-600 transition-colors text-center"
           >
             ¿Eres profesional de salud? <span className="text-turquoise underline ml-1" style={{ color: TURQUOISE }}>Ver red médica</span>
           </motion.button>
@@ -122,7 +122,7 @@ const UserProfileGatewayPage: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-center text-[12px] font-black uppercase tracking-[0.2em] mt-12 text-[#CBD5E1]"
+          className="text-center text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-[0.2em] mt-12 text-[#CBD5E1]"
         >
           Medicina de longevidad basada en evidencia
         </motion.p>

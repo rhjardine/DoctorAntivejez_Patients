@@ -67,14 +67,14 @@ const MealNotesField: React.FC<Props> = ({ mealId, mealLabel }) => {
       <div className="flex items-center justify-between mb-2">
         <label
           htmlFor={fieldId}
-          className="flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-[#107da8]"
+          className="flex items-center gap-2 text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest text-[#107da8]"
         >
           <PencilLine size={13} />
           Mis notas · {mealLabel}
         </label>
 
         {isSaved && (
-          <span className="flex items-center gap-1 text-[12px] font-bold uppercase tracking-widest text-emerald-600">
+          <span className="flex items-center gap-1 text-[calc(12px*var(--escala-texto,1))] font-bold uppercase tracking-widest text-emerald-600">
             <Check size={12} /> Guardado
           </span>
         )}
@@ -91,7 +91,7 @@ const MealNotesField: React.FC<Props> = ({ mealId, mealLabel }) => {
         className="w-full resize-none bg-[#f8fafc] border border-slate-100 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-[#293b64] placeholder:text-slate-500 outline-none focus:border-[#23bcef] transition-colors disabled:opacity-50"
       />
 
-      <p className="flex items-start gap-1.5 mt-2 text-[12px] font-medium leading-relaxed text-slate-500">
+      <p className="flex items-start gap-1.5 mt-2 text-[calc(12px*var(--escala-texto,1))] font-medium leading-relaxed text-slate-500">
         <Lock size={11} className="flex-shrink-0 mt-0.5" />
         Estas notas son privadas y se guardan solo en este dispositivo. Tu médico
         no las ve — coméntaselo en tu consulta.

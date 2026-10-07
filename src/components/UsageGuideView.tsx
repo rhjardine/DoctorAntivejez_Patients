@@ -46,7 +46,7 @@ const UsageGuideView: React.FC = () => {
           <div className="w-1.5 h-4 bg-primary rounded-full" />
           Indicadores de Salud
         </h3>
-        <p className="text-[13px] text-textMedium font-bold mb-5">
+        <p className="text-[calc(13px*var(--escala-texto,1))] text-textMedium font-bold mb-5">
           Los círculos de tu Dashboard muestran tu nivel
           de adherencia en cada área de salud.
         </p>
@@ -55,11 +55,11 @@ const UsageGuideView: React.FC = () => {
           {/* RED */}
           <div className="flex items-start gap-4 p-4 rounded-2xl bg-red-50 border border-red-100">
             <div className="w-12 h-12 rounded-full border-4 border-red-500 bg-white flex items-center justify-center shrink-0 shadow-sm">
-              <span className="text-[12px] font-black text-red-700">0-49%</span>
+              <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-red-700">0-49%</span>
             </div>
             <div>
               <p className="text-xs font-black text-red-700 uppercase tracking-wide mb-1">Necesita Atención</p>
-              <p className="text-[13px] text-red-800 font-bold leading-relaxed">
+              <p className="text-[calc(13px*var(--escala-texto,1))] text-red-800 font-bold leading-relaxed">
                 Adherencia baja. Este indicador necesita mejorar para recuperar tu salud. Consulta con tu médico.
               </p>
             </div>
@@ -68,11 +68,11 @@ const UsageGuideView: React.FC = () => {
           {/* YELLOW */}
           <div className="flex items-start gap-4 p-4 rounded-2xl bg-amber-50 border border-amber-100">
             <div className="w-12 h-12 rounded-full border-4 border-amber-400 bg-white flex items-center justify-center shrink-0 shadow-sm">
-              <span className="text-[12px] font-black text-amber-700">50-79%</span>
+              <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-amber-700">50-79%</span>
             </div>
             <div>
               <p className="text-xs font-black text-amber-700 uppercase tracking-wide mb-1">En Proceso</p>
-              <p className="text-[13px] text-amber-800 font-bold leading-relaxed">
+              <p className="text-[calc(13px*var(--escala-texto,1))] text-amber-800 font-bold leading-relaxed">
                 Adherencia básica. Rango aceptable pero aún no alcanzas tu óptimo. ¡Sigue adelante!
               </p>
             </div>
@@ -81,11 +81,11 @@ const UsageGuideView: React.FC = () => {
           {/* GREEN */}
           <div className="flex items-start gap-4 p-4 rounded-2xl bg-[#23bcef]/10 border border-[#23bcef]/20">
             <div className="w-12 h-12 rounded-full border-4 border-[#23bcef] bg-white flex items-center justify-center shrink-0 shadow-sm">
-              <span className="text-[12px] font-black text-sky-800">80-100%</span>
+              <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-sky-800">80-100%</span>
             </div>
             <div>
               <p className="text-xs font-black text-sky-800 uppercase tracking-wide mb-1">Hito de Salud</p>
-              <p className="text-[13px] text-sky-800 font-bold leading-relaxed">
+              <p className="text-[calc(13px*var(--escala-texto,1))] text-sky-800 font-bold leading-relaxed">
                 Adherencia elevada. En el camino óptimo hacia tu rejuvenecimiento celular. ¡Excelente!
               </p>
             </div>
@@ -113,8 +113,8 @@ const UsageGuideView: React.FC = () => {
                 <div className={`w-3 h-3 rounded-full border-2 border-current ${item.textColor}`} />
               </div>
               <div>
-                <p className="text-[13px] font-black text-darkBlue uppercase tracking-wide">{item.label}</p>
-                <p className="text-[12px] text-textMedium font-bold">{item.desc}</p>
+                <p className="text-[calc(13px*var(--escala-texto,1))] font-black text-darkBlue uppercase tracking-wide">{item.label}</p>
+                <p className="text-[calc(12px*var(--escala-texto,1))] text-textMedium font-bold">{item.desc}</p>
               </div>
             </div>
           ))}
@@ -151,7 +151,7 @@ const UsageGuideView: React.FC = () => {
 
       <div className="flex flex-col items-center pt-8 opacity-40">
         <ShieldCheck size={40} className="text-darkBlue mb-2" />
-        <p className="text-[12px] font-black uppercase tracking-[0.2em]">Doctor Antivejez</p>
+        <p className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-[0.2em]">Doctor Antivejez</p>
       </div>
     </div>
   );
