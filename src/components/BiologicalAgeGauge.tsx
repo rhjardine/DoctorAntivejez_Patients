@@ -58,10 +58,15 @@ const BiologicalAgeGauge: React.FC<BiologicalAgeGaugeProps> = ({
   const [anchos, setAnchos] = useState({ barra: 0, ref: 0, tu: 0 });
 
   useEffect(() => {
+    // `offsetWidth` y no `getBoundingClientRect()`: HomePage monta este marcador
+    // dentro de una animación de framer-motion que arranca en `scale: 0.98`, y
+    // el rect viene ya transformado. Medido así, la barra daba 343px en lugar de
+    // 350 y cada etiqueta quedaba ~5px a la izquierda de su marcador; como la
+    // caja de maquetación no cambia, el ResizeObserver nunca lo corregía.
     const medir = () => {
-      const barra = barraRef.current?.getBoundingClientRect().width ?? 0;
-      const ref = carrilRef.current?.getBoundingClientRect().width ?? 0;
-      const tu = carrilTu.current?.getBoundingClientRect().width ?? 0;
+      const barra = barraRef.current?.offsetWidth ?? 0;
+      const ref = carrilRef.current?.offsetWidth ?? 0;
+      const tu = carrilTu.current?.offsetWidth ?? 0;
       setAnchos((previo) =>
         Math.abs(previo.barra - barra) < 0.5 &&
         Math.abs(previo.ref - ref) < 0.5 &&
