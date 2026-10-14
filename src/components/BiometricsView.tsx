@@ -13,7 +13,7 @@ interface BiometricsViewProps {
 }
 
 const SimpleLineChart: React.FC<{ data: number[]; color: string; height?: number }> = ({ data, color, height = 40 }) => {
-  if (data.length < 2) return <div style={{ height }} className="flex items-end justify-center text-[12px] text-gray-300 dark:text-slate-600 pb-1">Sin historial</div>;
+  if (data.length < 2) return <div style={{ height }} className="flex items-end justify-center text-[calc(12px*var(--escala-texto,1))] text-gray-300 dark:text-slate-600 pb-1">Sin historial</div>;
 
   const max = Math.max(...data);
   const min = Math.min(...data);
@@ -106,7 +106,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
             </div>
             <div>
               <h3 className="text-sm font-semibold text-[#293b64] dark:text-white">{title}</h3>
-              <span className="text-[12px] text-textLight dark:text-slate-500">Último: {latest ? latest.timestamp.toLocaleDateString() : '--'}</span>
+              <span className="text-[calc(12px*var(--escala-texto,1))] text-textLight dark:text-slate-500">Último: {latest ? latest.timestamp.toLocaleDateString() : '--'}</span>
             </div>
           </div>
 
@@ -386,18 +386,18 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
                   autoFocus
                 />
                 {validationError ? (
-                  <p className="text-[12px] text-red-500 font-semibold pl-1 animate-in fade-in slide-in-from-top-1">
+                  <p className="text-[calc(12px*var(--escala-texto,1))] text-red-500 font-semibold pl-1 animate-in fade-in slide-in-from-top-1">
                     {validationError}
                   </p>
                 ) : (
-                  newType === 'BLOOD_PRESSURE' && <p className="text-[12px] text-slate-500 dark:text-slate-500 pl-1">Formato: Sistólica/Diastólica</p>
+                  newType === 'BLOOD_PRESSURE' && <p className="text-[calc(12px*var(--escala-texto,1))] text-slate-500 dark:text-slate-500 pl-1">Formato: Sistólica/Diastólica</p>
                 )}
               </div>
 
               {/* Date & Time Inputs */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-[12px] font-bold text-textMedium dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                  <label className="text-[calc(12px*var(--escala-texto,1))] font-bold text-textMedium dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
                     <Calendar size={12} /> Fecha
                   </label>
                   <input
@@ -409,7 +409,7 @@ const BiometricsView: React.FC<BiometricsViewProps> = ({ entries, onAdd, onDelet
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[12px] font-bold text-textMedium dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                  <label className="text-[calc(12px*var(--escala-texto,1))] font-bold text-textMedium dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
                     <Clock size={12} /> Hora
                   </label>
                   <input

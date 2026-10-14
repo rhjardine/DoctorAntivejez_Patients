@@ -6,6 +6,7 @@ import * as Sentry from "@sentry/react";
 import { cryptoService, CryptoConfigError } from './services/cryptoService';
 import { validateStoredSession } from './services/sessionBootstrap';
 import { logger } from './utils/logger';
+import { offlineQueue } from './services/offlineQueue';
 
 /**
  * Rutas que no exigen sesión. Si el guard de arranque descarta la sesión y el
@@ -124,6 +125,9 @@ async function main() {
     }
     keysToRemove.forEach(k => localStorage.removeItem(k));
     sessionStorage.clear();
+    // La cola offline vive en IndexedDB y sobrevivía a este reseteo: un
+    // dispositivo "limpiado" conservaba escrituras clínicas del paciente.
+    void offlineQueue.clearAll().catch(() => { /* el reseteo no debe fallar por esto */ });
     // Clear Service Worker caches too
     if ('caches' in window) {
       caches.keys().then(names => names.forEach(n => caches.delete(n)));

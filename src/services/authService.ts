@@ -2,6 +2,7 @@ import axios from 'axios';
 import { UserSession } from '../types';
 import { useProfileStore } from '../store/useProfileStore';
 import { logger } from '../utils/logger';
+import { offlineQueue } from './offlineQueue';
 import { clearPatientScopedStorage } from '../utils/storageCleanup';
 import { ProtocolService } from './protocolService';
 import { tokenStore } from './tokenStore';
@@ -32,6 +33,67 @@ const storage = localStorage;
  * Servicio de Autenticación para la PWA Rejuvenate.
  * Maneja el inicio de sesión del paciente y la persistencia de la sesión.
  */
+
+/**
+ * Al cerrar sesión: enviar lo que quedó encolado y retirar del dispositivo solo
+ * lo que llegó al servidor.
+ *
+ * La cola vive en IndexedDB, que no se borraba nunca al salir. Sus entradas van
+ * cifradas y acotadas a su dueño —`useSyncQueue` jamás reproduce las de otro
+ * paciente—, pero la clave está ligada al dispositivo, así que en un teléfono
+ * compartido seguían siendo descifrables hasta caducar a los siete días.
+ *
+ * No se borra sin más: una escritura sin sincronizar es un registro clínico que
+ * el paciente hizo sin conexión y que nadie más tiene. Destruirlo para resolver
+ * un problema de retención sería un remedio peor que la enfermedad. Lo que no
+ * se pudo enviar se queda —cifrado, acotado y con su caducidad— y se reintenta
+ * la próxima vez que ese paciente entre.
+ *
+ * Va sin `await` a propósito: cerrar sesión debe ser inmediato y esto es una
+ * tarea de limpieza, no un paso del que dependa la salida.
+ */
+const sincronizarYRetirarCola = async (
+  patientId: string,
+  token: string | null,
+): Promise<void> => {
+  if (!patientId) return;
+  try {
+    const pendientes = await offlineQueue.dequeueForPatient(patientId);
+    if (pendientes.length === 0) return;
+
+    if (!navigator.onLine || !token) {
+      logger.warn('[Logout] Cola offline conservada: sin conexión o sin token', {
+        reason: 'OFFLINE_QUEUE_KEPT',
+        pendientes: pendientes.length,
+      });
+      return;
+    }
+
+    let enviadas = 0;
+    for (const item of pendientes) {
+      try {
+        const res = await fetch(item.url, {
+          method: item.method,
+          headers: { ...item.headers, Authorization: `Bearer ${token}` },
+          body: item.body,
+        });
+        if (res.ok || res.status === 409) {
+          await offlineQueue.remove(item.id!);
+          enviadas += 1;
+        }
+      } catch {
+        break; // La red cayó: lo demás se queda para el próximo intento.
+      }
+    }
+
+    logger.audit('logout_queue_flush', { enviadas, pendientes: pendientes.length });
+  } catch (error) {
+    logger.warn('[Logout] No se pudo vaciar la cola offline', {
+      reason: 'OFFLINE_QUEUE_FLUSH_FAILED',
+    });
+  }
+};
+
 export const authService = {
   /**
    * Limpieza dirigida de datos de sesión previos.
@@ -165,6 +227,12 @@ export const authService = {
    * Finaliza la sesión y limpia el almacenamiento local y la memoria.
    */
   logout: () => {
+    // Se capturan antes de limpiar: después ya no se sabe de quién era la cola
+    // ni con qué credencial enviarla.
+    const patientId = authService.getCurrentUser()?.id ?? '';
+    const token = tokenStore.getAccessToken();
+    void sincronizarYRetirarCola(patientId, token);
+
     tokenStore.clearAccessToken();
 
     // Barrido único por prefijo (ver utils/storageCleanup.ts). Antes había aquí

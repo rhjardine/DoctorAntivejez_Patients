@@ -179,7 +179,16 @@ class OfflineQueue {
      * entrar en este dispositivo— y caducan por el TTL de 7 días.
      */
     async dequeueForCurrentPatient(): Promise<QueuedWrite[]> {
-        const patientId = currentPatientId();
+        return this.dequeueForPatient(currentPatientId());
+    }
+
+    /**
+     * Igual que `dequeueForCurrentPatient`, pero con el paciente explícito.
+     *
+     * Lo necesita el cierre de sesión, que borra la sesión del almacenamiento
+     * y por tanto ya no puede deducir de quién era la cola.
+     */
+    async dequeueForPatient(patientId: string): Promise<QueuedWrite[]> {
         if (!patientId) return [];
 
         const all = await this.dequeueAll();
@@ -208,6 +217,49 @@ class OfflineQueue {
             const request = store.delete(id);
 
             request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    /**
+     * Vacía la cola por completo.
+     *
+     * Para el reseteo de emergencia `?clear=1`, que existe precisamente para
+     * dejar el dispositivo limpio. No se usa en el cierre de sesión normal:
+     * ahí borrar sin más destruiría escrituras clínicas que el paciente hizo
+     * sin conexión y que todavía no han llegado al servidor.
+     */
+    async clearAll(): Promise<void> {
+        const db = await this.openDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(STORE_NAME, 'readwrite');
+            const request = transaction.objectStore(STORE_NAME).clear();
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    /**
+     * Retira las escrituras de un paciente concreto, sin tocar las de los
+     * demás. Se usa al cerrar sesión, después de intentar sincronizarlas: lo
+     * que ya llegó al servidor no tiene por qué seguir en el aparato.
+     *
+     * Un `patientId` vacío no borra nada: sin saber de quién son, lo seguro es
+     * dejarlas donde están.
+     */
+    async removeForPatient(patientId: string): Promise<void> {
+        if (!patientId) return;
+        const db = await this.openDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(STORE_NAME, 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.openCursor();
+            request.onsuccess = () => {
+                const cursor = request.result;
+                if (!cursor) return resolve();
+                if ((cursor.value as QueuedWrite).patientId === patientId) cursor.delete();
+                cursor.continue();
+            };
             request.onerror = () => reject(request.error);
         });
     }

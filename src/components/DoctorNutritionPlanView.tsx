@@ -224,7 +224,7 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
         </p>
         <button
           onClick={onBack}
-          className="bg-[#293b64] text-white px-8 py-4 rounded-2xl font-black text-[12px] uppercase tracking-widest shadow-lg active:scale-95 transition-transform"
+          className="bg-[#293b64] text-white px-8 py-4 rounded-2xl font-black text-[calc(12px*var(--escala-texto,1))] uppercase tracking-widest shadow-lg active:scale-95 transition-transform"
         >
           Volver
         </button>
@@ -248,7 +248,7 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
           <div className="text-center flex-1 px-4">
             <div className="flex items-center justify-center gap-2 mb-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-[#23BCEF] animate-pulse" />
-              <span className="text-[12px] font-black text-[#23BCEF] uppercase tracking-[0.2em] opacity-90">
+              <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-[#23BCEF] uppercase tracking-[0.2em] opacity-90">
                 Dr. Antivejez · 2024
               </span>
             </div>
@@ -280,7 +280,7 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
               }`}
             >
               <Icon size={16} />
-              <span className="text-[12px] uppercase font-black tracking-wider">
+              <span className="text-[calc(12px*var(--escala-texto,1))] uppercase font-black tracking-wider">
                 {label}
               </span>
             </button>
@@ -300,7 +300,7 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                 className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-100"
               >
                 <Info size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
-                <p className="text-[13px] font-medium leading-relaxed text-amber-900">
+                <p className="text-[calc(13px*var(--escala-texto,1))] font-medium leading-relaxed text-amber-900">
                   Tu médico aún no ha registrado tu plan personalizado. Lo que ves
                   es una <strong>pauta orientativa general</strong> según tu grupo
                   sanguíneo, no una prescripción.
@@ -336,12 +336,12 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                     </div>
                     <h3
                       id={`meal-${id}`}
-                      className="text-[13px] font-black uppercase tracking-widest text-[#293b64]"
+                      className="text-[calc(13px*var(--escala-texto,1))] font-black uppercase tracking-widest text-[#293b64]"
                     >
                       {label}
                     </h3>
                     {!isPrescribed && !planEsGenerico && (
-                      <span className="text-[12px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-100 px-2 py-1 rounded-lg">
+                      <span className="text-[calc(12px*var(--escala-texto,1))] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-100 px-2 py-1 rounded-lg">
                         Orientativo
                       </span>
                     )}
@@ -395,7 +395,7 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                 <div className="p-2.5 bg-red-500 rounded-xl text-white">
                   <ShieldAlert size={20} />
                 </div>
-                <h4 className="text-[13px] font-black text-red-700 uppercase tracking-widest">
+                <h4 className="text-[calc(13px*var(--escala-texto,1))] font-black text-red-700 uppercase tracking-widest">
                   Incompatibles
                 </h4>
               </div>
@@ -418,7 +418,7 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
                 <div className="p-2.5 bg-emerald-500 rounded-xl text-white">
                   <Heart size={20} />
                 </div>
-                <h4 className="text-[13px] font-black text-emerald-700 uppercase tracking-widest">
+                <h4 className="text-[calc(13px*var(--escala-texto,1))] font-black text-emerald-700 uppercase tracking-widest">
                   Sustitutos Sanos
                 </h4>
               </div>
@@ -439,7 +439,7 @@ const DoctorNutritionPlanView: React.FC<Props> = ({ onBack }) => {
 
         {/* Footer del plan */}
         <div className="px-5 py-10 opacity-40 text-center">
-          <p className="text-[12px] font-black text-[#293b64] uppercase tracking-[0.3em]">
+          <p className="text-[calc(12px*var(--escala-texto,1))] font-black text-[#293b64] uppercase tracking-[0.3em]">
             Documento Médico Digital • Protocolo Antivejez
           </p>
         </div>

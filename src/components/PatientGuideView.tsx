@@ -279,7 +279,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
     <div className="flex-1 overflow-y-auto no-scrollbar bg-[#F8FAFC] px-5 pt-5 pb-16 space-y-3">
       <div className="flex items-start gap-3 p-4 rounded-2xl bg-sky-50 border border-sky-100 mb-1">
         <Stethoscope size={16} className="text-[#107da8] flex-shrink-0 mt-0.5" />
-        <p className="text-[13px] font-medium leading-relaxed text-[#293b64]/70">
+        <p className="text-[calc(13px*var(--escala-texto,1))] font-medium leading-relaxed text-[#293b64]/70">
           Estos procedimientos se realizan <strong>en consulta</strong>. Es tu
           indicación médica oficial; no requiere que registres nada.
         </p>
@@ -297,7 +297,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
             </div>
             <h3
               id={`terapeutica-${catType}`}
-              className="text-[13px] font-black uppercase tracking-widest text-[#293b64]"
+              className="text-[calc(13px*var(--escala-texto,1))] font-black uppercase tracking-widest text-[#293b64]"
             >
               {CATEGORY_LABELS[catType] || catType}
             </h3>
@@ -329,7 +329,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
                 )}
 
                 {item.observations && (
-                  <p className="mt-2.5 text-[13px] font-medium italic leading-relaxed text-slate-500 bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
+                  <p className="mt-2.5 text-[calc(13px*var(--escala-texto,1))] font-medium italic leading-relaxed text-slate-500 bg-slate-50 rounded-xl px-3 py-2 border border-slate-100">
                     {item.observations}
                   </p>
                 )}
@@ -359,14 +359,14 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
           </div>
 
           <div className="relative z-10">
-            <h2 className="text-primary/90 text-[13px] font-bold uppercase tracking-wider mb-0.5">
+            <h2 className="text-primary/90 text-[calc(13px*var(--escala-texto,1))] font-bold uppercase tracking-wider mb-0.5">
               Mi Perfil de Longevidad
             </h2>
-            <p className="text-slate-500 text-[12px] mb-5">Basado en tus últimos biomarcadores clínicos</p>
+            <p className="text-slate-500 text-[calc(12px*var(--escala-texto,1))] mb-5">Basado en tus últimos biomarcadores clínicos</p>
 
             <div className="flex items-end gap-5">
               <div>
-                <p className="text-slate-500 text-[12px] uppercase font-semibold mb-0.5 tracking-widest">Edad Celular</p>
+                <p className="text-slate-500 text-[calc(12px*var(--escala-texto,1))] uppercase font-semibold mb-0.5 tracking-widest">Edad Celular</p>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-black text-white">{bioAge || '--'}</span>
                   <span className="text-primary text-base font-medium">años</span>
@@ -374,13 +374,13 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
               </div>
 
               <div className="pb-0.5 border-l border-slate-700 pl-5">
-                <p className="text-slate-500 text-[12px] uppercase font-semibold mb-0.5 tracking-widest">Edad Cronológica</p>
+                <p className="text-slate-500 text-[calc(12px*var(--escala-texto,1))] uppercase font-semibold mb-0.5 tracking-widest">Edad Cronológica</p>
                 <p className="text-lg font-medium text-slate-500">{chronoAge || '--'} años</p>
               </div>
             </div>
 
             {isYounger && (
-              <div className="mt-5 inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full text-[13px] font-black tracking-wide border border-primary/30 backdrop-blur-sm">
+              <div className="mt-5 inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full text-[calc(13px*var(--escala-texto,1))] font-black tracking-wide border border-primary/30 backdrop-blur-sm">
                 <Sparkles className="w-3.5 h-3.5" />
                 ¡Felicidades! Tu edad celular es {chronoAge - bioAge} años menor.
               </div>
@@ -401,7 +401,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
           >
             <div className="w-full bg-[#293B64] text-white px-5 py-3 flex items-center gap-3">
               <Pill size={14} />
-              <h3 className="font-black text-[13px] uppercase tracking-widest text-left">
+              <h3 className="font-black text-[calc(13px*var(--escala-texto,1))] uppercase tracking-widest text-left">
                 Nutracéuticos
               </h3>
             </div>
@@ -417,15 +417,15 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
                   >
                     <div className="flex justify-between items-start gap-3">
                       <div className="flex-1 min-w-0">
-                        <span className="block text-[12px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
+                        <span className="block text-[calc(12px*var(--escala-texto,1))] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
                           {CATEGORY_LABELS[item.category] || item.category}
                         </span>
-                        <h4 className="font-black text-darkBlue text-[15px] leading-snug">
+                        <h4 className="font-black text-darkBlue text-[calc(15px*var(--escala-texto,1))] leading-snug">
                           {item.itemName}
                         </h4>
                       </div>
                       {getSlotLabel(item.timeSlot) && (
-                        <span className="text-[12px] font-black text-primary bg-white px-2.5 py-1 rounded-lg uppercase tracking-tighter border border-sky-100 shrink-0">
+                        <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-primary bg-white px-2.5 py-1 rounded-lg uppercase tracking-tighter border border-sky-100 shrink-0">
                           {getSlotLabel(item.timeSlot)}
                         </span>
                       )}
@@ -434,15 +434,15 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
                     {(item.dose || item.schedule) && (
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
                         {item.dose && (
-                          <span className="text-[13px] font-bold text-[#107da8]">
+                          <span className="text-[calc(13px*var(--escala-texto,1))] font-bold text-[#107da8]">
                             {item.dose}
                           </span>
                         )}
                         {item.dose && item.schedule && (
-                          <span className="text-[13px] text-slate-500">·</span>
+                          <span className="text-[calc(13px*var(--escala-texto,1))] text-slate-500">·</span>
                         )}
                         {item.schedule && (
-                          <span className="flex items-center gap-1 text-[13px] font-medium italic text-slate-500">
+                          <span className="flex items-center gap-1 text-[calc(13px*var(--escala-texto,1))] font-medium italic text-slate-500">
                             <Clock size={11} className="text-slate-500" />
                             {item.schedule}
                           </span>
@@ -457,7 +457,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
                           className="text-amber-500 shrink-0"
                         />
                         <div className="flex-1 min-w-0">
-                          <span className="text-[12px] font-black uppercase block mb-1 text-amber-700 tracking-widest">
+                          <span className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase block mb-1 text-amber-700 tracking-widest">
                             Observación del Médico
                           </span>
                           <p className="text-xs leading-relaxed font-bold italic text-amber-900 whitespace-pre-wrap break-words">
@@ -489,7 +489,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
           <div className="flex items-center gap-3">
             <AlertTriangle size={20} className="text-white flex-shrink-0" />
             <div>
-              <p className="text-[13px] font-black uppercase tracking-widest text-white">
+              <p className="text-[calc(13px*var(--escala-texto,1))] font-black uppercase tracking-widest text-white">
                 No se registró tu cambio
               </p>
               <p className="text-xs font-bold text-red-50">{syncError}</p>
@@ -512,7 +512,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
           <div className="flex items-center gap-3">
             <Bell size={20} className="text-amber-900 animate-pulse" />
             <div>
-              <p className="text-[13px] font-black uppercase tracking-widest text-amber-900">
+              <p className="text-[calc(13px*var(--escala-texto,1))] font-black uppercase tracking-widest text-amber-900">
                 Protocolo Actualizado
               </p>
               <p className="text-xs font-bold text-amber-800">
@@ -532,14 +532,14 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
         <div className="bg-white pt-6 pb-4 px-6 border-b border-slate-100 shadow-sm z-20">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h2 className="text-[20px] font-black text-[#293B64] leading-none tracking-tighter uppercase">
+              <h2 className="text-[calc(20px*var(--escala-texto,1))] font-black text-[#293B64] leading-none tracking-tighter uppercase">
                 Tu Guía de Salud Personalizada
               </h2>
               <div className="flex items-center gap-2 mt-1.5">
                 <div
                   className={`w-2 h-2 rounded-full ${isRefreshing ? 'bg-amber-400 animate-spin' : 'bg-primary animate-pulse'}`}
                 ></div>
-                <span className="text-[12px] font-black text-slate-500 uppercase tracking-widest">
+                <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-slate-500 uppercase tracking-widest">
                   Sincronizado via Prisma
                 </span>
               </div>
@@ -591,7 +591,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
               </div>
               <button
                 onClick={handleManualRefresh}
-                className="bg-darkBlue text-white px-8 py-3.5 rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 active:scale-95 transition-all"
+                className="bg-darkBlue text-white px-8 py-3.5 rounded-2xl text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 active:scale-95 transition-all"
               >
                 <RefreshCw
                   size={14}
@@ -618,7 +618,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
               </div>
               <button
                 onClick={handleManualRefresh}
-                className="bg-[#293B64] text-white px-8 py-3.5 rounded-2xl text-[12px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 active:scale-95 transition-all"
+                className="bg-[#293B64] text-white px-8 py-3.5 rounded-2xl text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 active:scale-95 transition-all"
               >
                 <RefreshCw
                   size={14}

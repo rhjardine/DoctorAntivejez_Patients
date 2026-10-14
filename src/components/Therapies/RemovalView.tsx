@@ -120,11 +120,11 @@ const RemovalView: React.FC<RemovalViewProps> = ({ onBack }) => {
                             <div className="bg-[#23bcef] p-1.5 rounded-lg text-white">
                                 <Beaker size={14} fill="currentColor" fillOpacity={0.2} />
                             </div>
-                            <span className="text-[#107da8] font-black uppercase tracking-widest text-[12px]">Fase 1: Remoción</span>
+                            <span className="text-[#107da8] font-black uppercase tracking-widest text-[calc(12px*var(--escala-texto,1))]">Fase 1: Remoción</span>
                         </div>
                     </div>
 
-                    <h2 className="text-white text-[13px] font-bold italic leading-relaxed mb-4 opacity-90 max-w-[90%]">
+                    <h2 className="text-white text-[calc(13px*var(--escala-texto,1))] font-bold italic leading-relaxed mb-4 opacity-90 max-w-[90%]">
                         "{session?.name?.split(' ')[0]?.toUpperCase() || 'PACIENTE'}, para rejuvenecer, primero debemos remover. La acumulación de toxinas es la causa #1 de la inflamación crónica."
                     </h2>
 
@@ -139,7 +139,7 @@ const RemovalView: React.FC<RemovalViewProps> = ({ onBack }) => {
                                 />
                             </div>
                         </div>
-                        <span className="text-white font-black text-[12px] uppercase tracking-widest shrink-0">Nivel de Desbloqueo</span>
+                        <span className="text-white font-black text-[calc(12px*var(--escala-texto,1))] uppercase tracking-widest shrink-0">Nivel de Desbloqueo</span>
                     </div>
                 </div>
             </div>
@@ -161,9 +161,9 @@ const RemovalView: React.FC<RemovalViewProps> = ({ onBack }) => {
                             <div className="flex-1 min-w-0">
                                 <h3 className="text-[#293b64] font-black text-lg leading-tight mb-1">{therapy.title}</h3>
                                 <div className="flex items-center justify-between">
-                                    <p className="text-[#107da8] text-[12px] font-black uppercase tracking-widest truncate">{therapy.subtitle}</p>
+                                    <p className="text-[#107da8] text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest truncate">{therapy.subtitle}</p>
                                     {therapy.id === 'purga' && (
-                                        <span className="bg-[#23bcef] text-white text-[12px] font-black px-2 py-1 rounded-lg uppercase tracking-widest shadow-sm shadow-cyan-200">Protocolo Vital</span>
+                                        <span className="bg-[#23bcef] text-white text-[calc(12px*var(--escala-texto,1))] font-black px-2 py-1 rounded-lg uppercase tracking-widest shadow-sm shadow-cyan-200">Protocolo Vital</span>
                                     )}
                                 </div>
                             </div>
@@ -179,7 +179,7 @@ const RemovalView: React.FC<RemovalViewProps> = ({ onBack }) => {
                                     <Waves size={14} />
                                 </div>
                                 <div className="flex-1">
-                                    <span className="text-emerald-800/60 text-[12px] font-black uppercase tracking-widest block mb-1">Beneficio Celular:</span>
+                                    <span className="text-emerald-800/60 text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest block mb-1">Beneficio Celular:</span>
                                     <p className="text-emerald-800 text-xs font-bold leading-snug">{therapy.benefit}</p>
                                 </div>
                             </div>
@@ -188,7 +188,7 @@ const RemovalView: React.FC<RemovalViewProps> = ({ onBack }) => {
                         <div className="flex items-center justify-between gap-4">
                             <div className="flex-1 flex flex-col gap-1.5">
                                 <div className="flex justify-between items-end">
-                                    <span className="text-slate-500 text-[12px] font-black uppercase tracking-widest">Poder de Remoción</span>
+                                    <span className="text-slate-500 text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest">Poder de Remoción</span>
                                     <span className="text-[#293b64] text-xs font-black">{therapy.removalPower}%</span>
                                 </div>
                                 <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">

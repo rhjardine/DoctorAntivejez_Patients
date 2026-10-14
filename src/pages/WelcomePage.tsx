@@ -18,10 +18,10 @@ const WelcomePage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-16 text-center"
         >
-          <span className="font-extrabold tracking-[0.5em] text-[24px] text-[#293b64] block">
+          <span className="font-extrabold tracking-[0.5em] text-[calc(24px*var(--escala-texto,1))] text-[#293b64] block">
             VYTALIX
           </span>
-          <span className="text-[12px] font-black tracking-[0.3em] text-[#107da8] uppercase mt-3 block">
+          <span className="text-[calc(12px*var(--escala-texto,1))] font-black tracking-[0.3em] text-[#107da8] uppercase mt-3 block">
             Precision Longevity Suite
           </span>
         </motion.div>
@@ -79,7 +79,7 @@ const WelcomePage: React.FC = () => {
         </div>
         <div className="flex items-center justify-center gap-3">
           <div className="h-px w-8 bg-[#293b64]/10" />
-          <p className="text-[12px] font-black uppercase tracking-[0.4em] text-[#293b64]/20">
+          <p className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-[0.4em] text-[#293b64]/20">
             vytalix.io
           </p>
           <div className="h-px w-8 bg-[#293b64]/10" />

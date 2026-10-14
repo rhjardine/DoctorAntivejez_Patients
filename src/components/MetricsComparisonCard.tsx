@@ -30,21 +30,21 @@ const MetricsComparisonCard: React.FC<MetricsComparisonCardProps> = ({ bioAge, c
           </div>
           <div className="bg-green-50 dark:bg-green-900/30 px-3 py-1 rounded-full flex items-center gap-1 border border-green-100 dark:border-green-800">
              <TrendingDown size={14} className="text-accentGreen" />
-             <span className="text-[12px] font-black text-accentGreen uppercase">Evolución Positiva</span>
+             <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-accentGreen uppercase">Evolución Positiva</span>
           </div>
         </div>
 
         {/* Big Numbers Grid */}
         <div className="grid grid-cols-2 gap-4">
           <div className="flex flex-col">
-            <span className="text-[13px] font-bold text-textLight uppercase tracking-widest">Tu Edad Biológica</span>
+            <span className="text-[calc(13px*var(--escala-texto,1))] font-bold text-textLight uppercase tracking-widest">Tu Edad Biológica</span>
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-black text-primary">{bioAge}</span>
               <span className="text-xs font-bold text-textMedium">AÑOS</span>
             </div>
           </div>
           <div className="flex flex-col items-end">
-            <span className="text-[13px] font-bold text-textLight uppercase tracking-widest text-right">Años Rejuvenecidos</span>
+            <span className="text-[calc(13px*var(--escala-texto,1))] font-bold text-textLight uppercase tracking-widest text-right">Años Rejuvenecidos</span>
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-black text-accentGreen">+{yearsGained}</span>
               <span className="text-xs font-bold text-textMedium">EXITO</span>
@@ -73,11 +73,11 @@ const MetricsComparisonCard: React.FC<MetricsComparisonCardProps> = ({ bioAge, c
                     strokeLinecap="round"
                   />
                 </svg>
-                <span className="text-[12px] font-black">{adherence}%</span>
+                <span className="text-[calc(12px*var(--escala-texto,1))] font-black">{adherence}%</span>
              </div>
              <div>
                 <h4 className="font-bold text-sm leading-tight">Nivel de Excelencia</h4>
-                <p className="text-[12px] text-white/60 font-medium">Cumplimiento de Guía Médica</p>
+                <p className="text-[calc(12px*var(--escala-texto,1))] text-white/60 font-medium">Cumplimiento de Guía Médica</p>
              </div>
           </div>
           <Award size={24} className="text-accentYellow" fill={COLORS.AccentYellow} />

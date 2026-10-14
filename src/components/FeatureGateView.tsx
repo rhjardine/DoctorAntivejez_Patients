@@ -40,7 +40,7 @@ const FeatureGateView: React.FC<FeatureGateViewProps> = ({
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 px-6 py-3 bg-white
                    rounded-2xl border border-slate-100 shadow-sm
-                   text-[13px] font-black text-darkBlue uppercase
+                   text-[calc(13px*var(--escala-texto,1))] font-black text-darkBlue uppercase
                    tracking-widest hover:border-primary/20
                    active:scale-95 transition-all"
       >

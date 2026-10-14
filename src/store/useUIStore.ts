@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { UserPreferences, MainTab, DetailView } from '../types';
+import { UserPreferences, MainTab, DetailView, EscalaTexto } from '../types';
 
 interface UIState {
     isDrawerOpen: boolean;
@@ -15,6 +15,7 @@ interface UIState {
     togglePrivacyConsent: (isOpen?: boolean) => void;
     setMainTab: (tab: MainTab) => void;
     updatePreferences: (prefs: UserPreferences) => void;
+    setEscalaTexto: (escala: EscalaTexto) => void;
     setColorScheme: (scheme: 'auto' | 'light' | 'dark') => void;
     setLocale: (locale: 'es' | 'en') => void;
 }
@@ -28,6 +29,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
         REST: 'Bed'
     },
     colorScheme: 'auto',
+    escalaTexto: 'normal',
     locale: 'es',
 };
 
@@ -45,6 +47,9 @@ export const useUIStore = create<UIState>()(
             togglePrivacyConsent: (isOpen) => set((state) => ({ isPrivacyConsentOpen: isOpen ?? !state.isPrivacyConsentOpen })),
             setMainTab: (tab) => set({ currentMainTab: tab }),
             updatePreferences: (prefs) => set({ userPreferences: prefs }),
+            setEscalaTexto: (escala) => set((state) => ({
+                userPreferences: { ...state.userPreferences, escalaTexto: escala }
+            })),
             setColorScheme: (scheme) => set((state) => ({
                 userPreferences: { ...state.userPreferences, colorScheme: scheme }
             })),

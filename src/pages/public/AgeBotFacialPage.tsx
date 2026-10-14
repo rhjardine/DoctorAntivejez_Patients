@@ -430,7 +430,7 @@ const AgeBotFacialPage: React.FC = () => {
                     <h2 className="text-lg font-black text-[#293b64] uppercase tracking-tight">
                         {capturedImage ? "Análisis Facial" : "AgeBot Facial"}
                     </h2>
-                    <p className="text-[12px] font-bold text-slate-500 uppercase tracking-widest">Inteligencia Artificial</p>
+                    <p className="text-[calc(12px*var(--escala-texto,1))] font-bold text-slate-500 uppercase tracking-widest">Inteligencia Artificial</p>
                 </div>
             </div>
 
@@ -486,10 +486,10 @@ const AgeBotFacialPage: React.FC = () => {
                                                                 <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-2 border-r-2 border-[#23bcef]" />
                                                             </div>
                                                             <div className="absolute -bottom-12 left-0 right-0 flex flex-col items-center gap-1">
-                                                                <p className="text-[12px] font-black uppercase tracking-[0.2em] text-[#107da8]">
+                                                                <p className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-[0.2em] text-[#107da8]">
                                                                     Calibración Óptica
                                                                 </p>
-                                                                <p className="text-[13px] font-medium text-white/90">
+                                                                <p className="text-[calc(13px*var(--escala-texto,1))] font-medium text-white/90">
                                                                     Centra tu rostro
                                                                 </p>
                                                             </div>
@@ -544,12 +544,12 @@ const AgeBotFacialPage: React.FC = () => {
 
                                             <button
                                                 onClick={() => setShowDiagnostics(!showDiagnostics)}
-                                                className="mt-8 text-[12px] uppercase tracking-widest text-slate-500 hover:text-[#293b64] transition-opacity">
+                                                className="mt-8 text-[calc(12px*var(--escala-texto,1))] uppercase tracking-widest text-slate-500 hover:text-[#293b64] transition-opacity">
                                                 {showDiagnostics ? 'Ocultar diagnóstico' : 'Ver diagnóstico'}
                                             </button>
 
                                             {showDiagnostics && (
-                                                <div className="mt-4 p-3 rounded-lg bg-slate-100 text-[12px] text-left font-mono break-all text-slate-500">
+                                                <div className="mt-4 p-3 rounded-lg bg-slate-100 text-[calc(12px*var(--escala-texto,1))] text-left font-mono break-all text-slate-500">
                                                     <p>Secure: {window.isSecureContext ? 'YES' : 'NO'}</p>
                                                     <p>Device: {navigator.mediaDevices ? 'YES' : 'NO'}</p>
                                                     <p>Error: {errorMsg}</p>
@@ -622,7 +622,7 @@ const AgeBotFacialPage: React.FC = () => {
                                     initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5, type: 'spring' }}
                                     className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#10B981] whitespace-nowrap shadow-lg">
                                     <CheckCircle size={14} className="text-white" />
-                                    <span className="text-[12px] font-black uppercase tracking-widest text-white leading-none">Análisis Exitoso</span>
+                                    <span className="text-[calc(12px*var(--escala-texto,1))] font-black uppercase tracking-widest text-white leading-none">Análisis Exitoso</span>
                                 </motion.div>
                             </div>
 
@@ -630,7 +630,7 @@ const AgeBotFacialPage: React.FC = () => {
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
                                 className="w-full max-w-sm rounded-[2.5rem] p-8 mb-6 text-center bg-white/90 backdrop-blur-sm border border-slate-200 shadow-xl shadow-slate-200/50">
-                                <p className="text-[13px] uppercase tracking-[0.2em] font-black mb-3 text-slate-500">
+                                <p className="text-[calc(13px*var(--escala-texto,1))] uppercase tracking-[0.2em] font-black mb-3 text-slate-500">
                                     Tu {VITALITY_LABELS.age_result}
                                 </p>
                                 <p className="text-7xl font-black mb-2 text-[#293b64] tracking-tighter">
@@ -638,11 +638,11 @@ const AgeBotFacialPage: React.FC = () => {
                                     <span className="text-2xl ml-1 text-slate-500">años</span>
                                 </p>
                                 <div className="inline-block mt-2 mb-6 rounded-full px-4 py-1.5 bg-slate-100">
-                                    <p className="text-[12px] font-bold uppercase tracking-widest text-[#107da8]">IA de Precisión</p>
+                                    <p className="text-[calc(12px*var(--escala-texto,1))] font-bold uppercase tracking-widest text-[#107da8]">IA de Precisión</p>
                                 </div>
                                 <div className="flex items-center justify-center gap-8 mt-2">
                                     <div className="text-center">
-                                        <p className="text-[12px] uppercase font-black tracking-widest mb-1 text-slate-500">Confianza</p>
+                                        <p className="text-[calc(12px*var(--escala-texto,1))] uppercase font-black tracking-widest mb-1 text-slate-500">Confianza</p>
                                         <p className="text-base font-black text-[#293b64] tracking-tight">
                                             {Math.round(result.confidence * 100)}%
                                         </p>
@@ -652,7 +652,7 @@ const AgeBotFacialPage: React.FC = () => {
                                         <>
                                             <div className="w-px h-8 bg-slate-200" />
                                             <div className="text-center">
-                                                <p className="text-[12px] uppercase font-black tracking-widest mb-1 text-slate-500">Marcadores</p>
+                                                <p className="text-[calc(12px*var(--escala-texto,1))] uppercase font-black tracking-widest mb-1 text-slate-500">Marcadores</p>
                                                 <p className="text-base font-black text-[#293b64] tracking-tight">{result.analysisPoints}</p>
                                             </div>
                                         </>
@@ -671,11 +671,11 @@ const AgeBotFacialPage: React.FC = () => {
                                 className="w-full max-w-sm flex flex-col gap-3">
                                 <button
                                     onClick={handleFinalCTA}
-                                    className="w-full py-5 bg-gradient-to-r from-[#293b64] to-[#23bcef] text-white font-black text-[14px] flex items-center justify-center gap-2 rounded-2xl shadow-xl shadow-[#293b64]/20 transform active:scale-95 transition-all uppercase tracking-widest">
+                                    className="w-full py-5 bg-gradient-to-r from-[#293b64] to-[#23bcef] text-white font-black text-[calc(14px*var(--escala-texto,1))] flex items-center justify-center gap-2 rounded-2xl shadow-xl shadow-[#293b64]/20 transform active:scale-95 transition-all uppercase tracking-widest">
                                     Siguiente Paso <ArrowRight size={18} strokeWidth={3} />
                                 </button>
                                 <button onClick={reset}
-                                    className="w-full font-bold text-[12px] py-4 flex items-center justify-center gap-2 text-slate-500 hover:text-[#293b64] transition-all uppercase tracking-widest bg-white rounded-xl border border-slate-200 shadow-sm">
+                                    className="w-full font-bold text-[calc(12px*var(--escala-texto,1))] py-4 flex items-center justify-center gap-2 text-slate-500 hover:text-[#293b64] transition-all uppercase tracking-widest bg-white rounded-xl border border-slate-200 shadow-sm">
                                     <RefreshCw size={12} /> Analizar otra foto
                                 </button>
                             </motion.div>

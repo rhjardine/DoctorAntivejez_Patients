@@ -107,7 +107,7 @@ const ActivityView: React.FC = () => {
                 <h4 className={`text-sm font-semibold truncate ${isDone ? 'text-[#107da8] dark:text-[#107da8]' : 'text-darkBlue dark:text-white'}`}>
                   {tool.title}
                 </h4>
-                <p className="text-[13px] text-textMedium dark:text-slate-500 mt-0.5 leading-snug line-clamp-2">
+                <p className="text-[calc(13px*var(--escala-texto,1))] text-textMedium dark:text-slate-500 mt-0.5 leading-snug line-clamp-2">
                   {isDone ? '¡Completado hoy!' : tool.desc}
                 </p>
               </div>

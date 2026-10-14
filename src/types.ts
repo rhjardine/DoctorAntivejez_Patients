@@ -96,7 +96,8 @@ export interface NutrigenomicFood {
 }
 
 export interface NutrigenomicPlan {
-  bloodType: BloodType;
+  /** `null` cuando el backend no envió el grupo sanguíneo del paciente. */
+  bloodType: BloodType | null;
   dietTypes: DietType[];
   forbidden: string[];
   foods: NutrigenomicFood[];
@@ -116,7 +117,23 @@ export interface UserPreferences {
   colorScheme?: 'auto' | 'light' | 'dark';
   /** UI language. Default: 'es' (Spanish). Only affects UI chrome, not clinical content. */
   locale?: 'es' | 'en';
+  /**
+   * Escala del texto, a elección del paciente. El médico pidió que quien ve
+   * poco pudiera agrandar la letra sin depender de nadie, y quien ve bien
+   * pudiera dejarla compacta. Por defecto 'normal'.
+   */
+  escalaTexto?: EscalaTexto;
 }
+
+/** Niveles de escala tipográfica y su multiplicador. */
+export const ESCALAS_TEXTO = {
+  compacta: 0.88,
+  normal: 1,
+  grande: 1.15,
+  maxima: 1.3,
+} as const;
+
+export type EscalaTexto = keyof typeof ESCALAS_TEXTO;
 
 
 export interface PatientGuideResponse {
