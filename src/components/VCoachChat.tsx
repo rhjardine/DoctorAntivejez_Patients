@@ -4,6 +4,7 @@ import { COLORS, ChatMessage } from '../types';
 import { Send, Bot, User, Sparkles, ShieldAlert } from 'lucide-react';
 import { sendMessageToVCoach } from '../services/geminiService';
 import { featureFlags } from '../config/featureFlags';
+import { tieneConsentimiento } from '../services/consentService';
 
 const VCoachChat: React.FC = () => {
   const [input, setInput] = useState('');
@@ -102,6 +103,29 @@ const VCoachChat: React.FC = () => {
       handleSend();
     }
   };
+
+  /**
+   * Sin consentimiento de IA generativa no se envía nada a un modelo externo.
+   *
+   * El asistente manda contexto del paciente a un proveedor de terceros; si el
+   * paciente marcó que no, la casilla tiene que significar algo. Se le explica
+   * y se le dice dónde cambiarlo, en lugar de dejar la pantalla inservible sin
+   * motivo aparente.
+   */
+  if (!tieneConsentimiento('iaGenerativa')) {
+    return (
+      <div className="flex flex-col h-full bg-[#F8FAFC] items-center justify-center px-8 text-center">
+        <div className="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center mb-4">
+          <ShieldAlert size={32} className="text-slate-500" />
+        </div>
+        <h2 className="text-lg font-black text-darkBlue mb-2">Asistente desactivado</h2>
+        <p className="text-sm font-medium text-slate-600 leading-relaxed max-w-xs">
+          No has autorizado el envío de información de tu perfil a un asistente de
+          inteligencia artificial. Puedes activarlo en Configuración cuando quieras.
+        </p>
+      </div>
+    );
+  }
 
   // 🔴 Kill switch de IA (D-17). Ver docs/RUNBOOK.md.
   if (!featureFlags.vcoach) {
