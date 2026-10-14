@@ -62,7 +62,8 @@ const MEAL_ALIASES: Record<
 };
 
 export interface NormalizedAlimentacion {
-  grupoSanguineo: 'O_B' | 'A_AB';
+  /** `null` cuando el backend no envió el grupo sanguíneo del paciente. */
+  grupoSanguineo: 'O_B' | 'A_AB' | null;
   planAlimentario: {
     desayuno: string[];
     almuerzo: string[];
@@ -411,11 +412,29 @@ export const normalizePatientProtocol = (
   return [];
 };
 
-const normalizeBloodGroup = (value: unknown): 'O_B' | 'A_AB' => {
+/**
+ * Clasifica el grupo sanguíneo en los dos conjuntos que usa la clínica.
+ *
+ * Devuelve `null` cuando el dato no está o no se reconoce. Antes caía en
+ * `'O_B'` por defecto —`''.includes('A')` es `false`—, de modo que a un
+ * paciente sin grupo cargado se le asignaba silenciosamente la dieta de
+ * carnes rojas y lácteos de cabra. Un grupo sanguíneo no se deduce de la
+ * ausencia de datos. Ver ADR-007.
+ */
+const normalizeBloodGroup = (value: unknown): 'O_B' | 'A_AB' | null => {
   const normalized = String(value ?? '')
     .toUpperCase()
-    .replace(/\s+/g, '');
-  return normalized.includes('A') ? 'A_AB' : 'O_B';
+    .replace(/[\s+-]/g, '')
+    .replace(/RH.*$/, '')
+    .replace(/^GRUPO/, '');
+
+  // 'A_AB' y 'O_B' son la salida de esta misma función: el perfil se normaliza
+  // una vez en protocolService y otra al construir el plan, así que la función
+  // tiene que reconocer su propio resultado o lo descartaría en la segunda
+  // pasada, dejando sin grupo a un paciente que sí lo tiene.
+  if (normalized === 'A' || normalized === 'AB' || normalized === 'A_AB') return 'A_AB';
+  if (normalized === 'O' || normalized === 'B' || normalized === 'O_B') return 'O_B';
+  return null;
 };
 
 const normalizeMealList = (...values: unknown[]): string[] => {
@@ -451,17 +470,17 @@ export const normalizeAlimentacion = (
     asRecord(source.plan) ??
     asRecord(source.meals) ??
     {};
-  const defaults =
-    normalizeBloodGroup(
-      pickFirst(
-        source.grupoSanguineo,
-        source.bloodGroup,
-        source.bloodType,
-        profileRecord.bloodType,
-      ),
-    ) === 'A_AB'
-      ? DEFAULTS_A_AB
-      : DEFAULTS_O_B;
+  // Sin listas por defecto: lo que el médico no prescribió no se pinta. Antes
+  // `DEFAULTS_A_AB` / `DEFAULTS_O_B` rellenaban las comidas ausentes y el
+  // paciente las leía como indicación suya. Ver ADR-007.
+  const grupoSanguineo = normalizeBloodGroup(
+    pickFirst(
+      source.grupoSanguineo,
+      source.bloodGroup,
+      source.bloodType,
+      profileRecord.bloodType,
+    ),
+  );
 
   const planAlimentario: NormalizedAlimentacion['planAlimentario'] = {
     desayuno: normalizeMealList(
@@ -469,14 +488,12 @@ export const normalizeAlimentacion = (
       plan.breakfast,
       source.desayuno,
       source.breakfast,
-      defaults.desayuno,
     ),
     almuerzo: normalizeMealList(
       plan.almuerzo,
       plan.lunch,
       source.almuerzo,
       source.lunch,
-      defaults.almuerzo,
     ),
     cenaComunes: normalizeMealList(
       plan.cenaComunes,
@@ -485,14 +502,12 @@ export const normalizeAlimentacion = (
       source.cenaComunes,
       source.cena,
       source.dinner,
-      defaults.cena.comunes,
     ),
     meriendas: normalizeMealList(
       plan.meriendas,
       plan.snacks,
       source.meriendas,
       source.snacks,
-      DEFAULTS_COMUNES.meriendas,
     ),
   };
 
@@ -523,14 +538,7 @@ export const normalizeAlimentacion = (
 
   return {
     ...source,
-    grupoSanguineo: normalizeBloodGroup(
-      pickFirst(
-        source.grupoSanguineo,
-        source.bloodGroup,
-        source.bloodType,
-        profileRecord.bloodType,
-      ),
-    ),
+    grupoSanguineo,
     planAlimentario,
     alimentosEvitar:
       normalizeMealList(
@@ -538,13 +546,13 @@ export const normalizeAlimentacion = (
         source.forbidden,
         source.avoidFoods,
         latestFoodPlan?.forbidden,
-      ).join('\n') || DEFAULTS_COMUNES.alimentosEvitar.join('\n'),
+      ).join('\n'),
     sustitutos:
       normalizeMealList(
         source.sustitutos,
         source.substitutes,
         source.replacements,
-      ).join('\n') || DEFAULTS_COMUNES.sustitutos.join('\n'),
+      ).join('\n'),
     claves5a: Array.isArray(source.claves5a)
       ? source.claves5a
       : DEFAULTS_COMUNES.claves5a,
@@ -591,6 +599,17 @@ export const buildNutrigenomicPlan = (
   const alimentacion = normalizeAlimentacion(profile);
   if (!alimentacion) return null;
 
+  /**
+   * Sin nada prescrito no hay plan que mostrar: devolver `null` hace que la
+   * pantalla muestre su aviso de «no hay un plan configurado por el médico»,
+   * que es la verdad. Antes se construía un plan con listas por defecto y
+   * `isDemoTemplate: false`, indistinguible de una prescripción real.
+   */
+  const { desayuno, almuerzo, cenaComunes, meriendas } = alimentacion.planAlimentario;
+  const sinComidas = [desayuno, almuerzo, cenaComunes, meriendas].every((c) => c.length === 0);
+  const sinRestricciones = !alimentacion.alimentosEvitar?.trim();
+  if (sinComidas && sinRestricciones) return null;
+
   const foods: NutrigenomicFood[] = [];
   const pushFoods = (
     items: string[],
@@ -618,7 +637,14 @@ export const buildNutrigenomicPlan = (
   if (dietTypes.length === 0) dietTypes.push('STANDARD');
 
   return {
-    bloodType: alimentacion.grupoSanguineo === 'A_AB' ? 'A' : 'O',
+    // `null` cuando el backend no envió el grupo: la pantalla omite el dato en
+    // lugar de afirmar uno.
+    bloodType:
+      alimentacion.grupoSanguineo === null
+        ? null
+        : alimentacion.grupoSanguineo === 'A_AB'
+          ? 'A'
+          : 'O',
     dietTypes,
     forbidden: asArray<string>(alimentacion.alimentosEvitar),
     foods,

@@ -96,7 +96,8 @@ export interface NutrigenomicFood {
 }
 
 export interface NutrigenomicPlan {
-  bloodType: BloodType;
+  /** `null` cuando el backend no envió el grupo sanguíneo del paciente. */
+  bloodType: BloodType | null;
   dietTypes: DietType[];
   forbidden: string[];
   foods: NutrigenomicFood[];

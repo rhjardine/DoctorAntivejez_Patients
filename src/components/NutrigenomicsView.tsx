@@ -109,8 +109,10 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
   };
 
   const derivedForbidden = useMemo(() => {
-    const effectiveBloodType = (profileData?.bloodType as BloodType) || plan?.bloodType || 'O';
-    const bloodRules = BLOOD_TYPE_RESTRICTIONS[effectiveBloodType] || [];
+    // Sin grupo sanguíneo no se aplica ninguna regla por grupo: antes caía en
+    // 'O' y el paciente recibía las restricciones de un tipo que nadie verificó.
+    const effectiveBloodType = (profileData?.bloodType as BloodType) || plan?.bloodType || null;
+    const bloodRules = effectiveBloodType ? BLOOD_TYPE_RESTRICTIONS[effectiveBloodType] || [] : [];
     return Array.from(new Set([...bloodRules, ...(plan?.forbidden || [])]));
   }, [plan, profileData]);
 
@@ -259,7 +261,7 @@ const NutrigenomicsView: React.FC<NutrigenomicsViewProps> = ({ onBack }) => {
           <div className="flex-1 min-w-0">
             <h2 className="text-[calc(17px*var(--escala-texto,1))] font-black text-white leading-tight tracking-tight truncate">Nutrición Genómica</h2>
             <span className="text-[calc(13px*var(--escala-texto,1))] font-bold text-cyan-200 leading-tight block truncate">
-              Tipo {plan.bloodType} · Enfoque {plan.dietTypes.join(' + ')}
+              {plan.bloodType ? `Tipo ${plan.bloodType} · ` : ''}Enfoque {plan.dietTypes.join(' + ')}
             </span>
           </div>
 
