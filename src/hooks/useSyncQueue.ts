@@ -1,70 +1,115 @@
 import { useEffect } from 'react';
 import { offlineQueue } from '../services/offlineQueue';
-import { tokenStore } from '../services/tokenStore';
+import apiClient from '../services/apiClient';
+import { logger } from '../utils/logger';
 
-export const useSyncQueue = () => {
-    useEffect(() => {
-        const drain = async () => {
-            try {
-                // Solo las del paciente con sesión abierta. `dequeueAll()` incluiría
-                // las de sesiones anteriores en el mismo dispositivo, y la línea de
-                // abajo las reenviaría con el token del paciente actual.
-                const pending = await offlineQueue.dequeueForCurrentPatient();
-                if (pending.length === 0) return;
+/** Intentos antes de abandonar una escritura que el servidor rechaza por su contenido. */
+const MAX_REINTENTOS = 3;
 
-                console.log(`[SyncQueue] Drain triggered. Found ${pending.length} pending items.`);
+const estadoDe = (error: unknown): number | undefined =>
+  typeof error === 'object' && error !== null && 'status' in error
+    ? (error as { status?: number }).status
+    : undefined;
 
-                for (const item of pending) {
-                    try {
-                        // Apply fresh token in real-time to avoid sending expired tokens stored offline
-                        const currentToken = tokenStore.getAccessToken();
-                        const headers = { ...item.headers };
-                        if (currentToken) {
-                            headers['Authorization'] = `Bearer ${currentToken}`;
-                        }
+/**
+ * Reproduce contra el servidor las escrituras que el paciente dejó encoladas
+ * sin conexión.
+ *
+ * Sale por `apiClient` y no por `fetch` nativo a propósito. Tras recargar la
+ * página el access token vive solo en memoria y está vacío hasta que algo
+ * dispare el ciclo de refresco; con `fetch` las peticiones salían sin
+ * `Authorization`, el servidor devolvía 401, y la cola contaba ese 401 como un
+ * reintento fallido y BORRABA el registro al tercero. `apiClient` renueva el
+ * token y repite la petición antes de que eso ocurra.
+ *
+ * Y aunque el refresco no llegue a tiempo, un 401 nunca consume reintentos: la
+ * escritura no tiene nada de malo, es la sesión la que aún no está lista.
+ */
+export const drenarCola = async (): Promise<void> => {
+  try {
+    // Solo las del paciente con sesión abierta. `dequeueAll()` incluiría las de
+    // sesiones anteriores en el mismo dispositivo, y se reenviarían con el
+    // token del paciente actual.
+    const pendientes = await offlineQueue.dequeueForCurrentPatient();
+    if (pendientes.length === 0) return;
 
-                        // Attempt to replay the write
-                        const response = await fetch(item.url, {
-                            method: item.method,
-                            headers: headers,
-                            body: item.body,
-                        });
+    for (const item of pendientes) {
+      try {
+        // `baseURL: ''` porque la URL encolada ya es absoluta: axios la
+        // concatenaría de nuevo con la base y la dejaría inservible.
+        await apiClient.request({
+          url: item.url,
+          baseURL: '',
+          method: item.method,
+          headers: item.headers,
+          data: item.body ? JSON.parse(item.body) : undefined,
+        });
+        await offlineQueue.remove(item.id!);
+      } catch (error) {
+        const status = estadoDe(error);
 
-                        if (response.ok || response.status === 409) {
-                            // 409 Conflict = already applied = safe to remove
-                            await offlineQueue.remove(item.id!);
-                        } else {
-                            // If it fails with an explicit code (e.g. 400 Bad Request, 401 Unauthorized), we increment the retry count
-                            if (item.retryCount >= 3) {
-                                // Give up after 3 attempts — remove and log
-                                await offlineQueue.remove(item.id!);
-                                console.warn('[SyncQueue] Abandoned after 3 retries:', item.url);
-                            } else {
-                                await offlineQueue.updateRetryCount(item.id!, item.retryCount + 1);
-                            }
-                        }
-                    } catch (error) {
-                        // Network failed again while draining — leave in queue and break loop to avoid pounding offline loop
-                        console.warn('[SyncQueue] Network fail while draining, will retry later.');
-                        break;
-                    }
-                }
-
-                // Prune stale entries (> 7 days old)
-                await offlineQueue.pruneExpired();
-            } catch (err) {
-                console.error('[SyncQueue] Drain execution error:', err);
-            }
-        };
-
-        // Drain on mount if online
-        if (navigator.onLine) {
-            // slight delay to let the app finish booting and fetching critical tokens
-            setTimeout(() => drain(), 2000);
+        // Ya aplicada en el servidor: retirarla es lo correcto.
+        if (status === 409) {
+          await offlineQueue.remove(item.id!);
+          continue;
         }
 
-        // Drain when coming back online
-        window.addEventListener('online', drain);
-        return () => window.removeEventListener('online', drain);
-    }, []);
+        // Sesión aún no lista. No se penaliza la escritura ni se toca la cola:
+        // se reintentará cuando el token esté disponible.
+        if (status === 401) {
+          logger.warn('[SyncQueue] Sesión no disponible todavía; la cola espera', {
+            reason: 'QUEUE_WAITING_FOR_SESSION',
+          });
+          continue;
+        }
+
+        // Sin código de estado es un fallo de red: se deja todo como está y se
+        // corta el bucle para no golpear al servidor estando sin conexión.
+        if (status === undefined) {
+          logger.warn('[SyncQueue] Red caída durante el drenado; se reintentará', {
+            reason: 'QUEUE_NETWORK_FAIL',
+          });
+          break;
+        }
+
+        // El servidor rechaza el contenido (400, 422, 500…). Eso sí se reintenta
+        // un número acotado de veces antes de abandonar.
+        if (item.retryCount >= MAX_REINTENTOS) {
+          await offlineQueue.remove(item.id!);
+          logger.warn('[SyncQueue] Escritura abandonada tras agotar reintentos', {
+            reason: 'QUEUE_GAVE_UP',
+            status,
+            intentos: item.retryCount,
+          });
+        } else {
+          await offlineQueue.updateRetryCount(item.id!, item.retryCount + 1);
+        }
+      }
+    }
+
+    // Caducan las entradas de más de 7 días.
+    await offlineQueue.pruneExpired();
+  } catch (error) {
+    logger.error('[SyncQueue] Error ejecutando el drenado', {
+      reason: 'QUEUE_DRAIN_ERROR',
+    });
+  }
+};
+
+export const useSyncQueue = () => {
+  useEffect(() => {
+    const drain = () => {
+      void drenarCola();
+    };
+
+    if (navigator.onLine) {
+      // Un respiro para que la app termine de arrancar. Ya no es crítico —
+      // apiClient resuelve el token por su cuenta— pero evita competir con las
+      // peticiones del primer render.
+      setTimeout(drain, 2000);
+    }
+
+    window.addEventListener('online', drain);
+    return () => window.removeEventListener('online', drain);
+  }, []);
 };
