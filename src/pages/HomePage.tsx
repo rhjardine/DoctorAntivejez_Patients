@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trash2, RefreshCw, Activity, Flame, MessageCircle,
-    ClipboardCheck, ChevronRight, ClipboardList
+    ClipboardCheck, ChevronRight, ClipboardList, Wrench
 } from 'lucide-react';
 import { COLORS, MainTab } from '../types';
 import { useUIStore } from '../store/useUIStore';
@@ -48,6 +48,20 @@ const HomePage: React.FC = () => {
 
     // View state for detail drill-down
     const [activeDetail, setActiveDetail] = useState<string | null>(null);
+
+    /**
+     * Clave que el paciente acaba de tocar y cuyo contenido aún se prepara.
+     *
+     * El aviso se va solo a los pocos segundos: es una respuesta al toque, no
+     * algo que haya que cerrar. Mientras tanto se puede seguir usando la
+     * pantalla, así que no es un modal.
+     */
+    const [claveEnDesarrollo, setClaveEnDesarrollo] = useState<string | null>(null);
+    useEffect(() => {
+        if (!claveEnDesarrollo) return;
+        const id = setTimeout(() => setClaveEnDesarrollo(null), 3200);
+        return () => clearTimeout(id);
+    }, [claveEnDesarrollo]);
 
     useEffect(() => {
         setActiveDetail(null);
@@ -114,26 +128,40 @@ const HomePage: React.FC = () => {
     };
 
     /**
+     * Responde al toque de una clave que todavía no tiene contenido.
+     *
+     * Se vuelve a fijar aunque ya esté puesta (primero a `null`) para que tocar
+     * dos claves seguidas reinicie la cuenta y el aviso nombre a la última.
+     */
+    const avisarEnDesarrollo = (clave: string) => {
+        setClaveEnDesarrollo(null);
+        requestAnimationFrame(() => setClaveEnDesarrollo(clave));
+    };
+
+    /**
      * Envoltorio de un círculo de la matriz.
      *
-     * `inhabilitado` lo deja sin navegación y atenuado. No se oculta: el
-     * paciente debe seguir viendo el mapa completo de las 5A aunque el
-     * contenido de una clave esté en revisión.
+     * `enPreparacion` ya no deja el círculo muerto. Antes se atenuaba, se
+     * desaturaba y se rotulaba «PRONTO» dentro del aro: tres señales para decir
+     * lo mismo, y aun así el paciente lo tocaba y no pasaba nada. Ahora responde
+     * al toque con un aviso que lo explica en palabras, y se queda solo con una
+     * atenuación leve para que siga distinguiéndose de las claves ya abiertas.
+     *
+     * Es un `button` y no un `div`: con `onClick` sobre un `div` estos círculos
+     * no se alcanzaban con el teclado ni los anunciaba el lector de pantalla.
      */
     const Satelite: React.FC<{
         onClick?: () => void;
-        inhabilitado?: boolean;
+        enPreparacion?: boolean;
         children: React.ReactNode;
-    }> = ({ onClick, inhabilitado = false, children }) => (
-        <div
-            onClick={inhabilitado ? undefined : onClick}
-            aria-disabled={inhabilitado || undefined}
-            className={`flex justify-center ${inhabilitado
-                ? 'opacity-40 grayscale cursor-default select-none'
-                : 'cursor-pointer transition-transform active:scale-95'}`}
+    }> = ({ onClick, enPreparacion = false, children }) => (
+        <button
+            type="button"
+            onClick={onClick}
+            className={`flex justify-center rounded-full cursor-pointer transition-transform active:scale-95 ${enPreparacion ? 'opacity-70' : ''}`}
         >
             {children}
-        </div>
+        </button>
     );
 
     const renderDashboardMatrix = () => {
@@ -144,7 +172,31 @@ const HomePage: React.FC = () => {
         const claveEnRevision = is5A;
 
         return (
-            <div className="flex flex-col items-center justify-center w-full px-4 relative pb-2 min-h-[320px]">
+            <div className="flex flex-col items-center justify-center w-full px-4 relative pb-1 min-h-[296px]">
+                {/* Aviso de clave en preparación.
+                    `role="status"` para que el lector de pantalla lo anuncie sin
+                    robar el foco, y posición de barra inferior para que no tape
+                    el círculo que el paciente acaba de tocar.
+
+                    El centrado va en `x` de framer-motion y no en una clase
+                    `-translate-x-1/2`: la animación escribe `transform` en línea
+                    y se comía la utilidad de Tailwind, de modo que el aviso salía
+                    desplazado a la derecha y partido en dos líneas. */}
+                {claveEnDesarrollo && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 8, x: '-50%' }}
+                        animate={{ opacity: 1, y: 0, x: '-50%' }}
+                        exit={{ opacity: 0, x: '-50%' }}
+                        role="status"
+                        className="fixed bottom-24 left-1/2 z-40 flex items-center gap-2 bg-darkBlue text-white rounded-full pl-3 pr-4 py-2 shadow-xl max-w-[88vw]"
+                    >
+                        <Wrench size={14} className="shrink-0 text-primary" />
+                        <span className="text-[calc(12px*var(--escala-texto,1))] font-bold leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
+                            {claveEnDesarrollo}: en desarrollo
+                        </span>
+                    </motion.div>
+                )}
+
                 {/* Top Row: 2 Satellites */}
                 <div className="flex justify-center gap-12 w-full px-4">
                     <Satelite onClick={() => is5A ? navigate('/nutrition') : setActiveDetail('removal')}>
@@ -157,11 +209,14 @@ const HomePage: React.FC = () => {
                             size={82}
                         />
                     </Satelite>
-                    <Satelite onClick={() => setActiveDetail('restoration')} inhabilitado={claveEnRevision}>
+                    <Satelite
+                        onClick={() => claveEnRevision ? avisarEnDesarrollo('Actividad') : setActiveDetail('restoration')}
+                        enPreparacion={claveEnRevision}
+                    >
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Actividad" : "Restauración"}
-                            centerText={is5A ? 'PRONTO' : 'FASE 4'}
+                            centerText={is5A ? '' : 'FASE 4'}
                             icon={is5A ? getIcon('ACTIVITY') : <RefreshCw size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={82}
@@ -170,7 +225,7 @@ const HomePage: React.FC = () => {
                 </div>
 
                 {/* VCoach Center Nucleus */}
-                <div className="flex justify-center z-10 py-2">
+                <div className="flex justify-center z-10 py-1">
                     <button onClick={() => navigate('/chat')} className="active:scale-90 transition-transform bg-white rounded-full p-1 shadow-2xl shadow-blue-900/20">
                         <CircularProgress
                             percentage={adherence}
@@ -184,22 +239,28 @@ const HomePage: React.FC = () => {
                 </div>
 
                 {/* Bottom Row: 3 Satellites (5A) or 2 Satellites (4R) */}
-                <div className={`flex justify-center w-full py-2 ${is5A ? 'gap-4' : 'gap-12'}`}>
-                    <Satelite onClick={() => setActiveDetail('regeneration')} inhabilitado={claveEnRevision}>
+                <div className={`flex justify-center w-full py-1 ${is5A ? 'gap-4' : 'gap-12'}`}>
+                    <Satelite
+                        onClick={() => claveEnRevision ? avisarEnDesarrollo('Actitud') : setActiveDetail('regeneration')}
+                        enPreparacion={claveEnRevision}
+                    >
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Actitud" : "Regeneración"}
-                            centerText={is5A ? 'PRONTO' : 'FASE 3'}
+                            centerText={is5A ? '' : 'FASE 3'}
                             icon={is5A ? getIcon('ATTITUDE') : <Activity size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={is5A ? 78 : 82}
                         />
                     </Satelite>
-                    <Satelite onClick={() => setActiveDetail('revitalization')} inhabilitado={claveEnRevision}>
+                    <Satelite
+                        onClick={() => claveEnRevision ? avisarEnDesarrollo('Ambiente') : setActiveDetail('revitalization')}
+                        enPreparacion={claveEnRevision}
+                    >
                         <CircularProgress
                             percentage={is5A ? adherence : 0}
                             label={is5A ? "Ambiente" : "Revitalización"}
-                            centerText={is5A ? 'PRONTO' : 'FASE 2'}
+                            centerText={is5A ? '' : 'FASE 2'}
                             icon={is5A ? getIcon('ENVIRONMENT') : <Flame size={18} />}
                             color={COLORS.PrimaryBlue}
                             size={is5A ? 78 : 82}
@@ -207,11 +268,11 @@ const HomePage: React.FC = () => {
                     </Satelite>
                     {/* The 5th Element: Asueto (Only in 5A) */}
                     {is5A && (
-                        <Satelite onClick={() => navigate('/rest')} inhabilitado={claveEnRevision}>
+                        <Satelite onClick={() => avisarEnDesarrollo('Asueto')} enPreparacion>
                             <CircularProgress
                                 percentage={0}
                                 label="Asueto"
-                                centerText="PRONTO"
+                                centerText=""
                                 icon={getIcon('REST') || <Bed size={18} />}
                                 color={COLORS.PrimaryBlue}
                                 size={78}
@@ -296,7 +357,7 @@ const HomePage: React.FC = () => {
                                 </div>
                             ) : currentMainTab === MainTab.KEYS_5A ? (
                                 <div className="flex flex-col flex-1 px-4 pb-4">
-                                    <section className="mb-4">
+                                    <section className="mb-2">
                                         {renderDashboardMatrix()}
                                     </section>
                                 </div>
@@ -309,7 +370,7 @@ const HomePage: React.FC = () => {
                                         este aviso de una línea, y el paciente puede cerrarlo:
                                         la explicación larga vive dentro de cada fase, no aquí.
                                         ========================================================= */}
-                                    <section className="mb-4">
+                                    <section className="mb-2">
                                         {renderDashboardMatrix()}
                                     </section>
                                 </div>
