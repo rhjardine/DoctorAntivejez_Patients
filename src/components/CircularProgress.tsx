@@ -15,6 +15,10 @@ interface CircularProgressProps {
    * Cuando se pasa, el círculo deja de ser un indicador de adherencia: el aro
    * usa `color` y no el semáforo. Sin esto, un círculo puramente navegativo se
    * pintaba de rojo por tener 0 %, como si algo fuera mal.
+   *
+   * La cadena vacía significa «ningún texto»: queda solo el icono, centrado, y
+   * el aro sigue sin el semáforo. Es lo que usan las claves cuyo contenido aún
+   * se está preparando, desde que dejaron de rotularse «PRONTO».
    */
   centerText?: string;
 }
@@ -59,7 +63,11 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
     return '#4CAF50'; // Verde (AccentGreen)
   };
 
-  const progressColor = (isCenter || centerText) ? color : getStatusColor();
+  // `!== undefined` y no un test de verdad: la cadena vacía también significa
+  // que este círculo no muestra adherencia, y con un test de verdad volvía a
+  // pintarse de rojo por tener 0 %.
+  const textoPropio = centerText !== undefined;
+  const progressColor = (isCenter || textoPropio) ? color : getStatusColor();
 
   // Determine icon/text color based on background
   const sobreFondoOscuro = isCenter || fillColor === COLORS.DarkBlue || fillColor === COLORS.PrimaryBlue;
@@ -122,12 +130,14 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
               backgroundColor: innerBgColor
             }}
           >
-            <div style={{ color: contentColor }} className="mb-0.5">
+            <div style={{ color: contentColor }} className={centerText === '' ? '' : 'mb-0.5'}>
               {icon}
             </div>
-            <span className="text-[calc(12px*var(--escala-texto,1))] font-bold leading-none" style={{ color: textColor }}>
-              {centerText ?? `${percentage}%`}
-            </span>
+            {centerText !== '' && (
+              <span className="text-[calc(12px*var(--escala-texto,1))] font-bold leading-none" style={{ color: textColor }}>
+                {centerText ?? `${percentage}%`}
+              </span>
+            )}
           </div>
         </div>
       </div>
