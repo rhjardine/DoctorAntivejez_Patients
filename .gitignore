@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# Resultados de herramientas (se regeneran en cada corrida)
+coverage
+.nyc_output
+playwright-report
+test-results
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

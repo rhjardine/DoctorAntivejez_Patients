@@ -31,6 +31,25 @@ import {
   type TherapyGroup,
 } from '../config/therapyGroups';
 
+/**
+ * Antigüedad del plan en palabras.
+ *
+ * Sustituye a la etiqueta «Sincronizado via Prisma»: el nombre del ORM del
+ * backend no le dice nada al paciente y menos al médico, mientras que la
+ * pregunta que ambos sí hacen —«¿esto que veo es lo último que indiqué?»—
+ * no tenía respuesta en pantalla.
+ */
+export const describirFrescura = (fetchedAt?: number): string => {
+  if (!fetchedAt) return 'Plan sin descargar';
+  const minutos = Math.floor((Date.now() - fetchedAt) / 60000);
+  if (minutos < 1) return 'Actualizado recién';
+  if (minutos < 60) return `Actualizado hace ${minutos} min`;
+  const horas = Math.floor(minutos / 60);
+  if (horas < 24) return `Actualizado hace ${horas} h`;
+  const dias = Math.floor(horas / 24);
+  return `Actualizado hace ${dias} d`;
+};
+
 interface PatientGuideViewProps {
   items: PatientProtocol[];
   loading?: boolean;
@@ -94,6 +113,17 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
   const [activeGroup, setActiveGroup] = useState<TherapyGroup>('ORAL');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNewGuideBanner, setShowNewGuideBanner] = useState(false);
+  // La etiqueta de frescura envejece sola; sin este latido se quedaría
+  // congelada en «hace 0 min» mientras el paciente sigue en la pantalla.
+  const [latido, setLatido] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setLatido((n) => n + 1), 30000);
+    return () => clearInterval(id);
+  }, []);
+  const textoFrescura = useMemo(
+    () => describirFrescura(profileData?.fetchedAt),
+    [profileData?.fetchedAt, latido],
+  );
 
   // Extracción de Edades para el Hero Section
   const bioAge = profileData?.biologicalAge || 0;
@@ -540,7 +570,7 @@ const PatientGuideView: React.FC<PatientGuideViewProps> = ({
                   className={`w-2 h-2 rounded-full ${isRefreshing ? 'bg-amber-400 animate-spin' : 'bg-primary animate-pulse'}`}
                 ></div>
                 <span className="text-[calc(12px*var(--escala-texto,1))] font-black text-slate-500 uppercase tracking-widest">
-                  Sincronizado via Prisma
+                  {isRefreshing ? 'Actualizando…' : textoFrescura}
                 </span>
               </div>
             </div>

@@ -141,7 +141,7 @@ const UniversalEntry: React.FC = () => {
             className='text-[calc(12px*var(--escala-texto,1))] font-bold uppercase tracking-widest'
             style={{ color: 'rgba(255, 255, 255, 0.48)' }}
           >
-            VITALYX - INFRAESTRUCTURA CLINICA INTELIGENTE
+            VYTALIX · INFRAESTRUCTURA CLÍNICA INTELIGENTE
           </p>
         </div>
       </div>
